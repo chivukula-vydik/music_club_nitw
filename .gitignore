@@ -1,0 +1,4 @@
+.thumbnail
+node_modules/
+.vercel/
+.env

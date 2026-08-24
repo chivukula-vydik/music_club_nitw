@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="./supabase-config.js"></script>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#1a1a1a;color:#f3f1ec;font-family:Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:#d1682e;text-decoration:none}
+  a:hover{color:#3d8dbd}
+  input,select,button,textarea{font-family:inherit}
+  ::placeholder{color:rgba(243,241,236,.35)}
+  @keyframes mcin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column">
+
+<header style="position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 28px;background:rgba(26,26,26,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(243,241,236,.1)">
+  <a href="Music Club NITW.dc.html" style="display:flex;align-items:center;gap:11px;color:#f3f1ec">
+    <img src="assets/logo.png" alt="Music Club NITW" style="width:34px;height:34px;border-radius:6px;display:block">
+    <span style="font-family:'Archivo Black',sans-serif;font-size:13.5px">MUSIC CLUB <span style="color:rgba(243,241,236,.45)">NITW</span></span>
+    <span style="padding:4px 9px;border-radius:5px;background:rgba(61,141,189,.18);color:#7cb8db;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase">Members</span>
+  </a>
+  <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="display:flex;flex-direction:column;align-items:flex-end">
+        <span style="font-size:13.5px;font-weight:600">{{ me.name }}</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.45)">{{ me.meta }}</span>
+      </div>
+      <button onClick="{{ signOut }}" style="padding:8px 14px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:rgba(243,241,236,.7);font-size:12.5px;font-weight:500;cursor:pointer" style-hover="border-color:#f3f1ec;color:#f3f1ec">Sign out</button>
+    </div>
+  </sc-if>
+</header>
+
+<sc-if value="{{ signedOut }}" hint-placeholder-val="{{ true }}">
+<main style="flex:1;display:flex;align-items:center;justify-content:center;padding:56px 24px">
+  <div style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:26px;animation:mcin .3s ease both">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <h1 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:40px;line-height:.98;letter-spacing:-.02em;text-shadow:2px 0 rgba(194,85,31,.85),-2px 0 rgba(28,107,150,.85)">MEMBER<br>LOGIN</h1>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:rgba(243,241,236,.6)">Book jam-room slots and keep your skills up to date.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;padding:26px;border:1px solid rgba(243,241,236,.14);background:#201f1e">
+        <label style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Email</span>
+          <input type="email" value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" placeholder="you@student.nitw.ac.in" autoComplete="email" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">{{ loginPassLabel }}</span>
+          <input type="password" value="{{ loginPass }}" onChange="{{ onLoginPass }}" placeholder="••••••••" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+        </label>
+        <sc-if value="{{ showAccessCode }}" hint-placeholder-val="{{ false }}">
+          <label style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Club access code</span>
+            <input type="password" value="{{ loginCode }}" onChange="{{ onLoginCode }}" placeholder="ask the tech team — needed only for first login" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+          </label>
+        </sc-if>
+      <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.5;color:#e8886a">{{ loginErr }}</span>
+      </sc-if>
+        <button onClick="{{ signIn }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">{{ loginCta }}</button>
+        <sc-if value="{{ server }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:12px;margin:4px 0">
+            <hr style="flex:1;border:none;border-top:1px solid rgba(243,241,236,.14)"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(243,241,236,.35);text-transform:uppercase;letter-spacing:.1em">or</span><hr style="flex:1;border:none;border-top:1px solid rgba(243,241,236,.14)">
+          </div>
+          <button onClick="{{ googleSignIn }}" style="padding:14px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px" style-hover="border-color:#f3f1ec">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#34A853" d="M10.53 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.77.9 7.35 2.56 10.52l7.97-5.93z"/><path fill="#FBBC05" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.93C6.51 42.62 14.62 48 24 48z"/></svg>
+            Sign in with Google
+          </button>
+        </sc-if>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;line-height:1.6;color:rgba(243,241,236,.4)">use your @student.nitw.ac.in email. First sign-in needs the club access code. You can reset your password after login. Not a member? <a href="mailto:musicclub.nitw@gmail.com">mail the tech team</a></span>
+    </div>
+  </div>
+</main>
+</sc-if>
+
+<sc-if value="{{ signedIn }}" hint-placeholder-val="{{ true }}">
+<main style="flex:1;display:flex;flex-direction:column;gap:0">
+
+  <div style="display:flex;gap:4px;padding:0 28px;border-bottom:1px solid rgba(243,241,236,.1);background:#1a1a1a">
+    <button onClick="{{ goMine }}" style="padding:15px 18px 13px;border:none;background:transparent;color:{{ mineTabColor }};border-bottom:2px solid {{ mineTabLine }};font-size:13.5px;font-weight:600;cursor:pointer">My slots</button>
+    <button onClick="{{ goJam }}" style="padding:15px 18px 13px;border:none;background:transparent;color:{{ jamTabColor }};border-bottom:2px solid {{ jamTabLine }};font-size:13.5px;font-weight:600;cursor:pointer">Jam room</button>
+    <button onClick="{{ goSkills }}" style="padding:15px 18px 13px;border:none;background:transparent;color:{{ skillsTabColor }};border-bottom:2px solid {{ skillsTabLine }};font-size:13.5px;font-weight:600;cursor:pointer">Members &amp; skills</button>
+    <button onClick="{{ goMinutes }}" style="padding:15px 18px 13px;border:none;background:transparent;color:{{ minutesTabColor }};border-bottom:2px solid {{ minutesTabLine }};font-size:13.5px;font-weight:600;cursor:pointer">Minutes</button>
+    <button onClick="{{ goProfile }}" style="padding:15px 18px 13px;border:none;background:transparent;color:{{ profileTabColor }};border-bottom:2px solid {{ profileTabLine }};font-size:13.5px;font-weight:600;cursor:pointer">My profile</button>
+  </div>
+
+  <sc-if value="{{ onMinutes }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:32px 28px 56px;display:flex;flex-direction:column;gap:24px;max-width:860px">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">Minutes of meeting</h2>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">you're on {{ myTeam }} — you see combined minutes plus your own team's</span>
+      </div>
+      <button onClick="{{ toggleMomForm }}" style="padding:12px 20px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:#f3f1ec;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Add minutes</button>
+    </div>
+
+    <sc-if value="{{ momForm }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:14px;padding:22px;border:1px solid rgba(243,241,236,.14);background:#201f1e">
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <input value="{{ momTitle }}" onChange="{{ onMomTitle }}" placeholder="Meeting title" style="flex:1;min-width:200px;padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+          <select value="{{ momAudience }}" onChange="{{ onMomAudience }}" style="padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14.5px;cursor:pointer">
+            <sc-for list="{{ audienceOptions }}" as="a" hint-placeholder-count="2">
+              <option value="{{ a }}">{{ a }}</option>
+            </sc-for>
+          </select>
+        </div>
+        <textarea value="{{ momBody }}" onChange="{{ onMomBody }}" rows="5" placeholder="one point per line…" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px;line-height:1.6;resize:vertical"></textarea>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ postMom }}" style="padding:12px 22px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Post</button>
+          <button onClick="{{ toggleMomForm }}" style="padding:12px 18px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:rgba(243,241,236,.7);font-size:14px;cursor:pointer">Cancel</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <div style="display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+      <sc-for list="{{ minutes }}" as="m" hint-placeholder-count="4">
+        <div style="background:#1a1a1a;display:flex;flex-direction:column">
+          <button onClick="{{ m.onToggle }}" style="display:flex;align-items:center;gap:16px;padding:20px 22px;border:none;background:transparent;color:#f3f1ec;cursor:pointer;font-family:inherit;text-align:left" style-hover="background:#211f1e">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45);min-width:104px">{{ m.date }}</span>
+            <span style="flex:1;font-family:'Archivo Black',sans-serif;font-size:16px;line-height:1.25">{{ m.title }}</span>
+            <span style="padding:5px 11px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;background:{{ m.audBg }};color:{{ m.audFg }}">{{ m.audience }}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:14px;color:rgba(243,241,236,.4);width:14px">{{ m.caret }}</span>
+          </button>
+          <sc-if value="{{ m.open }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:0 22px 22px 142px;display:flex;flex-direction:column;gap:10px">
+              <span style="font-size:15px;line-height:1.7;color:rgba(243,241,236,.75);white-space:pre-line;text-wrap:pretty">{{ m.body }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.4)">noted by {{ m.author }}</span>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ onMine }}" hint-placeholder-val="{{ true }}">
+  <section style="padding:32px 28px 56px;display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">My slots</h2>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">{{ myCount }} booked · edit the line-up or move an hour any time</span>
+      </div>
+      <button onClick="{{ openRequest }}" style="padding:13px 22px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Request a slot</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+        <sc-for list="{{ mySlots }}" as="s" hint-placeholder-count="1">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;padding:16px 20px;background:#1a1a1a">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:14.5px;font-weight:600">{{ s.song }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.5)">{{ s.when }}</span>
+            </div>
+            <div style="display:flex;gap:9px">
+              <button onClick="{{ s.onEdit }}" style="padding:8px 15px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.75);font-size:12.5px;cursor:pointer" style-hover="border-color:#3d8dbd;color:#f3f1ec">Edit / add people</button>
+              <button onClick="{{ s.onDrop }}" style="padding:8px 15px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.6);font-size:12.5px;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Drop</button>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ noMySlots }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:20px;background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.4)">nothing booked yet — hit “Request a slot”</div>
+        </sc-if>
+      </div>
+    </div>
+
+    <sc-if value="{{ managedDay }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:'Archivo Black',sans-serif;font-size:18px">{{ managedDay }}</span>
+        <span style="padding:4px 10px;border-radius:999px;background:rgba(61,141,189,.18);color:#7cb8db;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase">you manage</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45)">{{ managedCount }}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+        <sc-for list="{{ managedSlots }}" as="ms" hint-placeholder-count="2">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 20px;background:#1a1a1a">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <span style="font-size:14px;font-weight:600">{{ ms.song }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.5)">{{ ms.time }} · {{ ms.by }}<sc-if value="{{ ms.players }}" hint-placeholder-val="{{ false }}"> + {{ ms.players }}</sc-if></span>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ noManagedSlots }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:18px 20px;background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.4)">nothing booked yet</div>
+        </sc-if>
+      </div>
+    </div>
+    </sc-if>
+
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ onJam }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:32px 28px 56px;display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">Jam room schedule</h2>
+        <div style="display:flex;gap:8px">
+          <sc-for list="{{ weekTabs }}" as="w" hint-placeholder-count="2">
+            <button onClick="{{ w.onClick }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:9px 15px;border-radius:8px;border:1px solid {{ w.border }};background:{{ w.bg }};color:{{ w.fg }};cursor:pointer;font-family:inherit;text-align:left">
+              <span style="font-size:13px;font-weight:600">{{ w.label }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;opacity:.7">{{ w.range }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">read-only view · slots go through your day's manager</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+        <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(61,141,189,.35);border:1px solid rgba(61,141,189,.6)"></span>booked</span>
+        <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(209,104,46,.4);border:1px solid #d1682e"></span>yours</span>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto;border:1px solid rgba(243,241,236,.14)">
+      <div style="min-width:900px">
+        <div style="display:grid;grid-template-columns:78px repeat(7,1fr);background:#242322;border-bottom:1px solid rgba(243,241,236,.14)">
+          <div style="padding:11px 10px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Time</div>
+          <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
+            <div style="padding:11px 10px;display:flex;flex-direction:column;gap:3px;border-left:1px solid rgba(243,241,236,.1)">
+              <span style="font-family:'Archivo Black',sans-serif;font-size:12.5px;letter-spacing:.01em">{{ d.name }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:rgba(243,241,236,.42)">mgr: {{ d.manager }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <sc-for list="{{ grid }}" as="row" hint-placeholder-count="14">
+          <div style="display:grid;grid-template-columns:78px repeat(7,1fr);border-bottom:1px solid rgba(243,241,236,.08)">
+            <div style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.5);background:#201f1e">{{ row.time }}</div>
+            <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="7">
+              <div title="{{ c.title }}" style="min-height:46px;padding:7px 9px;border-left:1px solid rgba(243,241,236,.08);background:{{ c.bg }};display:flex;flex-direction:column;gap:2px;justify-content:center">
+                <span style="font-size:12px;font-weight:500;line-height:1.25;color:{{ c.fg }}">{{ c.song }}</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:rgba(243,241,236,.42)">{{ c.by }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+      <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
+        <div style="flex:1 1 140px;padding:16px 18px;background:#1a1a1a;display:flex;flex-direction:column;gap:5px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">{{ d.name }} manager</span>
+          <span style="font-size:14.5px;font-weight:600">{{ d.manager }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ booking }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:60;background:rgba(12,12,12,.72);display:flex;align-items:center;justify-content:center;padding:24px">
+      <div style="width:100%;max-width:440px;max-height:88vh;overflow-y:auto;padding:26px;border:1px solid rgba(243,241,236,.16);background:#201f1e;display:flex;flex-direction:column;gap:18px;animation:mcin .18s ease both">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#3d8dbd">{{ bookingWhen }}</span>
+          <span style="font-family:'Archivo Black',sans-serif;font-size:22px">{{ bookingHeading }}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45)">goes to {{ bookingManager }} to confirm</span>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Week</span>
+          <select value="{{ bookingWeek }}" onChange="{{ onBookingWeek }}" style="padding:12px 13px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14.5px;cursor:pointer">
+            <sc-for list="{{ weekOptions }}" as="w" hint-placeholder-count="2">
+              <option value="{{ w.value }}">{{ w.label }}</option>
+            </sc-for>
+          </select>
+        </label>
+        <div style="display:flex;gap:10px">
+          <label style="flex:1;display:flex;flex-direction:column;gap:8px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Day</span>
+            <select value="{{ bookingDay }}" onChange="{{ onBookingDay }}" style="padding:12px 13px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14.5px;cursor:pointer">
+              <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
+                <option value="{{ d.name }}">{{ d.name }}</option>
+              </sc-for>
+            </select>
+          </label>
+          <label style="flex:1;display:flex;flex-direction:column;gap:8px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Free hour</span>
+            <select value="{{ bookingTime }}" onChange="{{ onBookingTime }}" style="padding:12px 13px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14.5px;cursor:pointer">
+              <sc-for list="{{ freeTimes }}" as="f" hint-placeholder-count="5">
+                <option value="{{ f.value }}">{{ f.label }}</option>
+              </sc-for>
+            </select>
+          </label>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">What are you working on</span>
+          <input value="{{ bookingSong }}" onChange="{{ onBookingSong }}" placeholder="song, or 'practice session'" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+        </label>
+        <sc-if value="{{ hasClusters }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Your clusters</span>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <sc-for list="{{ myClusters }}" as="c" hint-placeholder-count="2">
+                <button onClick="{{ c.onPick }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:9px 14px;border-radius:8px;border:1px solid rgba(209,104,46,.4);background:rgba(209,104,46,.1);color:#f3d5c2;cursor:pointer;font-family:inherit;text-align:left" style-hover="border-color:#d1682e;background:rgba(209,104,46,.22)">
+                  <span style="font-size:13px;font-weight:600">{{ c.song }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:rgba(243,241,236,.45)">{{ c.roster }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Who's playing</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#d1682e">{{ bookingWithCount }}</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;padding:11px;border:1px solid rgba(243,241,236,.14);background:#171716;min-height:44px;align-items:center">
+            <span style="padding:5px 11px;border-radius:999px;background:rgba(209,104,46,.24);border:1px solid rgba(209,104,46,.5);font-size:12px;color:#f3d5c2">{{ bookingOwner }} · you</span>
+            <sc-for list="{{ bookingWith }}" as="p" hint-placeholder-count="0">
+              <button onClick="{{ p.onRemove }}" style="display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;background:rgba(61,141,189,.18);border:1px solid rgba(61,141,189,.45);font-size:12px;color:#cfe4f0;cursor:pointer;font-family:inherit">
+                <span>{{ p.name }}</span><span style="opacity:.6">×</span>
+              </button>
+            </sc-for>
+          </div>
+          <input value="{{ pickQuery }}" onChange="{{ onPickQuery }}" placeholder="add a member — search by name or skill" style="padding:11px 13px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14px">
+          <div style="display:flex;flex-wrap:wrap;gap:6px;max-height:150px;overflow-y:auto">
+            <sc-for list="{{ pickable }}" as="p" hint-placeholder-count="6">
+              <button onClick="{{ p.onAdd }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:7px 12px;border-radius:8px;border:1px solid rgba(243,241,236,.16);background:transparent;color:rgba(243,241,236,.75);cursor:pointer;font-family:inherit;text-align:left" style-hover="border-color:#3d8dbd;color:#f3f1ec">
+                <span style="font-size:12.5px;font-weight:600">{{ p.name }}</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:rgba(243,241,236,.45)">{{ p.skill }}</span>
+                <sc-if value="{{ p.load }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#e8ac86">{{ p.load }}</span></sc-if>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button onClick="{{ confirmBooking }}" style="flex:1;min-width:120px;padding:13px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:14.5px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">{{ bookingConfirm }}</button>
+          <sc-if value="{{ bookingExisting }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ dropBooking }}" style="padding:13px 18px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:rgba(243,241,236,.7);font-size:14.5px;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Drop slot</button>
+          </sc-if>
+          <button onClick="{{ cancelBooking }}" style="padding:13px 18px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:rgba(243,241,236,.7);font-size:14.5px;cursor:pointer" style-hover="border-color:#f3f1ec;color:#f3f1ec">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ onSkills }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:32px 28px 56px;display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">Members &amp; skills</h2>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">{{ shownCount }} of {{ totalCount }} members</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="search name, skill, branch…" style="padding:11px 14px;width:230px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:#201f1e;color:#f3f1ec;font-size:14px">
+        <div style="display:flex;gap:6px">
+          <sc-for list="{{ teamFilters }}" as="t" hint-placeholder-count="3">
+            <button onClick="{{ t.onClick }}" style="padding:10px 15px;border-radius:999px;border:1px solid {{ t.border }};background:{{ t.bg }};color:{{ t.fg }};font-size:12.5px;font-weight:500;cursor:pointer">{{ t.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <sc-for list="{{ skillChips }}" as="s" hint-placeholder-count="8">
+        <button onClick="{{ s.onClick }}" style="padding:8px 13px;border-radius:999px;border:1px solid {{ s.border }};background:{{ s.bg }};color:{{ s.fg }};font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer">{{ s.label }}</button>
+      </sc-for>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+      <sc-for list="{{ members }}" as="m" hint-placeholder-count="9">
+        <div style="display:flex;flex-direction:column;gap:11px;padding:22px;background:#1a1a1a;transition:background .18s" style-hover="background:#211f1e">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <span style="font-family:'Archivo Black',sans-serif;font-size:16.5px;line-height:1.2">{{ m.name }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.45)">{{ m.meta }}</span>
+            </div>
+            <span style="padding:5px 10px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;background:{{ m.teamBg }};color:{{ m.teamFg }};white-space:nowrap">{{ m.team }}</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <sc-for list="{{ m.major }}" as="s" hint-placeholder-count="2">
+              <span style="padding:5px 11px;border-radius:999px;background:rgba(209,104,46,.16);border:1px solid rgba(209,104,46,.45);font-size:12px;color:#e8ac86">{{ s }}</span>
+            </sc-for>
+            <sc-for list="{{ m.minor }}" as="s" hint-placeholder-count="1">
+              <span style="padding:5px 11px;border-radius:999px;border:1px solid rgba(243,241,236,.18);font-size:12px;color:rgba(243,241,236,.6)">{{ s }}</span>
+            </sc-for>
+          </div>
+          <span style="font-size:13.5px;line-height:1.55;color:rgba(243,241,236,.62);text-wrap:pretty">{{ m.vibe }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:rgba(243,241,236,.4)">nobody matches that — try another skill</div>
+    </sc-if>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ onProfile }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:32px 28px 56px;display:flex;flex-direction:column;gap:26px;max-width:640px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">My profile</h2>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">this is what the rest of the club sees when they're building a setlist</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;padding:24px;border:1px solid rgba(243,241,236,.14);background:#201f1e">
+      <label style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Major skill</span>
+        <input value="{{ pMajor }}" onChange="{{ onPMajor }}" placeholder="vocals, guitar, tabla…" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Minor skill</span>
+        <input value="{{ pMinor }}" onChange="{{ onPMinor }}" placeholder="bass, keys, beatbox…" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+      </label>
+      <label style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">What's your vibe</span>
+        <textarea value="{{ pVibe }}" onChange="{{ onPVibe }}" rows="3" placeholder="be descriptive — genres, songs you want to attempt…" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px;line-height:1.55;resize:vertical"></textarea>
+      </label>
+      <div style="display:flex;align-items:center;gap:14px">
+        <button onClick="{{ saveProfile }}" style="padding:13px 24px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:14.5px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Save</button>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7cb8db">{{ saveNote }}</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;padding:24px;border:1px solid rgba(243,241,236,.14);background:#201f1e">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Password</span>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <input type="password" value="{{ pwOld }}" onChange="{{ onPwOld }}" placeholder="current password" style="flex:1;min-width:150px;padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14.5px">
+        <input type="password" value="{{ pwNew }}" onChange="{{ onPwNew }}" placeholder="new password" style="flex:1;min-width:150px;padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14.5px">
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <button onClick="{{ changePassword }}" style="padding:12px 22px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:#f3f1ec;font-size:14px;font-weight:600;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Update password</button>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7cb8db">{{ pwNote }}</span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">My slots</span>
+      <div style="display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+        <sc-for list="{{ mySlots }}" as="s" hint-placeholder-count="2">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 20px;background:#1a1a1a">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:14.5px;font-weight:600">{{ s.song }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.5)">{{ s.when }}</span>
+            </div>
+            <button onClick="{{ s.onDrop }}" style="padding:8px 14px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.65);font-size:12.5px;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Drop</button>
+          </div>
+        </sc-for>
+        <sc-if value="{{ noMySlots }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:22px 20px;background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.4)">nothing booked yet — grab a slot from the grid</div>
+        </sc-if>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+</main>
+</sc-if>
+
+<footer style="padding:22px 28px;border-top:1px solid rgba(243,241,236,.1);display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center">
+  <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.35)">prototype · bookings and profile edits save in this browser only</span>
+  <a href="Music Club NITW.dc.html" style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase">← Back to the site</a>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
+const DAYS = [
+  ["Monday", "Saumitra"], ["Tuesday", "Yashaswini"], ["Wednesday", "Kaivalya Kappaganthula"],
+  ["Thursday", "Arkadeep"], ["Friday", "Divya"], ["Saturday", "Joshua"], ["Sunday", "Balla Sri Sathwik"]
+];
+const TIMES = ["9-10","10-11","11-12","12-1","1-2","2-3","3-4","4-5","5-6","6-7","7-8","8-9","9-10*","10-11*"];
+const LABEL = { "9-10":"9–10 AM","10-11":"10–11 AM","11-12":"11–12","12-1":"12–1 PM","1-2":"1–2 PM","2-3":"2–3 PM","3-4":"3–4 PM","4-5":"4–5 PM","5-6":"5–6 PM","6-7":"6–7 PM","7-8":"7–8 PM","8-9":"8–9 PM","9-10*":"9–10 PM","10-11*":"10–11 PM" };
+const SERVER = !!(typeof window !== "undefined" && window.MC_SUPABASE && window.MC_SUPABASE.url && window.MC_SUPABASE.anonKey);
+const cfg = (typeof window !== "undefined" && window.MC_SUPABASE) || {};
+const SEED = {};
+// ROSTER: [name, branch, year, team, major, minor, vibe, email]
+const ROSTER = [
+  ["Aryan Agrawal","CSE","3","Tech","","","","ap24csb0a09@student.nitw.ac.in"],
+  ["Abishek Aby","Mech","3","Core","","","","aa24meb0b02@student.nitw.ac.in"],
+  ["Divya","ECE","3","Core","","","","gd24ecb0a19@student.nitw.ac.in"],
+  ["Balla Sri Sathwik","Mech","3","Core","","","","bs24meb0a12@student.nitw.ac.in"],
+  ["Sharan Deepak","CSE","3","Core","","","","sd24csb0b67@student.nitw.ac.in"],
+  ["Saisrihan","MnC","3","Tech","","","","sk24mab0a31@student.nitw.ac.in"],
+  ["Joshua","EEE","2","Core","","","","js25eeb0b65@student.nitw.ac.in"],
+  ["Vishnu Vardhan","Mech","3","Core","","","","sv22meb0b33@student.nitw.ac.in"],
+  ["Sarah Banerjee","Civil","4","Core","","","","sb23ceb0f06@student.nitw.ac.in"],
+  ["Saumitra","ECE","3","Core","","","","sm24ecb0a53@student.nitw.ac.in"],
+  ["Anirudh","Biotech","3","Core","","","","ar24btb0a05@student.nitw.ac.in"],
+  ["Samuel","MSc Chemistry","2","Core","","","","sc25cyc1r40@student.nitw.ac.in"],
+  ["Yashaswini","MnC","3","Core","","","","ys24mab0a37@student.nitw.ac.in"],
+  ["Ayush","EEE","3","Core","","","","as24eeb0b07@student.nitw.ac.in"],
+  ["Arkadeep","IMSc Maths","4","Core","","","","as23mae0005@student.nitw.ac.in"],
+  ["Sumedha","MnC","3","Core","","","","sk24mab0a38@student.nitw.ac.in"],
+  ["Pranav","CSE (AI&DS)","3","Core + Tech","","","","pu24csb1a50@student.nitw.ac.in"],
+  ["Dhiyaneshwar","EEE","4","Core","","","","23eeb0f17@student.nitw.ac.in"],
+  ["Niyati","CSE","4","Core","","","","ng23csb0f01@student.nitw.ac.in"],
+  ["Valli","Chemical","3","Tech","","","","ss24chb0a47@student.nitw.ac.in"],
+  ["Kaivalya Kappaganthula","CSE (AI&DS)","3","Core","","","","kk24csb1a24@student.nitw.ac.in"],
+  ["Srinath","ECE (VLSI)","3","Core","","","","ss24ecb1a44@student.nitw.ac.in"],
+  ["Abhinav Madathil","Chemical","3","Tech","","","","am24chb0b01@student.nitw.ac.in"],
+  ["Mohit Kalwani","Mechanical","2","Core","","","","mk25meb0a13@student.nitw.ac.in"],
+  ["Jaeden","EEE","4","Core","","","","jf23eeb0f07@student.nitw.ac.in"],
+  ["Chivukula Vydik","MnC","4","Tech","","","","cv23mab0f02@student.nitw.ac.in"],
+  ["Bulusu Siddharth","ECE","3","Core","","","","bs24ecb0a13@student.nitw.ac.in"],
+  ["Adhved Sumesh","EEE","3","Core","","","","as24eeb0a01@student.nitw.ac.in"]
+];
+const CHIPS = ["Vocals","Guitar","Keyboard","Drums","Bass","Tabla","Flute","Violin","Beatbox","Hosting","Photography","Graphic design"];
+// Song clusters — fixed performance groups. Edit this list as songs get assigned.
+// Each entry: { song: "song name", members: ["Name1", "Name2", ...] }
+const CLUSTERS = [
+  { song: "Tera Ban Jaunga", members: ["Saumitra", "Yashaswini", "Anirudh", "Ayush"] },
+  { song: "Kun Faya Kun", members: ["Arkadeep", "Srinath", "Divya", "Adhved Sumesh"] },
+  { song: "Pasoori", members: ["Joshua", "Samuel", "Sumedha", "Bulusu Siddharth"] },
+];
+// When a server is configured, nothing sensitive ships in the page: the roster,
+// the demo schedule and the team-restricted minutes all come from the database,
+// filtered by row-level rules before they ever reach the browser.
+
+const SEED_MOM = [];
+const KEY = "mc-portal-v1";
+const split = s => (s || "").split(",").map(x => x.trim()).filter(Boolean);
+
+class Component extends DCLogic {
+  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginCode: "", loginPass: "", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "" };
+
+  async componentDidMount() {
+    try {
+      const s = JSON.parse(localStorage.getItem(KEY) || "{}");
+      this.setState({ user: s.user || null, bookings: s.bookings || {}, profiles: s.profiles || {}, creds: s.creds || {}, moms: s.moms || [] }, () => {
+        if (s.user) this.loadProfile(s.user);
+      });
+    } catch (e) {}
+
+    try {
+      this.db = await import("./db.js");
+      this.setState({ server: this.db.serverMode });
+      if (!this.db.serverMode) return;
+      this.off = this.db.onAuthChange(() => this.pull());
+      this.unsub = await this.db.subscribe(() => this.pull());
+      await this.pull();
+    } catch (e) {
+      this.setState({ dbErr: String(e.message || e) });
+    }
+  }
+  componentWillUnmount() { if (this.off) this.off(); if (this.unsub) this.unsub(); }
+
+  // pull everything the signed-in member is allowed to see
+  async pull() {
+    if (!this.db || !this.db.serverMode) return;
+    const account = await this.db.currentUser();
+    if (!account) return this.setState({ user: null, account: null });
+    try {
+      const d = await this.db.load();
+      // RLS returns empty members list for non-club accounts — hard block them
+      if (!d.members || !d.members.length) {
+        await this.db.signOut();
+        return this.setState({ user: null, account: null, loginErr: "You're not on the club roster. Ask the Tech team to add you." });
+      }
+      ROSTER.length = 0; ROSTER.push(...d.members);
+      const name = d.members.map(r => r[0]).find(n => n === account.name) || account.name;
+      this.setState({
+        account, user: name, bookings: d.bookings, profiles: d.profiles, moms: d.minutes, dbErr: ""
+      }, () => this.loadProfile(name));
+    } catch (e) {
+      this.setState({ dbErr: String(e.message || e) });
+    }
+  }
+
+  persist(next) {
+    const s = { ...this.state, ...next };
+    try { localStorage.setItem(KEY, JSON.stringify({ user: s.user, bookings: s.bookings, profiles: s.profiles, creds: s.creds, moms: s.moms })); } catch (e) {}
+    this.setState(next);
+  }
+
+  // write a booking through to the server when configured, else keep it local
+  async writeBooking(key, rec, nextBookings) {
+    this.persist({ bookings: nextBookings });
+    if (this.db && this.db.serverMode) {
+      try { await this.db.saveBooking(key, rec); } catch (e) { this.setState({ dbErr: String(e.message || e) }); this.pull(); }
+    }
+  }
+  async hash(name, pw) {
+    const data = new TextEncoder().encode("mcnitw:" + name.toLowerCase() + ":" + pw);
+    const buf = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+  async hashCode(code) {
+    const data = new TextEncoder().encode("mcnitw:clubcode:" + code);
+    const buf = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+  matchEmail(input) {
+    const q = (input || "").trim().toLowerCase();
+    if (!q) return null;
+    const match = ROSTER.find(r => (r[7] || "").toLowerCase() === q);
+    return match ? match[0] : null;
+  }
+  teamOf(name) { return ((ROSTER.find(r => r[0] === name) || [])[3] || "Core"); }
+  canSee(aud, name) {
+    if (aud === "Combined") return true;
+    return this.teamOf(name).toLowerCase().includes(aud.toLowerCase());
+  }
+  loadProfile(name) {
+    const base = ROSTER.find(r => r[0] === name) || ["", "", "", "", "", "", ""];
+    const p = this.state.profiles[name] || {};
+    this.setState({ pMajor: p.major ?? base[4], pMinor: p.minor ?? base[5], pVibe: p.vibe ?? base[6] });
+  }
+  effective(row) {
+    const p = this.state.profiles[row[0]] || {};
+    return { major: p.major ?? row[4], minor: p.minor ?? row[5], vibe: p.vibe ?? row[6] };
+  }
+
+  key(week, day, t) { return (week ? "w" + week + "|" : "") + day + "|" + t; }
+
+  record(week, day, t) {
+    const st = this.state, k = this.key(week, day, t);
+    if (k in st.bookings) return st.bookings[k];
+    if (!week && SEED[k]) return { song: SEED[k][0], by: SEED[k][1], with: [] };
+    return null;
+  }
+
+  freeFor(week, day, keep) {
+    return TIMES.filter(t => {
+      const k = this.key(week, day, t);
+      if (keep && k === keep) return true;
+      return !this.record(week, day, t);
+    });
+  }
+
+  weekLabel(week) {
+    const now = new Date();
+    const mon = new Date(now);
+    mon.setDate(now.getDate() - ((now.getDay() + 6) % 7) + week * 7);
+    const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+    const f = d => d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+    return f(mon) + " – " + f(sun);
+  }
+
+  renderVals() {
+    const st = this.state;
+    const me = st.user;
+    const tabC = t => (st.tab === t ? "#f3f1ec" : "rgba(243,241,236,.5)");
+    const tabL = t => (st.tab === t ? "#d1682e" : "transparent");
+
+    const grid = TIMES.map(t => ({
+      time: LABEL[t],
+      cells: DAYS.map(([day]) => {
+        const rec = this.record(st.week, day, t);
+        const mine = rec && rec.by === me;
+        const withList = (rec && rec.with) || [];
+        const roll = rec ? [rec.by || "unclaimed"].concat(withList).join(", ") : "";
+        return {
+          song: rec ? rec.song : "",
+          by: rec && withList.length ? (rec.by || "unclaimed") + " +" + withList.length : roll,
+          bg: mine ? "rgba(209,104,46,.28)" : rec ? "rgba(61,141,189,.14)" : "transparent",
+          fg: mine ? "#f3d5c2" : rec ? "#cfe4f0" : "rgba(243,241,236,.25)",
+          title: (rec ? rec.song + " — " + roll : "free") + " · " + day + " " + LABEL[t]
+        };
+      })
+    }));
+
+    const mine = [];
+    [0, 1].forEach(w => DAYS.forEach(([day]) => TIMES.forEach(t => {
+      const rec = this.record(w, day, t);
+      if (rec && rec.by === me) mine.push({ key: this.key(w, day, t), week: w, day, t, rec });
+    })));
+
+    const q = st.query.trim().toLowerCase();
+    const members = ROSTER.filter(r => {
+      const e = this.effective(r);
+      if (st.team !== "All" && !r[3].toLowerCase().includes(st.team.toLowerCase())) return false;
+      if (st.chip && !((e.major + " " + e.minor).toLowerCase().includes(st.chip.toLowerCase()))) return false;
+      if (!q) return true;
+      return (r[0] + " " + r[1] + " " + r[3] + " " + e.major + " " + e.minor + " " + e.vibe).toLowerCase().includes(q);
+    }).map(r => {
+      const e = this.effective(r);
+      const tech = r[3].toLowerCase().includes("tech");
+      return {
+        name: r[0], meta: r[1] + " · year " + r[2], team: r[3],
+        teamBg: tech ? "rgba(61,141,189,.18)" : "rgba(209,104,46,.18)",
+        teamFg: tech ? "#7cb8db" : "#e8ac86",
+        major: split(e.major), minor: split(e.minor), vibe: e.vibe || "—"
+      };
+    });
+
+    return {
+      signedIn: !!me, signedOut: !me,
+      me: me ? { name: me, meta: (ROSTER.find(r => r[0] === me) || [])[1] || "member" } : { name: "", meta: "" },
+      roster: ROSTER.map(r => ({ name: r[0] })),
+      loginEmail: st.loginEmail, loginCode: st.loginCode, loginPass: st.loginPass, loginErr: st.loginErr,
+      loginPassLabel: (() => { const n = this.matchEmail(st.loginEmail); return n && st.creds[n] ? "Password" : "Set a password"; })(),
+      loginCta: (() => { const n = this.matchEmail(st.loginEmail); return n && st.creds[n] ? "Sign in" : "Set password & sign in"; })(),
+      showAccessCode: (() => { const n = this.matchEmail(st.loginEmail); return !n || !st.creds[n]; })(),
+      onLoginEmail: e => this.setState({ loginEmail: e.target.value, loginErr: "" }),
+      onLoginCode: e => this.setState({ loginCode: e.target.value, loginErr: "" }),
+      onLoginPass: e => this.setState({ loginPass: e.target.value, loginErr: "" }),
+      signIn: async () => {
+        const n = this.matchEmail(st.loginEmail);
+        const pw = st.loginPass.trim();
+        const code = st.loginCode.trim();
+        if (!n) return this.setState({ loginErr: "That email isn't on the club roster. Ask the Tech team to add you." });
+        const known = st.creds[n];
+        if (!known) {
+          if (!code) return this.setState({ loginErr: "First login needs the club access code." });
+          const expectedHash = (cfg.clubCodeHash || "");
+          if (expectedHash) {
+            const codeHash = await this.hashCode(code);
+            if (codeHash !== expectedHash) return this.setState({ loginErr: "Wrong access code. Ask the Tech team for it." });
+          }
+        }
+        if (pw.length < 6) return this.setState({ loginErr: "Password needs at least 6 characters." });
+        const h = await this.hash(n, pw);
+        if (!known) this.persist({ creds: { ...st.creds, [n]: h }, user: n, tab: "mine", loginPass: "", loginCode: "", loginErr: "", loginEmail: "" });
+        else if (h !== known) return this.setState({ loginErr: "Wrong password." });
+        else this.persist({ user: n, tab: "mine", loginPass: "", loginCode: "", loginErr: "", loginEmail: "" });
+        this.loadProfile(n);
+      },
+      server: SERVER || !!st.server, localMode: !(SERVER || st.server), dbErr: st.dbErr || "",
+      googleSignIn: () => { if (this.db) this.db.signInWithGoogle(); },
+      signOut: () => {
+        if (this.db && this.db.serverMode) this.db.signOut();
+        this.persist({ user: null, account: null, loginEmail: "", loginCode: "", loginPass: "" });
+      },
+      onMine: st.tab === "mine", onJam: st.tab === "jam", onSkills: st.tab === "skills", onProfile: st.tab === "profile", onMinutes: st.tab === "minutes",
+      goMine: () => this.setState({ tab: "mine" }), goJam: () => this.setState({ tab: "jam" }), goSkills: () => this.setState({ tab: "skills" }),
+      goMinutes: () => this.setState({ tab: "minutes" }),
+      goProfile: () => { this.setState({ tab: "profile", saveNote: "", pwNote: "" }); this.loadProfile(me); },
+      mineTabColor: tabC("mine"), mineTabLine: tabL("mine"),
+      jamTabColor: tabC("jam"), jamTabLine: tabL("jam"),
+      skillsTabColor: tabC("skills"), skillsTabLine: tabL("skills"),
+      minutesTabColor: tabC("minutes"), minutesTabLine: tabL("minutes"),
+      profileTabColor: tabC("profile"), profileTabLine: tabL("profile"),
+      myTeam: this.teamOf(me),
+      pwOld: st.pwOld, pwNew: st.pwNew, pwNote: st.pwNote,
+      onPwOld: e => this.setState({ pwOld: e.target.value, pwNote: "" }),
+      onPwNew: e => this.setState({ pwNew: e.target.value, pwNote: "" }),
+      changePassword: async () => {
+        if (st.creds[me] && (await this.hash(me, st.pwOld)) !== st.creds[me]) return this.setState({ pwNote: "current password doesn't match" });
+        if (st.pwNew.trim().length < 6) return this.setState({ pwNote: "new password needs 6+ characters" });
+        this.persist({ creds: { ...st.creds, [me]: await this.hash(me, st.pwNew.trim()) } });
+        this.setState({ pwOld: "", pwNew: "", pwNote: "password updated ✓" });
+      },
+      minutes: SEED_MOM.concat(st.moms).filter(m => this.canSee(m.audience, me))
+        .sort((a, b) => (a.date < b.date ? 1 : -1))
+        .map(m => {
+          const open = st.momOpen === m.id;
+          return {
+            id: m.id, title: m.title, author: m.author, audience: m.audience,
+            date: new Date(m.date + "T00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }),
+            audBg: m.audience === "Tech" ? "rgba(61,141,189,.18)" : m.audience === "Core" ? "rgba(209,104,46,.18)" : "rgba(243,241,236,.1)",
+            audFg: m.audience === "Tech" ? "#7cb8db" : m.audience === "Core" ? "#e8ac86" : "rgba(243,241,236,.7)",
+            open, body: m.body, caret: open ? "−" : "+",
+            onToggle: () => this.setState({ momOpen: open ? null : m.id })
+          };
+        }),
+      momForm: st.momForm, momTitle: st.momTitle, momBody: st.momBody, momAudience: st.momAudience,
+      audienceOptions: ["Combined"].concat(this.teamOf(me).split("+").map(x => x.trim()).filter(x => /core|tech/i.test(x)).map(x => x[0].toUpperCase() + x.slice(1).toLowerCase())),
+      toggleMomForm: () => this.setState({ momForm: !st.momForm, momTitle: "", momBody: "", momAudience: "Combined" }),
+      onMomTitle: e => this.setState({ momTitle: e.target.value }),
+      onMomBody: e => this.setState({ momBody: e.target.value }),
+      onMomAudience: e => this.setState({ momAudience: e.target.value }),
+      postMom: () => {
+        if (!st.momTitle.trim() || !st.momBody.trim()) return;
+        const entry = { id: "u" + Date.now(), date: new Date().toISOString().slice(0, 10), title: st.momTitle.trim(), audience: st.momAudience, author: me, body: st.momBody.trim() };
+        this.persist({ moms: st.moms.concat([entry]) });
+        this.setState({ momForm: false, momTitle: "", momBody: "", momOpen: entry.id });
+        if (this.db && this.db.serverMode) {
+          this.db.addMinutes(entry).then(() => this.pull()).catch(e => this.setState({ dbErr: String(e.message || e) }));
+        }
+      },
+      days: DAYS.map(([name, manager]) => ({ name, manager })),
+      grid, myCount: mine.length,
+      booking: !!st.booking, bookingSong: st.bookingSong,
+      bookingWhen: st.booking && st.booking.existing ? st.booking.label : "Request",
+      bookingDay: st.booking ? st.booking.day : DAYS[0][0],
+      bookingTime: st.booking ? st.booking.t : TIMES[0],
+      bookingManager: (DAYS.find(d => d[0] === (st.booking ? st.booking.day : "")) || DAYS[0])[1],
+      freeTimes: (st.booking ? this.freeFor(st.booking.week || 0, st.booking.day, st.booking.origin) : TIMES).map(t => ({ value: t, label: LABEL[t] })),
+      bookingWeek: st.booking ? String(st.booking.week || 0) : "0",
+      weekOptions: [0, 1].map(w => ({ value: String(w), label: (w ? "Next week" : "This week") + " · " + this.weekLabel(w) })),
+      onBookingWeek: e => {
+        const week = Number(e.target.value);
+        const free = this.freeFor(week, st.booking.day, st.booking.origin);
+        this.setState({ booking: { ...st.booking, week, t: free.includes(st.booking.t) ? st.booking.t : free[0] } });
+      },
+      onBookingDay: e => {
+        const day = e.target.value;
+        const free = this.freeFor(st.booking.week || 0, day, st.booking && st.booking.origin);
+        this.setState({ booking: { ...st.booking, day, t: free.includes(st.booking.t) ? st.booking.t : free[0] } });
+      },
+      onBookingTime: e => this.setState({ booking: { ...st.booking, t: e.target.value } }),
+      openRequest: () => {
+        const day = DAYS[0][0];
+        this.setState({
+          booking: { week: st.week, day, t: this.freeFor(st.week, day)[0], label: "Request", existing: false },
+          bookingSong: "", bookingWith: [], pickQuery: ""
+        });
+      },
+      week: st.week,
+      weekTabs: [0, 1].map(w => ({
+        label: w ? "Next week" : "This week", range: this.weekLabel(w),
+        onClick: () => this.setState({ week: w }),
+        bg: st.week === w ? "rgba(209,104,46,.2)" : "transparent",
+        border: st.week === w ? "#d1682e" : "rgba(243,241,236,.18)",
+        fg: st.week === w ? "#f3f1ec" : "rgba(243,241,236,.55)"
+      })),
+      bookingExisting: !!(st.booking && st.booking.existing),
+      bookingHeading: st.booking && st.booking.existing ? "Your slot" : "Request a slot",
+      bookingConfirm: st.booking && st.booking.existing ? "Save changes" : "Send request",
+      bookingOwner: me || "",
+      bookingWith: st.bookingWith.map(name => ({ name, onRemove: () => this.setState({ bookingWith: st.bookingWith.filter(x => x !== name) }) })),
+      bookingWithCount: st.bookingWith.length ? st.bookingWith.length + 1 + " playing" : "just you so far",
+      pickQuery: st.pickQuery,
+      onPickQuery: e => this.setState({ pickQuery: e.target.value }),
+      pickable: (() => {
+        const pq = st.pickQuery.trim().toLowerCase();
+        const load = {};
+        for (const [k, b] of Object.entries(st.bookings)) {
+          if (b) { load[b.by] = (load[b.by] || 0) + 1; for (const p of (b.with || [])) load[p] = (load[p] || 0) + 1; }
+        }
+        return ROSTER.filter(r => {
+          if (r[0] === me || st.bookingWith.includes(r[0])) return false;
+          if (!pq) return true;
+          const e = this.effective(r);
+          return (r[0] + " " + e.major + " " + e.minor + " " + r[1] + " " + r[3]).toLowerCase().includes(pq);
+        }).slice(0, pq ? 12 : 8).map(r => ({
+          name: r[0], skill: this.effective(r).major || r[3],
+          load: load[r[0]] ? load[r[0]] + " slot" + (load[r[0]] > 1 ? "s" : "") : "",
+          onAdd: () => this.setState({ bookingWith: st.bookingWith.concat([r[0]]), pickQuery: "" })
+        }));
+      })(),
+      myClusters: CLUSTERS.filter(c => c.members.includes(me)).map(c => ({
+        song: c.song,
+        roster: c.members.filter(m => m !== me).join(", "),
+        onPick: () => this.setState({ bookingSong: c.song, bookingWith: c.members.filter(m => m !== me) })
+      })),
+      hasClusters: CLUSTERS.some(c => c.members.includes(me)),
+      onBookingSong: e => this.setState({ bookingSong: e.target.value }),
+      confirmBooking: () => {
+        const b = st.booking; if (!b) return;
+        const k = this.key(b.week || 0, b.day, b.t);
+        if (!b.t || !this.freeFor(b.week || 0, b.day, b.origin).includes(b.t)) return;
+        const next = { ...st.bookings };
+        const rec = { song: st.bookingSong.trim() || "practice session", by: me, with: st.bookingWith };
+        if (b.existing && b.origin && b.origin !== k) {
+          next[b.origin] = null;
+          this.writeBooking(b.origin, null, next);
+        }
+        next[k] = rec;
+        this.writeBooking(k, rec, next);
+        this.setState({ booking: null, bookingSong: "", bookingWith: [], pickQuery: "" });
+      },
+      dropBooking: () => {
+        const b = st.booking; if (!b) return;
+        const k = b.origin || this.key(b.week || 0, b.day, b.t);
+        this.writeBooking(k, null, { ...st.bookings, [k]: null });
+        this.setState({ booking: null, bookingSong: "", bookingWith: [], pickQuery: "" });
+      },
+      cancelBooking: () => this.setState({ booking: null, bookingSong: "", bookingWith: [], pickQuery: "" }),
+      query: st.query, onQuery: e => this.setState({ query: e.target.value }),
+      teamFilters: ["All", "Core", "Tech"].map(label => {
+        const on = st.team === label;
+        return { label, onClick: () => this.setState({ team: label }),
+          border: on ? "#d1682e" : "rgba(243,241,236,.2)", bg: on ? "rgba(209,104,46,.2)" : "transparent",
+          fg: on ? "#f3f1ec" : "rgba(243,241,236,.6)" };
+      }),
+      skillChips: CHIPS.map(label => {
+        const on = st.chip === label;
+        return { label, onClick: () => this.setState({ chip: on ? "" : label }),
+          border: on ? "#3d8dbd" : "rgba(243,241,236,.16)", bg: on ? "rgba(61,141,189,.2)" : "transparent",
+          fg: on ? "#cfe4f0" : "rgba(243,241,236,.55)" };
+      }),
+      members, shownCount: members.length, totalCount: ROSTER.length, noResults: members.length === 0,
+      pMajor: st.pMajor, pMinor: st.pMinor, pVibe: st.pVibe, saveNote: st.saveNote,
+      onPMajor: e => this.setState({ pMajor: e.target.value }),
+      onPMinor: e => this.setState({ pMinor: e.target.value }),
+      onPVibe: e => this.setState({ pVibe: e.target.value }),
+      saveProfile: async () => {
+        const p = { major: st.pMajor, minor: st.pMinor, vibe: st.pVibe };
+        this.persist({ profiles: { ...st.profiles, [me]: p } });
+        this.setState({ saveNote: "saved ✓" });
+        if (this.db && this.db.serverMode) {
+          try { await this.db.saveProfile(me, p); } catch (e) { this.setState({ saveNote: "", dbErr: String(e.message || e) }); }
+        }
+      },
+      mySlots: mine.map(({ key, week, day, t, rec }) => {
+        const when = (week ? "Next week · " : "") + day + " · " + LABEL[t];
+        return { song: rec.song, when: when + ((rec.with && rec.with.length) ? " · with " + rec.with.join(", ") : " · solo"),
+          onEdit: () => this.setState({
+            booking: { week, day, t, label: when, existing: true, origin: key },
+            bookingSong: rec.song, bookingWith: (rec.with || []).slice(), pickQuery: ""
+          }),
+          onDrop: () => this.writeBooking(key, null, { ...st.bookings, [key]: null }) };
+      }),
+      noMySlots: mine.length === 0,
+      ...(() => {
+        const mgDay = DAYS.find(d => d[1] === me);
+        if (!mgDay) return { managedDay: null };
+        const dayName = mgDay[0];
+        const slots = [];
+        [0, 1].forEach(w => TIMES.forEach(t => {
+          const rec = this.record(w, dayName, t);
+          if (rec) slots.push({ time: (w ? "Next wk · " : "") + LABEL[t], song: rec.song, by: rec.by, players: (rec.with || []).length ? rec.with.join(", ") : "" });
+        }));
+        return { managedDay: dayName, managedSlots: slots, managedCount: slots.length + " booked", noManagedSlots: slots.length === 0 };
+      })()
+    };
+  }
+}
+</script>
+</body>
+</html>

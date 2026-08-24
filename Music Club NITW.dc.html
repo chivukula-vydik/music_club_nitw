@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#1a1a1a;color:#f3f1ec;font-family:Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:#d1682e;text-decoration:none}
+  a:hover{color:#3d8dbd}
+  @keyframes mcslide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @keyframes mcslideb{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+  @keyframes mceq{0%,100%{transform:scaleY(.2)}50%{transform:scaleY(1)}}
+  @keyframes mcspin{to{transform:rotate(360deg)}}
+  @keyframes mcwave{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(1)}}
+</style>
+</helmet>
+
+<div style="max-width:100%;overflow-x:hidden">
+
+<header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:12px 32px;background:rgba(26,26,26,.85);backdrop-filter:blur(14px);">
+  <a href="#top" style="display:flex;align-items:center;gap:11px;color:#f3f1ec">
+    <img src="assets/logo.png" alt="Music Club NITW" style="width:36px;height:36px;border-radius:999px;display:block">
+    <span style="font-family:'Archivo Black',sans-serif;font-size:14px;letter-spacing:.02em">MUSIC CLUB <span style="color:rgba(243,241,236,.45)">NITW</span></span>
+  </a>
+  <nav style="display:flex;align-items:center;gap:26px;font-size:13px;font-weight:500;color:rgba(243,241,236,.62)">
+    <a href="#about" style="color:inherit" style-hover="color:#f3f1ec">About</a>
+    <a href="#events" style="color:inherit" style-hover="color:#f3f1ec">Events</a>
+    <a href="#gallery" style="color:inherit" style-hover="color:#f3f1ec">Gallery</a>
+    <a href="#sponsors" style="color:inherit" style-hover="color:#f3f1ec">Sponsors</a>
+    <a href="Member Portal.dc.html" style="color:inherit" style-hover="color:#f3f1ec">Member login</a>
+    <a href="#contact" style="display:inline-flex;align-items:center;padding:9px 16px;border-radius:999px;background:#d1682e;color:#1a1a1a;font-weight:600;font-size:13px" style-hover="background:#3d8dbd">Get in touch</a>
+  </nav>
+</header>
+
+<section id="top" style="position:relative;padding:88px 32px 64px;">
+  <div style="position:absolute;inset:0;background:radial-gradient(110% 85% at 8% 0%,rgba(209,104,46,.15),transparent 58%),radial-gradient(90% 80% at 95% 25%,rgba(45,123,168,.14),transparent 60%);pointer-events:none"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:210px;display:flex;align-items:flex-end;gap:5px;padding:0 18px;opacity:.16;pointer-events:none;mask-image:linear-gradient(to top,#000,transparent);-webkit-mask-image:linear-gradient(to top,#000,transparent)"><span style="flex:1;height:18%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 0.90s ease-in-out infinite 0.00s"></span><span style="flex:1;height:27%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.86s ease-in-out infinite 0.91s"></span><span style="flex:1;height:36%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.70s ease-in-out infinite 0.39s"></span><span style="flex:1;height:45%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.54s ease-in-out infinite 1.30s"></span><span style="flex:1;height:54%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.38s ease-in-out infinite 0.78s"></span><span style="flex:1;height:63%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.22s ease-in-out infinite 0.26s"></span><span style="flex:1;height:72%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.06s ease-in-out infinite 1.17s"></span><span style="flex:1;height:81%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 0.90s ease-in-out infinite 0.65s"></span><span style="flex:1;height:90%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.86s ease-in-out infinite 0.13s"></span><span style="flex:1;height:18%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.70s ease-in-out infinite 1.04s"></span><span style="flex:1;height:27%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.54s ease-in-out infinite 0.52s"></span><span style="flex:1;height:36%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.38s ease-in-out infinite 0.00s"></span><span style="flex:1;height:45%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.22s ease-in-out infinite 0.91s"></span><span style="flex:1;height:54%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.06s ease-in-out infinite 0.39s"></span><span style="flex:1;height:63%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 0.90s ease-in-out infinite 1.30s"></span><span style="flex:1;height:72%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.86s ease-in-out infinite 0.78s"></span><span style="flex:1;height:81%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.70s ease-in-out infinite 0.26s"></span><span style="flex:1;height:90%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.54s ease-in-out infinite 1.17s"></span><span style="flex:1;height:18%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.38s ease-in-out infinite 0.65s"></span><span style="flex:1;height:27%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.22s ease-in-out infinite 0.13s"></span><span style="flex:1;height:36%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.06s ease-in-out infinite 1.04s"></span><span style="flex:1;height:45%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 0.90s ease-in-out infinite 0.52s"></span><span style="flex:1;height:54%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.86s ease-in-out infinite 0.00s"></span><span style="flex:1;height:63%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.70s ease-in-out infinite 0.91s"></span><span style="flex:1;height:72%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.54s ease-in-out infinite 0.39s"></span><span style="flex:1;height:81%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.38s ease-in-out infinite 1.30s"></span><span style="flex:1;height:90%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.22s ease-in-out infinite 0.78s"></span><span style="flex:1;height:18%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.06s ease-in-out infinite 0.26s"></span><span style="flex:1;height:27%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 0.90s ease-in-out infinite 1.17s"></span><span style="flex:1;height:36%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.86s ease-in-out infinite 0.65s"></span><span style="flex:1;height:45%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.70s ease-in-out infinite 0.13s"></span><span style="flex:1;height:54%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.54s ease-in-out infinite 1.04s"></span><span style="flex:1;height:63%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.38s ease-in-out infinite 0.52s"></span><span style="flex:1;height:72%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.22s ease-in-out infinite 0.00s"></span><span style="flex:1;height:81%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.06s ease-in-out infinite 0.91s"></span><span style="flex:1;height:90%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 0.90s ease-in-out infinite 0.39s"></span><span style="flex:1;height:18%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.86s ease-in-out infinite 1.30s"></span><span style="flex:1;height:27%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.70s ease-in-out infinite 0.78s"></span><span style="flex:1;height:36%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.54s ease-in-out infinite 0.26s"></span><span style="flex:1;height:45%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.38s ease-in-out infinite 1.17s"></span><span style="flex:1;height:54%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.22s ease-in-out infinite 0.65s"></span><span style="flex:1;height:63%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.06s ease-in-out infinite 0.13s"></span><span style="flex:1;height:72%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 0.90s ease-in-out infinite 1.04s"></span><span style="flex:1;height:81%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.86s ease-in-out infinite 0.52s"></span><span style="flex:1;height:90%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.70s ease-in-out infinite 0.00s"></span><span style="flex:1;height:18%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.54s ease-in-out infinite 0.91s"></span><span style="flex:1;height:27%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.38s ease-in-out infinite 0.39s"></span><span style="flex:1;height:36%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.22s ease-in-out infinite 1.30s"></span><span style="flex:1;height:45%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.06s ease-in-out infinite 0.78s"></span><span style="flex:1;height:54%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 0.90s ease-in-out infinite 0.26s"></span><span style="flex:1;height:63%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.86s ease-in-out infinite 1.17s"></span><span style="flex:1;height:72%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.70s ease-in-out infinite 0.65s"></span><span style="flex:1;height:81%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.54s ease-in-out infinite 0.13s"></span><span style="flex:1;height:90%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.38s ease-in-out infinite 1.04s"></span><span style="flex:1;height:18%;background:rgba(61,141,189,.5);transform-origin:bottom;animation:mcwave 1.22s ease-in-out infinite 0.52s"></span><span style="flex:1;height:27%;background:rgba(209,104,46,.55);transform-origin:bottom;animation:mcwave 1.06s ease-in-out infinite 0.00s"></span></div>
+  <div style="position:relative;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:56px;align-items:center">
+    <div style="display:flex;flex-direction:column;gap:30px">
+      <div style="display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(243,241,236,.5)">
+        <span style="display:flex;align-items:flex-end;gap:2px;height:13px">
+          <span style="width:3px;height:100%;background:#d1682e;transform-origin:bottom;animation:mceq 1.1s ease-in-out infinite"></span>
+          <span style="width:3px;height:100%;background:#3d8dbd;transform-origin:bottom;animation:mceq .8s ease-in-out infinite .2s"></span>
+          <span style="width:3px;height:100%;background:#d1682e;transform-origin:bottom;animation:mceq 1.4s ease-in-out infinite .4s"></span>
+        </span>
+        <span>NIT Warangal</span>
+        <span style="color:rgba(243,241,236,.25)">/</span>
+        <span style="color:#d1682e">#highonmusic</span>
+      </div>
+      <h1 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:clamp(48px,8.5vw,104px);line-height:.88;letter-spacing:-.03em;text-shadow:2px 0 rgba(194,85,31,.85),-2px 0 rgba(28,107,150,.85)">EVERY SHOW,<br>EVERY JAM,<br>EVERY YEAR.</h1>
+      <p style="margin:0;max-width:520px;font-size:17.5px;line-height:1.6;color:rgba(243,241,236,.72);text-wrap:pretty">
+        The student-run music club of NIT Warangal, supported by the college — two major concerts a year at Technozion and Spring Spree, plus the open mics and the jam room that's booked out most evenings.
+      </p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px">
+        <a href="#events" style="display:inline-flex;align-items:center;padding:15px 26px;border-radius:999px;background:#f3f1ec;color:#1a1a1a;font-weight:600;font-size:15px" style-hover="background:#d1682e">See what's on →</a>
+        <a href="Member Portal.dc.html" style="display:inline-flex;align-items:center;padding:15px 26px;border-radius:999px;border:1px solid rgba(243,241,236,.25);color:#f3f1ec;font-weight:600;font-size:15px" style-hover="border-color:#f3f1ec;background:rgba(243,241,236,.06)">Member login</a>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:center;align-items:center">
+      <div style="position:relative;width:100%;max-width:410px;aspect-ratio:1">
+        <div style="position:absolute;inset:0;border-radius:999px;background:repeating-radial-gradient(circle at 50% 50%,#121110 0 2px,#1e1c1b 2px 5px);box-shadow:0 34px 90px rgba(0,0,0,.6),inset 0 0 70px rgba(0,0,0,.55);animation:mcspin 14s linear infinite">
+          <img src="assets/logo.png" alt="Music Club NITW logo" style="position:absolute;inset:30%;width:40%;height:40%;border-radius:999px;object-fit:cover;border:1px solid rgba(243,241,236,.18);display:block">
+          <span style="position:absolute;top:50%;left:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:999px;background:#1a1a1a;box-shadow:0 0 0 2px rgba(243,241,236,.25)"></span>
+        </div>
+        <div style="position:absolute;inset:0;border-radius:999px;background:linear-gradient(118deg,transparent 38%,rgba(243,241,236,.07) 49%,transparent 60%);pointer-events:none"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div style="overflow:hidden;padding:16px 0;background:#d1682e;color:#1a1a1a;mask-image:linear-gradient(to right,transparent,#000 6%,#000 94%,transparent);-webkit-mask-image:linear-gradient(to right,transparent,#000 6%,#000 94%,transparent)">
+  <div style="display:flex;width:max-content;animation:mcslide 28s linear infinite">
+    <div style="display:flex;align-items:center;gap:32px;padding-right:32px;font-family:'Archivo Black',sans-serif;font-size:21px;white-space:nowrap">
+      <span>OPEN MIC · SAC LAWNS</span><span style="opacity:.45">✳</span>
+      <span>OPEN AIR · SPRING SPREE</span><span style="opacity:.45">✳</span>
+      <span>NOCTURN · TECHNOZION</span><span style="opacity:.45">✳</span>
+      <span>JAM ROOM OPEN 5–10 PM</span><span style="opacity:.45">✳</span>
+      <span>#HIGHONMUSIC</span><span style="opacity:.45">✳</span>
+      <span>OPEN MIC · SAC LAWNS</span><span style="opacity:.45">✳</span>
+      <span>OPEN AIR · SPRING SPREE</span><span style="opacity:.45">✳</span>
+      <span>NOCTURN · TECHNOZION</span><span style="opacity:.45">✳</span>
+      <span>JAM ROOM OPEN 5–10 PM</span><span style="opacity:.45">✳</span>
+      <span>#HIGHONMUSIC</span><span style="opacity:.45">✳</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:32px;padding-right:32px;font-family:'Archivo Black',sans-serif;font-size:21px;white-space:nowrap">
+      <span>OPEN MIC · SAC LAWNS</span><span style="opacity:.45">✳</span>
+      <span>OPEN AIR · SPRING SPREE</span><span style="opacity:.45">✳</span>
+      <span>NOCTURN · TECHNOZION</span><span style="opacity:.45">✳</span>
+      <span>JAM ROOM OPEN 5–10 PM</span><span style="opacity:.45">✳</span>
+      <span>#HIGHONMUSIC</span><span style="opacity:.45">✳</span>
+      <span>OPEN MIC · SAC LAWNS</span><span style="opacity:.45">✳</span>
+      <span>OPEN AIR · SPRING SPREE</span><span style="opacity:.45">✳</span>
+      <span>NOCTURN · TECHNOZION</span><span style="opacity:.45">✳</span>
+      <span>JAM ROOM OPEN 5–10 PM</span><span style="opacity:.45">✳</span>
+      <span>#HIGHONMUSIC</span><span style="opacity:.45">✳</span>
+    </div>
+  </div>
+</div>
+
+<section id="about" style="padding:92px 32px;">
+  <div style="max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:56px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:22px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#3d8dbd">01 — About</div>
+      <span style="display:block;width:100%;max-width:210px;height:11px;background:repeating-linear-gradient(to bottom,rgba(243,241,236,.16) 0 1px,transparent 1px 3px)"></span>
+      <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:clamp(30px,4.2vw,50px);line-height:1.02;letter-spacing:-.02em">A room where<br>everyone plays.</h2>
+      <p style="margin:0;font-size:16.5px;line-height:1.7;color:rgba(243,241,236,.72);text-wrap:pretty">
+        A student-run club backed by the college, with a diverse group of trained artists: vocals, western band, Indian classical and a small production setup, all working out of one jam room. If a stage at NITW has a mic on it, somebody from here has probably stood behind it.
+      </p>
+      <p style="margin:0;font-size:16.5px;line-height:1.7;color:rgba(243,241,236,.72);text-wrap:pretty">
+        NIT Warangal has grown from its 1959 beginnings as Regional Engineering College into one of India's top technical institutes — and art and culture have always been part of that education. No prior training needed to jam with us.
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;margin-top:8px;background:transparent">
+        <div style="padding:22px;background:#201f1e;border-radius:16px">
+          <div style="font-family:'Archivo Black',sans-serif;font-size:30px;color:#d1682e">4,000+</div>
+          <div style="margin-top:5px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.5)">NOCTURN footfall</div>
+        </div>
+        <div style="padding:22px;background:#201f1e;border-radius:16px">
+          <div style="font-family:'Archivo Black',sans-serif;font-size:30px;color:#d1682e">10,000</div>
+          <div style="margin-top:5px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.5)">Spring Spree footfall</div>
+        </div>
+        <div style="padding:22px;background:#201f1e;border-radius:16px">
+          <div style="font-family:'Archivo Black',sans-serif;font-size:30px;color:#d1682e">4</div>
+          <div style="margin-top:5px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.5)">Wings</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;background:transparent">
+      <sc-for list="{{ wings }}" as="w" hint-placeholder-count="4">
+        <div style="display:flex;gap:18px;align-items:baseline;padding:22px 24px;background:#201f1e;border-radius:18px;transition:background .2s" style-hover="background:#262422">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.35);min-width:20px">{{ w.no }}</span>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-family:'Archivo Black',sans-serif;font-size:18px">{{ w.name }}</span>
+            <span style="font-size:14.5px;line-height:1.6;color:rgba(243,241,236,.62)">{{ w.blurb }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<div style="padding:0 32px 20px">
+  <div style="position:relative;max-width:1180px;margin:0 auto;border-radius:22px;overflow:hidden">
+    <img src="assets/photo-band-strip.png" alt="Five members of Music Club NITW on stage" style="width:100%;display:block">
+  </div>
+</div>
+
+<section id="events" style="padding:60px 32px 92px;">
+  <div style="max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:36px">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#3d8dbd">02 — Calendar</div>
+        <span style="display:block;width:100%;max-width:210px;height:11px;background:repeating-linear-gradient(to bottom,rgba(243,241,236,.16) 0 1px,transparent 1px 3px)"></span>
+        <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:clamp(30px,4.2vw,50px);line-height:1.02;letter-spacing:-.02em">What's coming up.</h2>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(243,241,236,.35)">Side A · this semester</span>
+        <a href="#contact" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase">Add us to your fest ↗</a>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <sc-for list="{{ events }}" as="e" hint-placeholder-count="4">
+        <div style="display:grid;grid-template-columns:44px 104px 1fr auto auto;gap:22px;align-items:center;padding:22px 20px;border-radius:18px;transition:background .25s,transform .25s" style-hover="background:#201f1e;transform:translateX(6px)">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.06em;color:rgba(243,241,236,.32)">{{ e.track }}</span>
+          <div style="display:flex;flex-direction:column">
+            <span style="font-family:'Archivo Black',sans-serif;font-size:26px;line-height:1;color:#d1682e">{{ e.day }}</span>
+            <span style="margin-top:5px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.5)">{{ e.month }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-family:'Archivo Black',sans-serif;font-size:20px;line-height:1.2">{{ e.title }}</span>
+            <span style="font-size:14.5px;color:rgba(243,241,236,.6)">{{ e.where }}</span>
+          </div>
+          <span style="display:flex;align-items:flex-end;gap:3px;height:26px;width:64px">
+            <span style="flex:1;height:45%;background:rgba(209,104,46,.6);transform-origin:bottom;animation:mcwave 1.1s ease-in-out infinite"></span>
+            <span style="flex:1;height:85%;background:rgba(209,104,46,.6);transform-origin:bottom;animation:mcwave .82s ease-in-out infinite .18s"></span>
+            <span style="flex:1;height:60%;background:rgba(61,141,189,.6);transform-origin:bottom;animation:mcwave 1.35s ease-in-out infinite .34s"></span>
+            <span style="flex:1;height:100%;background:rgba(209,104,46,.6);transform-origin:bottom;animation:mcwave .96s ease-in-out infinite .5s"></span>
+            <span style="flex:1;height:35%;background:rgba(61,141,189,.6);transform-origin:bottom;animation:mcwave 1.2s ease-in-out infinite .66s"></span>
+          </span>
+          <span style="padding:6px 13px;border-radius:999px;border:1px solid rgba(243,241,236,.22);font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.7)">{{ e.kind }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{ showPastEvents }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:20px;margin-top:12px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(243,241,236,.45)">Archive</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;background:transparent">
+          <sc-for list="{{ archive }}" as="a" hint-placeholder-count="4">
+            <div style="display:flex;flex-direction:column;gap:9px;padding:24px;background:#201f1e;border-radius:18px;transition:background .2s" style-hover="background:#262422">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#3d8dbd">{{ a.year }}</span>
+              <span style="font-family:'Archivo Black',sans-serif;font-size:17px;line-height:1.25">{{ a.title }}</span>
+              <span style="font-size:14px;line-height:1.55;color:rgba(243,241,236,.58)">{{ a.note }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+</section>
+
+<section id="gallery" style="padding:92px 32px;">
+  <div style="max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:36px">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#3d8dbd">03 — Gallery</div>
+        <span style="display:block;width:100%;max-width:210px;height:11px;background:repeating-linear-gradient(to bottom,rgba(243,241,236,.16) 0 1px,transparent 1px 3px)"></span>
+        <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:clamp(30px,4.2vw,50px);line-height:1.02;letter-spacing:-.02em">On stage.</h2>
+      </div>
+      <p style="margin:0;max-width:320px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.6;color:rgba(243,241,236,.45)">shot at NOCTURN and Open Air</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));grid-auto-rows:190px;gap:14px">
+      <div style="grid-column:span 2;grid-row:span 2;position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
+        <img src="assets/photo-nocturn-neon.png" alt="NOCTURN neon sign" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
+        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">NOCTURN · Technozion</span>
+      </div>
+      <div style="position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
+        <img src="assets/photo-vocalist-blue.png" alt="Vocalist under blue stage lights" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
+        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">Open Air</span>
+      </div>
+      <div style="position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
+        <img src="assets/photo-drummer.png" alt="Drummer mid-set" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
+        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">Drums</span>
+      </div>
+      <div style="grid-row:span 2;position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
+        <img src="assets/photo-bass-keys.png" alt="Bass and keys on stage" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
+        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">Bass &amp; keys</span>
+      </div>
+      <div style="position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
+        <img src="assets/photo-guitarist-green.png" alt="Guitarist in green light" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
+        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">Guitar</span>
+      </div>
+      <div style="grid-column:span 2;grid-row:span 2;position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
+        <img src="assets/photo-mtv-mixtape.jpg" alt="The band on stage under blue light at MTV Mixtape" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
+        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">MTV Mixtape night</span>
+      </div>
+      <div style="position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
+        <img src="assets/photo-vocalist-bw.png" alt="Vocalist in a spotlight" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
+        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">Vocals in the smoke</span>
+      </div>
+      <div style="position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
+        <img src="assets/photo-bassist-green.png" alt="Bassist in smoke" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
+        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">Soundcheck</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<sc-if value="{{ showSponsors }}" hint-placeholder-val="{{ true }}">
+<section id="sponsors" style="padding:92px 32px;">
+  <div style="max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:48px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#3d8dbd">04 — Collabs</div>
+      <span style="display:block;width:100%;max-width:210px;height:11px;background:repeating-linear-gradient(to bottom,rgba(243,241,236,.16) 0 1px,transparent 1px 3px)"></span>
+      <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:clamp(30px,4.2vw,50px);line-height:1.02;letter-spacing:-.02em">Work with the club.</h2>
+      <p style="margin:0;max-width:460px;font-size:16.5px;line-height:1.7;color:rgba(243,241,236,.72);text-wrap:pretty">
+        Spring Spree draws around 10,000 people from 600 colleges, and our Technozion concert NOCTURN pulled 4,000+ on Day 0 alone. Sponsors and associates have made these events bigger every year — we want Open Air to be one of the biggest concerts in South India.
+      </p>
+      <a href="mailto:musicclub.nitw@gmail.com?subject=Collab%20with%20Music%20Club%20NITW" style="display:inline-flex;align-self:flex-start;align-items:center;padding:14px 24px;border-radius:999px;background:#f3f1ec;color:#1a1a1a;font-weight:600;font-size:15px" style-hover="background:#d1682e">Get the deck</a>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;background:transparent">
+      <sc-for list="{{ offers }}" as="o" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:8px;padding:24px;background:#201f1e;border-radius:18px">
+          <span style="font-family:'Archivo Black',sans-serif;font-size:15.5px;color:#d1682e">{{ o.title }}</span>
+          <span style="font-size:14px;line-height:1.55;color:rgba(243,241,236,.6)">{{ o.body }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="grid-column:1/-1;display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start;padding:34px;border-radius:22px;background:linear-gradient(112deg,rgba(209,104,46,.1),rgba(61,141,189,.08));margin-top:18px">
+      <span style="font-family:'Archivo Black',sans-serif;font-size:64px;line-height:.7;color:rgba(209,104,46,.7)">“</span>
+      <div style="flex:1;min-width:280px;display:flex;flex-direction:column;gap:18px">
+        <p style="margin:0;font-size:clamp(17px,2vw,21px);line-height:1.6;font-style:italic;color:rgba(243,241,236,.88);text-wrap:pretty">Music Club has been an interesting team to work with. Having worked with teams across top engineering colleges in India, I can say that this team has been professional, well versed and efficient in delivering what has been promised to us as a part of the sponsorship agreement for Music Asylum, their flagship event for Technozion '22.</p>
+        <div style="display:flex flex-direction:column">
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-family:'Archivo Black',sans-serif;font-size:15px">Harikrishna B</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#d1682e">Business Head, AskLoans · Associate of ICICI Bank Ltd.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="grid-column:1/-1;display:flex;flex-direction:column;gap:18px;margin-top:18px">
+      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:baseline;justify-content:space-between">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(243,241,236,.45)">Previous NITW sponsors</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.35)">brands that have backed our fests</span>
+      </div>
+      <div style="overflow:hidden;mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent)">
+        <div style="display:flex;width:max-content;animation:mcslide 42s linear infinite">
+          <div style="display:flex;gap:14px;padding-right:14px"><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Red Bull</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Vizag Steel</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Wipro</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Toyota</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Airtel</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Indian Oil</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Pepsi</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">SHIAMAK</span></div>
+          <div style="display:flex;gap:14px;padding-right:14px"><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Red Bull</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Vizag Steel</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Wipro</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Toyota</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Airtel</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Indian Oil</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Pepsi</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">SHIAMAK</span></div>
+        </div>
+      </div>
+      <div style="overflow:hidden;mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent)">
+        <div style="display:flex;width:max-content;animation:mcslideb 46s linear infinite">
+          <div style="display:flex;gap:14px;padding-right:14px"><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Puma</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Vodafone</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Birla A1</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Coke Studio</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">HCL</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">TVS</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Andhra Bank</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Red Bull</span></div>
+          <div style="display:flex;gap:14px;padding-right:14px"><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Puma</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Vodafone</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Birla A1</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Coke Studio</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">HCL</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">TVS</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Andhra Bank</span><span style="padding:12px 22px;border-radius:999px;background:#201f1e;font-family:'Archivo Black',sans-serif;font-size:17px;color:rgba(243,241,236,.82);white-space:nowrap">Red Bull</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+</sc-if>
+
+<div style="display:flex;align-items:center;gap:3px;height:78px;padding:0 32px;overflow:hidden;opacity:.45;mask-image:linear-gradient(to right,transparent,#000 12%,#000 88%,transparent);-webkit-mask-image:linear-gradient(to right,transparent,#000 12%,#000 88%,transparent)"><span style="flex:1;height:12%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.00s ease-in-out infinite 0.00s"></span><span style="flex:1;height:60%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.28s ease-in-out infinite 0.55s"></span><span style="flex:1;height:96%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.56s ease-in-out infinite 1.10s"></span><span style="flex:1;height:92%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.84s ease-in-out infinite 0.22s"></span><span style="flex:1;height:85%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 2.12s ease-in-out infinite 0.77s"></span><span style="flex:1;height:41%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.14s ease-in-out infinite 1.32s"></span><span style="flex:1;height:32%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.42s ease-in-out infinite 0.44s"></span><span style="flex:1;height:77%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.70s ease-in-out infinite 0.99s"></span><span style="flex:1;height:88%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.98s ease-in-out infinite 0.11s"></span><span style="flex:1;height:98%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.00s ease-in-out infinite 0.66s"></span><span style="flex:1;height:66%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.28s ease-in-out infinite 1.21s"></span><span style="flex:1;height:38%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.56s ease-in-out infinite 0.33s"></span><span style="flex:1;height:52%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.84s ease-in-out infinite 0.88s"></span><span style="flex:1;height:74%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 2.12s ease-in-out infinite 0.00s"></span><span style="flex:1;height:99%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.14s ease-in-out infinite 0.55s"></span><span style="flex:1;height:82%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.42s ease-in-out infinite 1.10s"></span><span style="flex:1;height:64%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.70s ease-in-out infinite 0.22s"></span><span style="flex:1;height:34%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.98s ease-in-out infinite 0.77s"></span><span style="flex:1;height:51%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.00s ease-in-out infinite 1.32s"></span><span style="flex:1;height:89%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.28s ease-in-out infinite 0.44s"></span><span style="flex:1;height:88%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.56s ease-in-out infinite 0.99s"></span><span style="flex:1;height:85%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.84s ease-in-out infinite 0.11s"></span><span style="flex:1;height:62%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 2.12s ease-in-out infinite 0.66s"></span><span style="flex:1;height:22%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.14s ease-in-out infinite 1.21s"></span><span style="flex:1;height:69%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.42s ease-in-out infinite 0.33s"></span><span style="flex:1;height:82%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.70s ease-in-out infinite 0.88s"></span><span style="flex:1;height:95%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.98s ease-in-out infinite 0.00s"></span><span style="flex:1;height:85%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.00s ease-in-out infinite 0.55s"></span><span style="flex:1;height:39%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.28s ease-in-out infinite 1.10s"></span><span style="flex:1;height:42%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.56s ease-in-out infinite 0.22s"></span><span style="flex:1;height:66%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.84s ease-in-out infinite 0.77s"></span><span style="flex:1;height:94%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 2.12s ease-in-out infinite 1.32s"></span><span style="flex:1;height:100%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.14s ease-in-out infinite 0.44s"></span><span style="flex:1;height:65%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.42s ease-in-out infinite 0.99s"></span><span style="flex:1;height:35%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.70s ease-in-out infinite 0.11s"></span><span style="flex:1;height:42%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.98s ease-in-out infinite 0.66s"></span><span style="flex:1;height:82%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.00s ease-in-out infinite 1.21s"></span><span style="flex:1;height:104%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.28s ease-in-out infinite 0.33s"></span><span style="flex:1;height:83%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.56s ease-in-out infinite 0.88s"></span><span style="flex:1;height:63%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.84s ease-in-out infinite 0.00s"></span><span style="flex:1;height:13%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 2.12s ease-in-out infinite 0.55s"></span><span style="flex:1;height:60%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.14s ease-in-out infinite 1.10s"></span><span style="flex:1;height:96%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.42s ease-in-out infinite 0.22s"></span><span style="flex:1;height:92%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.70s ease-in-out infinite 0.77s"></span><span style="flex:1;height:85%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.98s ease-in-out infinite 1.32s"></span><span style="flex:1;height:40%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.00s ease-in-out infinite 0.44s"></span><span style="flex:1;height:33%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.28s ease-in-out infinite 0.99s"></span><span style="flex:1;height:78%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.56s ease-in-out infinite 0.11s"></span><span style="flex:1;height:89%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.84s ease-in-out infinite 0.66s"></span><span style="flex:1;height:98%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 2.12s ease-in-out infinite 1.21s"></span><span style="flex:1;height:65%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.14s ease-in-out infinite 0.33s"></span><span style="flex:1;height:37%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.42s ease-in-out infinite 0.88s"></span><span style="flex:1;height:52%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.70s ease-in-out infinite 0.00s"></span><span style="flex:1;height:74%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.98s ease-in-out infinite 0.55s"></span><span style="flex:1;height:99%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.00s ease-in-out infinite 1.10s"></span><span style="flex:1;height:82%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.28s ease-in-out infinite 0.22s"></span><span style="flex:1;height:64%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.56s ease-in-out infinite 0.77s"></span><span style="flex:1;height:33%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.84s ease-in-out infinite 1.32s"></span><span style="flex:1;height:51%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 2.12s ease-in-out infinite 0.44s"></span><span style="flex:1;height:89%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.14s ease-in-out infinite 0.99s"></span><span style="flex:1;height:88%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.42s ease-in-out infinite 0.11s"></span><span style="flex:1;height:84%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.70s ease-in-out infinite 0.66s"></span><span style="flex:1;height:62%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.98s ease-in-out infinite 1.21s"></span><span style="flex:1;height:23%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.00s ease-in-out infinite 0.33s"></span><span style="flex:1;height:70%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.28s ease-in-out infinite 0.88s"></span><span style="flex:1;height:83%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.56s ease-in-out infinite 0.00s"></span><span style="flex:1;height:95%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.84s ease-in-out infinite 0.55s"></span><span style="flex:1;height:85%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 2.12s ease-in-out infinite 1.10s"></span><span style="flex:1;height:38%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.14s ease-in-out infinite 0.22s"></span><span style="flex:1;height:43%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.42s ease-in-out infinite 0.77s"></span><span style="flex:1;height:67%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.70s ease-in-out infinite 1.32s"></span><span style="flex:1;height:94%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.98s ease-in-out infinite 0.44s"></span><span style="flex:1;height:100%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.00s ease-in-out infinite 0.99s"></span><span style="flex:1;height:64%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.28s ease-in-out infinite 0.11s"></span><span style="flex:1;height:35%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.56s ease-in-out infinite 0.66s"></span><span style="flex:1;height:42%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.84s ease-in-out infinite 1.21s"></span><span style="flex:1;height:82%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 2.12s ease-in-out infinite 0.33s"></span><span style="flex:1;height:104%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.14s ease-in-out infinite 0.88s"></span><span style="flex:1;height:83%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.42s ease-in-out infinite 0.00s"></span><span style="flex:1;height:63%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.70s ease-in-out infinite 0.55s"></span><span style="flex:1;height:13%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.98s ease-in-out infinite 1.10s"></span><span style="flex:1;height:61%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.00s ease-in-out infinite 0.22s"></span><span style="flex:1;height:96%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.28s ease-in-out infinite 0.77s"></span><span style="flex:1;height:92%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.56s ease-in-out infinite 1.32s"></span><span style="flex:1;height:85%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.84s ease-in-out infinite 0.44s"></span><span style="flex:1;height:40%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 2.12s ease-in-out infinite 0.99s"></span><span style="flex:1;height:33%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.14s ease-in-out infinite 0.11s"></span><span style="flex:1;height:78%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.42s ease-in-out infinite 0.66s"></span><span style="flex:1;height:89%;background:rgba(61,141,189,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.70s ease-in-out infinite 1.21s"></span><span style="flex:1;height:98%;background:rgba(209,104,46,.75);border-radius:99px;transform-origin:center;animation:mcwave 1.98s ease-in-out infinite 0.33s"></span></div>
+
+<section id="contact" style="padding:88px 32px 64px">
+  <div style="max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:40px">
+    <div style="display:flex;flex-wrap:wrap;gap:36px;align-items:flex-end;justify-content:space-between">
+      <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:clamp(34px,6.5vw,80px);line-height:.94;letter-spacing:-.025em;text-shadow:2px 0 rgba(194,85,31,.85),-2px 0 rgba(28,107,150,.85)">COME PLAY<br>WITH US.</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:12px">
+        <a href="mailto:musicclub.nitw@gmail.com" style="display:inline-flex;align-items:center;padding:15px 26px;border-radius:999px;background:#d1682e;color:#1a1a1a;font-weight:600;font-size:15px" style-hover="background:#3d8dbd">Mail the club</a>
+        <a href="https://www.instagram.com/" style="display:inline-flex;align-items:center;padding:15px 26px;border-radius:999px;border:1px solid rgba(243,241,236,.25);color:#f3f1ec;font-weight:600;font-size:15px" style-hover="border-color:#f3f1ec;background:rgba(243,241,236,.06)">Instagram</a>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;background:transparent">
+      <div style="display:flex;flex-direction:column;gap:7px;padding:24px;background:#201f1e;border-radius:18px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.4)">Mail</span>
+        <a href="mailto:musicclub.nitw@gmail.com" style="font-size:15px">musicclub.nitw@gmail.com</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;padding:24px;background:#201f1e;border-radius:18px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.4)">Sponsorship</span>
+        <a href="tel:+919150172740" style="font-size:15px">Thrilok · +91 91501 72740</a>
+        <a href="tel:+916366690505" style="font-size:15px">Keshna · +91 63666 90505</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;padding:24px;background:#201f1e;border-radius:18px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.4)">Find us</span>
+        <span style="font-size:15px;color:rgba(243,241,236,.8)">Student Activity Centre, NITW</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;padding:24px;background:#201f1e;border-radius:18px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.4)">Socials</span>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:15px">
+          <a href="https://www.instagram.com/">Instagram</a>
+          <a href="https://www.youtube.com/">YouTube</a>
+          <a href="https://www.facebook.com/nitwmusicclub/">Facebook</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer style="padding:36px 32px 40px;border-top:1px solid rgba(243,241,236,.06)">
+  <div style="max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:12px">
+      <img src="assets/logo.png" alt="" style="width:32px;height:32px;border-radius:999px;display:block">
+      <span style="font-family:'Archivo Black',sans-serif;font-size:15px">MUSIC CLUB NITW</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#d1682e">#highonmusic</span>
+    </div>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.35)">National Institute of Technology, Warangal — 506004 · dates and photos are placeholders</span>
+  </div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showPastEvents&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;},&quot;showSponsors&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      showPastEvents: this.props.showPastEvents ?? true,
+      showSponsors: this.props.showSponsors ?? true,
+      wings: [
+        { no: "01", name: "Vocals", blurb: "Solo, duet and full choir — Hindi, Telugu, English." },
+        { no: "02", name: "Western band", blurb: "Guitar, bass, drums, keys. The unit that opens Pronites." },
+        { no: "03", name: "Indian classical", blurb: "Tabla, flute, violin and keys; semi-classical fusion sets." },
+        { no: "04", name: "Production", blurb: "Recording the club, mixing originals, running live sound." }
+      ],
+      events: [
+        { track: "A1", day: "29", month: "Aug", title: "Freshers' Jam", where: "Jam room, Student Activity Centre · 6 PM", kind: "Open to all" },
+        { track: "A2", day: "12", month: "Sep", title: "Open Mic — Monsoon Edition", where: "SAC lawns · 7 PM", kind: "Open mic" },
+        { track: "A3", day: "04", month: "Oct", title: "Unplugged Night", where: "Lecture Hall Complex steps · 8 PM", kind: "Gig" },
+        { track: "B1", day: "28", month: "Feb", title: "OPEN AIR — Spring Spree", where: "Our flagship concert · main stage", kind: "Flagship" }
+      ],
+      archive: [
+        { year: "2026", title: "NOCTURN — Technozion", note: "Day 0 of the tech fest: 4,000+ footfall, 1,500 at the venue at once." },
+        { year: "2026", title: "OPEN AIR — Spring Spree", note: "The club's flagship concert at South India's largest cultural fest." },
+        { year: "2025", title: "Independence Day choir", note: "40-voice choir at the main ground." },
+        { year: "2025", title: "Open mic series", note: "Eleven Fridays across the semester." }
+      ],
+      offers: [
+        { title: "Open Air · ₹80,000", body: "Title association with our flagship Spring Spree concert." },
+        { title: "NOCTURN · ₹50,000", body: "Day 0 of Technozion — 4,000+ footfall last edition." },
+        { title: "Run a workshop", body: "Production, live sound, vocal coaching." },
+        { title: "Inter-college", body: "Exchange gigs and joint competitions." }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
