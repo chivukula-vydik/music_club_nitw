@@ -68,6 +68,7 @@
         <span style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.5;color:#e8886a">{{ loginErr }}</span>
       </sc-if>
         <button onClick="{{ signIn }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">{{ loginCta }}</button>
+        <!-- ponytail: Google OAuth button hidden until provider config is fixed
         <sc-if value="{{ server }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;align-items:center;gap:12px;margin:4px 0">
             <hr style="flex:1;border:none;border-top:1px solid rgba(243,241,236,.14)"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(243,241,236,.35);text-transform:uppercase;letter-spacing:.1em">or</span><hr style="flex:1;border:none;border-top:1px solid rgba(243,241,236,.14)">
@@ -77,6 +78,7 @@
             Sign in with Google
           </button>
         </sc-if>
+        -->
         <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;line-height:1.6;color:rgba(243,241,236,.4)">use your @student.nitw.ac.in email. First sign-in needs the club access code. You can reset your password after login. Not a member? <a href="mailto:musicclub.nitw@gmail.com">mail the tech team</a></span>
     </div>
   </div>
