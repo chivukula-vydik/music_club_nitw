@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/portal", "destination": "/Member Portal.dc.html" },
+    { "source": "/", "destination": "/Music Club NITW.dc.html" }
+  ]
+}

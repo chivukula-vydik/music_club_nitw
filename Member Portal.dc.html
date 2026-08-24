@@ -553,7 +553,7 @@ class Component extends DCLogic {
         return this.setState({ user: null, account: null, loginErr: "You're not on the club roster. Ask the Tech team to add you." });
       }
       ROSTER.length = 0; ROSTER.push(...d.members);
-      const name = d.members.map(r => r[0]).find(n => n === account.name) || account.name;
+      const name = (d.members.find(r => (r[7] || "").toLowerCase() === account.email.toLowerCase()) || [])[0] || account.name;
       this.setState({
         account, user: name, bookings: d.bookings, profiles: d.profiles, moms: d.minutes, dbErr: ""
       }, () => this.loadProfile(name));
