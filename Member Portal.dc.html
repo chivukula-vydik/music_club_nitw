@@ -69,32 +69,25 @@
           <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Email</span>
           <input type="email" value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" placeholder="you@student.nitw.ac.in" autoComplete="email" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
         </label>
-        <sc-if value="{{ localMode }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ emailLogin }}" hint-placeholder-val="{{ true }}">
         <label style="display:flex;flex-direction:column;gap:8px">
           <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">{{ loginPassLabel }}</span>
           <input type="password" value="{{ loginPass }}" onChange="{{ onLoginPass }}" placeholder="••••••••" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
         </label>
-        <sc-if value="{{ otpSent }}" hint-placeholder-val="{{ false }}">
-          <label style="display:flex;flex-direction:column;gap:8px">
-            <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Email OTP</span>
-            <input inputmode="numeric" autocomplete="one-time-code" value="{{ otp }}" onChange="{{ onOtp }}" placeholder="6-digit code" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
-          </label>
-        </sc-if>
+        <label style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Email OTP</span>
+          <input inputmode="numeric" autocomplete="one-time-code" value="{{ otp }}" onChange="{{ onOtp }}" placeholder="6-digit code" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+        </label>
         </sc-if>
       <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}">
         <span style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.5;color:#e8886a">{{ loginErr }}</span>
       </sc-if>
-        <sc-if value="{{ localMode }}" hint-placeholder-val="{{ true }}">
-          <sc-if value="{{ firstLogin }}" hint-placeholder-val="{{ false }}">
-            <sc-if value="{{ otpSent }}" hint-placeholder-val="{{ false }}">
-              <button onClick="{{ verifyOtp }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Verify OTP &amp; set password</button>
-            </sc-if>
-            <sc-if value="{{ otpSent }}" hint-placeholder-val="{{ true }}">
-              <button onClick="{{ sendOtp }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Send OTP</button>
-            </sc-if>
+        <sc-if value="{{ emailLogin }}" hint-placeholder-val="{{ true }}">
+          <sc-if value="{{ showSendOtp }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ sendOtp }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Send OTP</button>
           </sc-if>
-          <sc-if value="{{ firstLogin }}" hint-placeholder-val="{{ true }}">
-            <button onClick="{{ signIn }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Sign in</button>
+          <sc-if value="{{ showVerifyOtp }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ verifyOtp }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Verify OTP &amp; set password</button>
           </sc-if>
         </sc-if>
         <sc-if value="{{ server }}" hint-placeholder-val="{{ false }}">
@@ -609,11 +602,6 @@ class Component extends DCLogic {
     const buf = await crypto.subtle.digest("SHA-256", data);
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
   }
-  async hashCode(code) {
-    const data = new TextEncoder().encode("mcnitw:clubcode:" + code);
-    const buf = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
-  }
   matchEmail(input) {
     const q = (input || "").trim().toLowerCase();
     if (!q) return null;
@@ -712,9 +700,10 @@ class Component extends DCLogic {
       roster: ROSTER.map(r => ({ name: r[0] })),
       loginEmail: st.loginEmail, loginPass: st.loginPass, otp: st.otp, loginErr: st.loginErr,
       loginPassLabel: (() => { const n = this.matchEmail(st.loginEmail); return n && st.creds[n] ? "Password" : "Set a password"; })(),
-      loginCta: (() => { const n = this.matchEmail(st.loginEmail); return n && st.creds[n] ? "Sign in" : "Set password & sign in"; })(),
-      firstLogin: (() => { const n = this.matchEmail(st.loginEmail); return !!n && !st.creds[n]; })(),
+      firstLogin: SERVER || (() => { const n = this.matchEmail(st.loginEmail); return !!n && !st.creds[n]; })(),
       otpSent: !!st.otpSent,
+      showSendOtp: !st.otpSent,
+      showVerifyOtp: !!st.otpSent,
       onLoginEmail: e => this.setState({ loginEmail: e.target.value, loginErr: "" }),
       onLoginPass: e => this.setState({ loginPass: e.target.value, loginErr: "" }),
       onOtp: e => this.setState({ otp: e.target.value.replace(/\D/g, "").slice(0, 6), loginErr: "" }),
@@ -722,10 +711,16 @@ class Component extends DCLogic {
         const email = st.loginEmail.trim().toLowerCase();
         if (!this.matchEmail(email)) return this.setState({ loginErr: "That email isn't on the club roster. Ask the Tech team to add you." });
         try {
-          const response = await fetch(new URL("./api/send-otp", window.location.href), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
-          const data = await response.json();
-          if (!response.ok) throw new Error(data.error || "Failed to send OTP");
-          this.setState({ otpToken: data.token, otpSent: true, loginErr: "OTP sent. Check your institute email." });
+          if (SERVER) {
+            const { error } = await this.db.sendEmailOtp(email);
+            if (error) throw error;
+          } else {
+            const response = await fetch(new URL("./api/send-otp", window.location.href), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || "Failed to send OTP");
+            this.setState({ otpToken: data.token });
+          }
+          this.setState({ otpSent: true, loginErr: "OTP sent. Check your institute email." });
         } catch (e) { this.setState({ loginErr: e.message || "Failed to send OTP" }); }
       },
       verifyOtp: async () => {
@@ -735,10 +730,19 @@ class Component extends DCLogic {
         if (!/^\d{6}$/.test(st.otp)) return this.setState({ loginErr: "Enter the 6-digit OTP from your email." });
         if (st.loginPass.trim().length < 6) return this.setState({ loginErr: "Password needs at least 6 characters." });
         try {
-          const response = await fetch(new URL("./api/verify-otp", window.location.href), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, otp: st.otp, token: st.otpToken }) });
-          const data = await response.json();
-          if (!response.ok || !data.verified) throw new Error(data.error || "Invalid OTP");
-          this.persist({ creds: { ...st.creds, [name]: await this.hash(name, st.loginPass.trim()) }, user: name, tab: "mine", loginPass: "", otp: "", otpToken: "", otpSent: false, loginErr: "", loginEmail: "" });
+          if (SERVER) {
+            const { error } = await this.db.verifyEmailOtp(email, st.otp);
+            if (error) throw error;
+            const { error: passwordError } = await this.db.setPassword(st.loginPass.trim());
+            if (passwordError) throw passwordError;
+            await this.pull();
+          } else {
+            const response = await fetch(new URL("./api/verify-otp", window.location.href), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, otp: st.otp, token: st.otpToken }) });
+            const data = await response.json();
+            if (!response.ok || !data.verified) throw new Error(data.error || "Invalid OTP");
+            this.persist({ creds: { ...st.creds, [name]: await this.hash(name, st.loginPass.trim()) }, user: name });
+          }
+          this.persist({ tab: "mine", loginPass: "", otp: "", otpToken: "", otpSent: false, loginErr: "", loginEmail: "" });
           this.loadProfile(name);
         } catch (e) { this.setState({ loginErr: e.message || "OTP verification failed" }); }
       },
@@ -749,12 +753,17 @@ class Component extends DCLogic {
         const known = st.creds[n];
         if (!known) return this.setState({ loginErr: "First login needs an OTP. Enter your email and request one." });
         if (pw.length < 6) return this.setState({ loginErr: "Password needs at least 6 characters." });
-        const h = await this.hash(n, pw);
-        if (h !== known) return this.setState({ loginErr: "Wrong password." });
+        if (SERVER) {
+          const { error } = await this.db.signInWithPassword(st.loginEmail.trim().toLowerCase(), pw);
+          if (error) return this.setState({ loginErr: error.message || "Wrong password." });
+        } else {
+          const h = await this.hash(n, pw);
+          if (h !== known) return this.setState({ loginErr: "Wrong password." });
+        }
         this.persist({ user: n, tab: "mine", loginPass: "", otp: "", otpToken: "", otpSent: false, loginErr: "", loginEmail: "" });
         this.loadProfile(n);
       },
-      server: SERVER || !!st.server, localMode: !(SERVER || st.server),
+      server: SERVER || !!st.server, emailLogin: true,
       storageNote: SERVER || st.server ? "prototype · bookings and profile edits save to the club database" : "prototype · bookings and profile edits save in this browser only",
       dbErr: st.dbErr || "",
       googleSignIn: () => { if (this.db) this.db.signInWithGoogle(); },

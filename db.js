@@ -48,6 +48,26 @@ export async function signInWithGoogle() {
   });
 }
 
+export async function sendEmailOtp(email) {
+  const c = await client();
+  return c.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+}
+
+export async function verifyEmailOtp(email, token) {
+  const c = await client();
+  return c.auth.verifyOtp({ email, token, type: "email" });
+}
+
+export async function setPassword(password) {
+  const c = await client();
+  return c.auth.updateUser({ password });
+}
+
+export async function signInWithPassword(email, password) {
+  const c = await client();
+  return c.auth.signInWithPassword({ email, password });
+}
+
 export async function signOut() {
   if (!serverMode) return;
   const c = await client();
