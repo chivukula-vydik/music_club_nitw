@@ -69,11 +69,11 @@
           <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Email</span>
           <input type="email" value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" placeholder="you@student.nitw.ac.in" autoComplete="email" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
         </label>
-        <sc-if value="{{ emailLogin }}" hint-placeholder-val="{{ true }}">
         <label style="display:flex;flex-direction:column;gap:8px">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">{{ loginPassLabel }}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Password</span>
           <input type="password" value="{{ loginPass }}" onChange="{{ onLoginPass }}" placeholder="••••••••" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
         </label>
+        <sc-if value="{{ setupMode }}" hint-placeholder-val="{{ false }}">
         <label style="display:flex;flex-direction:column;gap:8px">
           <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Email OTP</span>
           <input inputmode="numeric" autocomplete="one-time-code" value="{{ otp }}" onChange="{{ onOtp }}" placeholder="enter OTP from email" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
@@ -82,14 +82,18 @@
       <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}">
         <span style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.5;color:#e8886a">{{ loginErr }}</span>
       </sc-if>
-        <sc-if value="{{ emailLogin }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ signinMode }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ signIn }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Sign in</button>
+          <button onClick="{{ goSetup }}" style="padding:0;border:none;background:transparent;color:rgba(243,241,236,.45);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;text-align:left" style-hover="color:#d1682e">First time? Set up with OTP →</button>
+        </sc-if>
+        <sc-if value="{{ setupMode }}" hint-placeholder-val="{{ false }}">
           <sc-if value="{{ showSendOtp }}" hint-placeholder-val="{{ true }}">
-            <button onClick="{{ signIn }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Sign in</button>
-            <button onClick="{{ sendOtp }}" style="padding:14px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:rgba(243,241,236,.7);font-size:14px;font-weight:500;cursor:pointer" style-hover="border-color:#f3f1ec;color:#f3f1ec">First time? Send OTP</button>
+            <button onClick="{{ sendOtp }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Send OTP to my email</button>
           </sc-if>
           <sc-if value="{{ showVerifyOtp }}" hint-placeholder-val="{{ false }}">
             <button onClick="{{ verifyOtp }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Verify OTP &amp; set password</button>
           </sc-if>
+          <button onClick="{{ goSignin }}" style="padding:0;border:none;background:transparent;color:rgba(243,241,236,.45);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;text-align:left" style-hover="color:#d1682e">← Already have a password? Sign in</button>
         </sc-if>
         <sc-if value="{{ server }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;align-items:center;gap:12px;margin:4px 0">
@@ -100,7 +104,7 @@
             Sign in with Google
           </button>
         </sc-if>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;line-height:1.6;color:rgba(243,241,236,.4)">use your @student.nitw.ac.in email. First sign-in sends an OTP to your institute inbox. Not a member? <a href="mailto:musicclub.nitw@gmail.com">mail the tech team</a></span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;line-height:1.6;color:rgba(243,241,236,.4)">use your @student.nitw.ac.in email. Not a member? <a href="mailto:musicclub.nitw@gmail.com">mail the tech team</a></span>
     </div>
   </div>
 </main>
@@ -540,7 +544,7 @@ const KEY = "mc-portal-v1";
 const split = s => (s || "").split(",").map(x => x.trim()).filter(Boolean);
 
 class Component extends DCLogic {
-  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "" };
+  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "" };
 
   async componentDidMount() {
     if (!SERVER) try {
@@ -703,6 +707,10 @@ class Component extends DCLogic {
       loginPassLabel: (() => { const n = this.matchEmail(st.loginEmail); return n && st.creds[n] ? "Password" : "Set a password"; })(),
       firstLogin: SERVER || (() => { const n = this.matchEmail(st.loginEmail); return !!n && !st.creds[n]; })(),
       otpSent: !!st.otpSent,
+      signinMode: st.loginMode === "signin",
+      setupMode: st.loginMode === "setup",
+      goSetup: () => this.setState({ loginMode: "setup", loginErr: "" }),
+      goSignin: () => this.setState({ loginMode: "signin", loginErr: "", otpSent: false }),
       showSendOtp: !st.otpSent,
       showVerifyOtp: !!st.otpSent,
       onLoginEmail: e => this.setState({ loginEmail: e.target.value, loginErr: "" }),
