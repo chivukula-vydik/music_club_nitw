@@ -4,6 +4,6 @@
     { "source": "/", "destination": "/Music Club NITW.dc.html" }
   ],
   "crons": [
-    { "path": "/api/notify-events", "schedule": "*/5 * * * *" }
+    { "path": "/api/notify-events", "schedule": "0 0 * * *" }
   ]
 }
