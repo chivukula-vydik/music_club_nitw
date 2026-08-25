@@ -762,13 +762,13 @@ class Component extends DCLogic {
         const n = this.matchEmail(st.loginEmail);
         const pw = st.loginPass.trim();
         if (!n) return this.setState({ loginErr: "That email isn't on the club roster. Ask the Tech team to add you." });
-        const known = st.creds[n];
-        if (!known) return this.setState({ loginErr: "First login needs an OTP. Enter your email and request one." });
         if (pw.length < 6) return this.setState({ loginErr: "Password needs at least 6 characters." });
         if (SERVER) {
           const { error } = await this.db.signInWithPassword(st.loginEmail.trim().toLowerCase(), pw);
           if (error) return this.setState({ loginErr: error.message || "Wrong password." });
         } else {
+          const known = st.creds[n];
+          if (!known) return this.setState({ loginErr: "First login needs an OTP. Enter your email and request one." });
           const h = await this.hash(n, pw);
           if (h !== known) return this.setState({ loginErr: "Wrong password." });
         }
