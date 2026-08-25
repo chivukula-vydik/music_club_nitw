@@ -41,6 +41,7 @@
   .tag-admin{background:rgba(243,241,236,.06);color:rgba(243,241,236,.5)}
   .ev-past{opacity:.45}
   .cal-sel{background:#252524 !important;outline:1px solid #d1682e;outline-offset:-1px}
+  .tag-club{background:rgba(130,200,130,.18);color:#8ec88e}
 </style>
 </helmet>
 
@@ -177,14 +178,49 @@
 
   <sc-if value="{{ onEvents }}" hint-placeholder-val="{{ false }}">
   <section style="padding:32px 28px 56px;display:flex;flex-direction:column;gap:24px;max-width:860px">
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">Events</h2>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">NIT Warangal · Autumn 2026-27</span>
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">Events</h2>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">NIT Warangal · Autumn 2026-27</span>
+      </div>
+      <button onClick="{{ toggleEvForm }}" style="padding:12px 20px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:#f3f1ec;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Add event</button>
     </div>
+    <sc-if value="{{ evForm }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:14px;padding:22px;border:1px solid rgba(243,241,236,.14);background:#201f1e">
+      <input value="{{ evTitle }}" onChange="{{ onEvTitle }}" placeholder="Event title" style="padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+      <input value="{{ evDesc }}" onChange="{{ onEvDesc }}" placeholder="Description (optional)" style="padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <input type="date" value="{{ evDate }}" onChange="{{ onEvDate }}" style="flex:1;min-width:160px;padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14px">
+        <input type="time" value="{{ evTime }}" onChange="{{ onEvTime }}" style="flex:1;min-width:120px;padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14px">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Notify</span>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" checked="{{ evAllMembers }}" onChange="{{ onEvAll }}" style="accent-color:#d1682e;width:16px;height:16px">
+          <span style="font-size:14px;color:rgba(243,241,236,.7)">All members</span>
+        </label>
+        <sc-if value="{{ evPickMembers }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;max-height:120px;overflow-y:auto;padding:8px;border:1px solid rgba(243,241,236,.1);border-radius:8px;background:#171716">
+          <sc-for list="{{ evMemberList }}" as="m" hint-placeholder-count="4">
+            <label style="display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;cursor:pointer;border:1px solid rgba(243,241,236,.15);color:rgba(243,241,236,.7)" class="{{ m.cls }}">
+              <input type="checkbox" checked="{{ m.checked }}" onChange="{{ m.toggle }}" style="accent-color:#d1682e;width:14px;height:14px">
+              {{ m.name }}
+            </label>
+          </sc-for>
+        </div>
+        </sc-if>
+      </div>
+      <sc-if value="{{ evErr }}" hint-placeholder-val="{{ false }}">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8886a">{{ evErr }}</span>
+      </sc-if>
+      <button onClick="{{ submitEvent }}" style="padding:13px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Create event</button>
+    </div>
+    </sc-if>
     <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
       <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(209,104,46,.4);border:1px solid #d1682e"></span>holiday</span>
       <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(61,141,189,.35);border:1px solid rgba(61,141,189,.6)"></span>exam</span>
-      <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(243,241,236,.15);border:1px solid rgba(243,241,236,.3)"></span>event / admin</span>
+      <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(243,241,236,.15);border:1px solid rgba(243,241,236,.3)"></span>event</span>
+      <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(130,200,130,.5);border:1px solid rgba(130,200,130,.7)"></span>club event</span>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between">
       <button onClick="{{ calPrev }}" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:transparent;color:#f3f1ec;font-size:18px;cursor:pointer" style-hover="border-color:#d1682e">←</button>
@@ -213,8 +249,16 @@
       </div>
       <sc-for list="{{ calSelectedEvents }}" as="ev" hint-placeholder-count="1">
         <div style="display:flex;align-items:center;gap:16px;padding:14px 22px;background:#1a1a1a">
-          <span style="flex:1;font-size:14px;font-weight:500">{{ ev.title }}</span>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:14px;font-weight:500">{{ ev.title }}</span>
+            <sc-if value="{{ ev.desc }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:12px;color:rgba(243,241,236,.45)">{{ ev.desc }}</span>
+            </sc-if>
+          </div>
           <span class="{{ ev.tagClass }}" style="padding:5px 11px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap">{{ ev.tag }}</span>
+          <sc-if value="{{ ev.onDelete }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ ev.onDelete }}" style="padding:5px 10px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.5);font-size:11px;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Delete</button>
+          </sc-if>
         </div>
       </sc-for>
     </div>
@@ -628,7 +672,7 @@ const KEY = "mc-portal-v1";
 const split = s => (s || "").split(",").map(x => x.trim()).filter(Boolean);
 
 class Component extends DCLogic {
-  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "", calMonth: new Date().getFullYear() * 12 + new Date().getMonth(), calSelectedDay: null };
+  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "", calMonth: new Date().getFullYear() * 12 + new Date().getMonth(), calSelectedDay: null, dbEvents: [], evForm: false, evTitle: "", evDesc: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [] };
 
   async componentDidMount() {
     if (!SERVER) try {
@@ -657,7 +701,7 @@ class Component extends DCLogic {
     const account = await this.db.currentUser();
     if (!account) return this.setState({ user: null, account: null });
     try {
-      const d = await this.db.load();
+      const [d, dbEvents] = await Promise.all([this.db.load(), this.db.loadEvents().catch(() => [])]);
       // RLS returns empty members list for non-club accounts — hard block them
       if (!d.members || !d.members.length) {
         await this.db.signOut();
@@ -666,7 +710,7 @@ class Component extends DCLogic {
       ROSTER.length = 0; ROSTER.push(...d.members);
       const name = (d.members.find(r => (r[7] || "").toLowerCase() === account.email.toLowerCase()) || [])[0] || account.name;
       this.setState({
-        account, user: name, bookings: d.bookings, profiles: d.profiles, moms: d.minutes, dbErr: ""
+        account, user: name, bookings: d.bookings, profiles: d.profiles, moms: d.minutes, dbEvents, dbErr: ""
       }, () => this.loadProfile(name));
     } catch (e) {
       this.setState({ dbErr: String(e.message || e) });
@@ -887,9 +931,13 @@ class Component extends DCLogic {
         const moKey = yr + "-" + pad(mo + 1);
         const firstDay = new Date(yr, mo, 1).getDay();
         const daysInMonth = new Date(yr, mo + 1, 0).getDate();
-        const tagColor = t => t === "holiday" ? "rgba(209,104,46,.7)" : t === "exam" ? "rgba(61,141,189,.7)" : "rgba(243,241,236,.45)";
+        const tagColor = t => t === "holiday" ? "rgba(209,104,46,.7)" : t === "exam" ? "rgba(61,141,189,.7)" : t === "club" ? "rgba(130,200,130,.7)" : "rgba(243,241,236,.45)";
+        const allEvs = [
+          ...ACAD_EVENTS,
+          ...(st.dbEvents || []).map(e => ({ date: e.event_date, title: e.title, tag: "club", id: e.id, time: e.event_time, desc: e.description, createdBy: e.created_by }))
+        ];
         const evByDay = {};
-        for (const ev of ACAD_EVENTS) {
+        for (const ev of allEvs) {
           const s = ev.date, e = ev.end || ev.date;
           if (e < moKey + "-01" || s > moKey + "-" + pad(daysInMonth)) continue;
           const d0 = Math.max(1, s >= moKey + "-01" ? +s.slice(8, 10) : 1);
@@ -903,14 +951,13 @@ class Component extends DCLogic {
           const isToday = iso === today;
           const sel = st.calSelectedDay === iso;
           const evs = evByDay[d] || [];
-          const dd = d;
           calDays.push({
             num: String(d), numColor: isToday ? "#d1682e" : sel ? "#f3f1ec" : "rgba(243,241,236,.55)",
             dots: evs.slice(0, 4).map(e => ({ color: tagColor(e.tag), title: e.title })),
             cellClass: sel ? "cal-sel" : "", onClick: () => this.setState({ calSelectedDay: iso })
           });
         }
-        const selEvs = st.calSelectedDay ? ACAD_EVENTS.filter(ev => st.calSelectedDay >= ev.date && st.calSelectedDay <= (ev.end || ev.date)) : [];
+        const selEvs = st.calSelectedDay ? allEvs.filter(ev => st.calSelectedDay >= ev.date && st.calSelectedDay <= (ev.end || ev.date)) : [];
         const fmtSel = st.calSelectedDay ? new Date(st.calSelectedDay + "T00:00").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }) : "";
         return {
           calHeaders: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
@@ -918,9 +965,48 @@ class Component extends DCLogic {
           calDays, calPrev: () => this.setState({ calMonth: cm - 1, calSelectedDay: null }),
           calNext: () => this.setState({ calMonth: cm + 1, calSelectedDay: null }),
           calSelected: selEvs.length > 0, calSelectedLabel: fmtSel,
-          calSelectedEvents: selEvs.map(ev => ({ title: ev.title, tag: ev.tag, tagClass: "tag-" + ev.tag }))
+          calSelectedEvents: selEvs.map(ev => ({
+            title: ev.title + (ev.time ? " · " + ev.time.slice(0, 5) : ""), tag: ev.tag, tagClass: "tag-" + ev.tag,
+            isClub: ev.tag === "club", id: ev.id, desc: ev.desc || "",
+            onDelete: ev.id ? () => { this.db.deleteEvent(ev.id).then(() => this.pull()); } : null
+          }))
         };
       })(),
+      toggleEvForm: () => this.setState({ evForm: !st.evForm, evErr: "" }),
+      evForm: !!st.evForm, evTitle: st.evTitle, evDesc: st.evDesc, evDate: st.evDate, evTime: st.evTime,
+      evAllMembers: !!st.evAllMembers, evPickMembers: !st.evAllMembers, evErr: st.evErr || "",
+      onEvTitle: e => this.setState({ evTitle: e.target.value }),
+      onEvDesc: e => this.setState({ evDesc: e.target.value }),
+      onEvDate: e => this.setState({ evDate: e.target.value }),
+      onEvTime: e => this.setState({ evTime: e.target.value }),
+      onEvAll: e => this.setState({ evAllMembers: e.target.checked, evParticipants: e.target.checked ? [] : st.evParticipants }),
+      evMemberList: ROSTER.map(r => {
+        const name = r[0], sel = (st.evParticipants || []).includes(name);
+        return {
+          name, checked: sel, cls: sel ? "chip-on" : "chip-off",
+          toggle: () => {
+            const ps = st.evParticipants || [];
+            this.setState({ evParticipants: sel ? ps.filter(p => p !== name) : [...ps, name] });
+          }
+        };
+      }),
+      submitEvent: async () => {
+        if (!st.evTitle.trim()) return this.setState({ evErr: "Title is required" });
+        if (!st.evDate) return this.setState({ evErr: "Date is required" });
+        if (!st.evTime) return this.setState({ evErr: "Time is required" });
+        const email = st.account?.email || st.loginEmail || "";
+        const participants = st.evAllMembers ? [] : (st.evParticipants || []);
+        try {
+          await this.db.addEvent({
+            title: st.evTitle.trim(), description: st.evDesc.trim(),
+            event_date: st.evDate, event_time: st.evTime,
+            created_by: email, all_members: !!st.evAllMembers,
+            participants: participants.map(p => { const r = ROSTER.find(r => r[0] === p); return r ? (r[7] || p) : p; })
+          });
+          this.setState({ evForm: false, evTitle: "", evDesc: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], evErr: "" });
+          await this.pull();
+        } catch (e) { this.setState({ evErr: e.message || "Failed to create event" }); }
+      },
       myTeam: this.teamOf(me),
       pwOld: st.pwOld, pwNew: st.pwNew, pwNote: st.pwNote,
       onPwOld: e => this.setState({ pwOld: e.target.value, pwNote: "" }),

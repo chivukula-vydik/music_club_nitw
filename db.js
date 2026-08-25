@@ -186,6 +186,30 @@ export async function addMinutes(entry) {
   if (error) throw error;
 }
 
+/* ---------- events ---------- */
+
+export async function loadEvents() {
+  if (!serverMode) return [];
+  const c = await client();
+  const { data, error } = await c.from("events").select("*").order("event_date").order("event_time");
+  if (error) throw error;
+  return data || [];
+}
+
+export async function addEvent(ev) {
+  if (!serverMode) return;
+  const c = await client();
+  const { error } = await c.from("events").insert(ev);
+  if (error) throw error;
+}
+
+export async function deleteEvent(id) {
+  if (!serverMode) return;
+  const c = await client();
+  const { error } = await c.from("events").delete().eq("id", id);
+  if (error) throw error;
+}
+
 // Live updates so a booking made on one phone shows up on everyone else's.
 export async function subscribe(onChange) {
   if (!serverMode) return () => {};
@@ -194,6 +218,7 @@ export async function subscribe(onChange) {
     .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, onChange)
     .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, onChange)
     .on("postgres_changes", { event: "*", schema: "public", table: "minutes" }, onChange)
+    .on("postgres_changes", { event: "*", schema: "public", table: "events" }, onChange)
     .subscribe();
   return () => c.removeChannel(ch);
 }

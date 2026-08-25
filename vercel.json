@@ -2,5 +2,8 @@
   "rewrites": [
     { "source": "/portal", "destination": "/Member Portal.dc.html" },
     { "source": "/", "destination": "/Music Club NITW.dc.html" }
+  ],
+  "crons": [
+    { "path": "/api/notify-events", "schedule": "*/5 * * * *" }
   ]
 }
