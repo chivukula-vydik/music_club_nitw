@@ -42,6 +42,24 @@
   .ev-past{opacity:.45}
   .cal-sel{background:#252524 !important;outline:1px solid #d1682e;outline-offset:-1px}
   .tag-club{background:rgba(130,200,130,.18);color:#8ec88e}
+  @media(max-width:640px){
+    header{padding:10px 14px !important;gap:10px !important}
+    header a span:last-child{display:none}
+    .tab{padding:12px 10px 10px !important;font-size:11.5px !important}
+    .mc-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:0 14px !important}
+    .mc-tabs::-webkit-scrollbar{display:none}
+    section{padding:20px 14px 40px !important}
+    h2{font-size:22px !important}
+    h1{font-size:30px !important}
+    .cal-cell{min-height:52px !important;padding:4px 3px !important}
+    .cal-cell span:first-child{font-size:10px !important}
+    .cal-dot{width:6px !important;height:6px !important}
+    .mc-stat-grid{grid-template-columns:repeat(2,1fr) !important}
+    .mc-song-grid{grid-template-columns:1fr !important}
+    .mc-member-grid{grid-template-columns:1fr !important}
+    .mc-mgr-bar{flex-direction:column}
+    .mc-mgr-bar>div{flex-basis:auto !important}
+  }
 </style>
 </helmet>
 
@@ -68,7 +86,7 @@
 <main style="flex:1;display:flex;align-items:center;justify-content:center;padding:56px 24px">
   <div style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:26px;animation:mcin .3s ease both">
     <div style="display:flex;flex-direction:column;gap:12px">
-      <h1 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:40px;line-height:.98;letter-spacing:-.02em;text-shadow:2px 0 rgba(194,85,31,.85),-2px 0 rgba(28,107,150,.85)">MEMBER<br>LOGIN</h1>
+      <h1 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:36px;line-height:.98;letter-spacing:-.02em;text-shadow:2px 0 rgba(194,85,31,.85),-2px 0 rgba(28,107,150,.85)">MEMBER<br>LOGIN</h1>
       <p style="margin:0;font-size:15px;line-height:1.6;color:rgba(243,241,236,.6)">Book jam-room slots and keep your skills up to date.</p>
     </div>
     <div style="display:flex;flex-direction:column;gap:16px;padding:26px;border:1px solid rgba(243,241,236,.14);background:#201f1e">
@@ -118,10 +136,10 @@
 <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ true }}">
 <main style="flex:1;display:flex;flex-direction:column;gap:0">
 
-  <div style="display:flex;gap:4px;padding:0 28px;border-bottom:1px solid rgba(243,241,236,.1);background:#1a1a1a">
+  <div class="mc-tabs" style="display:flex;gap:4px;padding:0 28px;border-bottom:1px solid rgba(243,241,236,.1);background:#1a1a1a;white-space:nowrap">
     <button onClick="{{ goMine }}" class="tab {{ mineTabClass }}">My slots</button>
     <button onClick="{{ goJam }}" class="tab {{ jamTabClass }}">Jam room</button>
-    <button onClick="{{ goSkills }}" class="tab {{ skillsTabClass }}">Members &amp; skills</button>
+    <button onClick="{{ goSkills }}" class="tab {{ skillsTabClass }}">Members</button>
     <button onClick="{{ goMinutes }}" class="tab {{ minutesTabClass }}">Minutes</button>
     <button onClick="{{ goEvents }}" class="tab {{ eventsTabClass }}">Events</button>
     <button onClick="{{ goProfile }}" class="tab {{ profileTabClass }}">My profile</button>
@@ -232,11 +250,11 @@
         <div style="padding:10px 4px;text-align:center;background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">{{ h }}</div>
       </sc-for>
       <sc-for list="{{ calDays }}" as="d" hint-placeholder-count="35">
-        <div onClick="{{ d.onClick }}" class="{{ d.cellClass }}" style="min-height:72px;padding:6px 8px;background:#1a1a1a;cursor:pointer;position:relative" style-hover="background:#252524">
+        <div onClick="{{ d.onClick }}" class="cal-cell {{ d.cellClass }}" style="min-height:72px;padding:6px 8px;background:#1a1a1a;cursor:pointer;position:relative" style-hover="background:#252524">
           <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:{{ d.numColor }}">{{ d.num }}</span>
           <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">
             <sc-for list="{{ d.dots }}" as="dot" hint-placeholder-count="0">
-              <span style="width:8px;height:8px;border-radius:50%;background:{{ dot.color }}" title="{{ dot.title }}"></span>
+              <span class="cal-dot" style="width:8px;height:8px;border-radius:50%;background:{{ dot.color }}" title="{{ dot.title }}"></span>
             </sc-for>
           </div>
         </div>
@@ -276,7 +294,7 @@
       <button onClick="{{ openRequest }}" style="padding:13px 22px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Request a slot</button>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+    <div class="mc-stat-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
       <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px">
         <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Team</span>
         <span style="font-size:15px;font-weight:600">{{ myTeam }}</span>
@@ -298,7 +316,7 @@
     <sc-if value="{{ hasMySongs }}" hint-placeholder-val="{{ true }}">
     <div style="display:flex;flex-direction:column;gap:10px">
       <span style="font-family:'Archivo Black',sans-serif;font-size:16px">My songs</span>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+      <div class="mc-song-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
         <sc-for list="{{ mySongCards }}" as="sc" hint-placeholder-count="3">
           <div style="padding:16px 18px;background:#1a1a1a;display:flex;flex-direction:column;gap:8px">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
@@ -375,7 +393,7 @@
             </button>
           </sc-for>
         </div>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">read-only view · slots go through your day's manager</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">tap an unclaimed slot to claim it · tap yours to edit</span>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
         <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(61,141,189,.35);border:1px solid rgba(61,141,189,.6)"></span>booked</span>
@@ -408,7 +426,7 @@
       </div>
     </div>
 
-    <div style="display:flex;flex-wrap:wrap;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+    <div class="mc-mgr-bar" style="display:flex;flex-wrap:wrap;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
       <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
         <div style="flex:1 1 140px;padding:16px 18px;background:#1a1a1a;display:flex;flex-direction:column;gap:5px">
           <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">{{ d.name }} manager</span>
@@ -528,7 +546,7 @@
       </sc-for>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+    <div class="mc-member-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
       <sc-for list="{{ members }}" as="m" hint-placeholder-count="9">
         <div style="display:flex;flex-direction:column;gap:11px;padding:22px;background:#1a1a1a;transition:background .18s" style-hover="background:#211f1e">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
