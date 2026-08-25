@@ -390,24 +390,24 @@
       </div>
     </div>
 
-    <div style="border:1px solid rgba(243,241,236,.14)">
-      <div class="mc-jam-grid">
-        <div class="mc-jam-header" style="display:grid;grid-template-columns:56px repeat(7,1fr);background:#242322;border-bottom:1px solid rgba(243,241,236,.14)">
-          <div style="padding:10px 6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.4)">Time</div>
+    <div style="overflow-x:auto;border:1px solid rgba(243,241,236,.14)">
+      <div style="min-width:900px">
+        <div style="display:grid;grid-template-columns:78px repeat(7,1fr);background:#242322;border-bottom:1px solid rgba(243,241,236,.14)">
+          <div style="padding:11px 10px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Time</div>
           <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
-            <div style="padding:10px 4px;display:flex;flex-direction:column;gap:2px;border-left:1px solid rgba(243,241,236,.1)">
-              <span class="mc-day-name" style="font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:.01em">{{ d.short }}</span>
-              <span class="mc-day-mgr" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(243,241,236,.42)">{{ d.mgr }}</span>
+            <div style="padding:11px 10px;display:flex;flex-direction:column;gap:3px;border-left:1px solid rgba(243,241,236,.1)">
+              <span style="font-family:'Archivo Black',sans-serif;font-size:12.5px;letter-spacing:.01em">{{ d.name }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:rgba(243,241,236,.42)">mgr: {{ d.manager }}</span>
             </div>
           </sc-for>
         </div>
         <sc-for list="{{ grid }}" as="row" hint-placeholder-count="14">
-          <div style="display:grid;grid-template-columns:56px repeat(7,1fr);border-bottom:1px solid rgba(243,241,236,.08)">
-            <div class="mc-time-label" style="padding:6px 4px;font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(243,241,236,.5);background:#201f1e;display:flex;align-items:center">{{ row.timeShort }}</div>
+          <div style="display:grid;grid-template-columns:78px repeat(7,1fr);border-bottom:1px solid rgba(243,241,236,.08)">
+            <div style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.5);background:#201f1e">{{ row.time }}</div>
             <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="7">
-              <div onClick="{{ c.onClick }}" title="{{ c.title }}" class="{{ c.class }}" style="min-height:40px;padding:4px 3px;border-left:1px solid rgba(243,241,236,.08);display:flex;flex-direction:column;gap:1px;justify-content:center;cursor:pointer" style-hover="background:#252524">
-                <span class="mc-cell-song" style="font-size:10px;font-weight:500;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.song }}</span>
-                <span class="mc-cell-by" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(243,241,236,.42);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.by }}</span>
+              <div onClick="{{ c.onClick }}" title="{{ c.title }}" class="{{ c.class }}" style="min-height:46px;padding:7px 9px;border-left:1px solid rgba(243,241,236,.08);display:flex;flex-direction:column;gap:2px;justify-content:center;cursor:pointer" style-hover="background:#252524">
+                <span style="font-size:12px;font-weight:500;line-height:1.25">{{ c.song }}</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:rgba(243,241,236,.42)">{{ c.by }}</span>
               </div>
             </sc-for>
           </div>
@@ -885,7 +885,6 @@ class Component extends DCLogic {
 
     const grid = TIMES.map(t => ({
       time: LABEL[t],
-      timeShort: t.replace("-", "–"),
       cells: DAYS.map(([day]) => {
         const rec = this.record(st.week, day, t);
         const mine = rec && rec.by === me;
@@ -1149,7 +1148,7 @@ class Component extends DCLogic {
           this.db.addMinutes(entry).then(() => this.pull()).catch(e => this.setState({ dbErr: String(e.message || e) }));
         }
       },
-      days: DAYS.map(([name, manager]) => ({ name, manager, short: name.slice(0, 3), mgr: manager.split(" ")[0] })),
+      days: DAYS.map(([name, manager]) => ({ name, manager })),
       grid, myCount: mine.length,
       booking: !!st.booking, bookingSong: st.bookingSong,
       bookingWhen: st.booking && st.booking.existing ? st.booking.label : "Request",
