@@ -28,8 +28,13 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: "Invalid email" });
   }
 
-  if (!SMTP_USER || !SMTP_PASS || !MAIL_FROM) {
-    return res.status(500).json({ error: "Email service not configured" });
+  const missingEmailEnv = [
+    !SMTP_USER && "SMTP_USER",
+    !SMTP_PASS && "SMTP_PASS",
+    !MAIL_FROM && "MAIL_FROM",
+  ].filter(Boolean);
+  if (missingEmailEnv.length) {
+    return res.status(500).json({ error: `Email service not configured: missing ${missingEmailEnv.join(", ")}` });
   }
 
   const redirectTo = String((req.body || {}).redirectTo || "").trim();
