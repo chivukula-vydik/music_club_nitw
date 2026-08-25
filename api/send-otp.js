@@ -75,7 +75,10 @@ module.exports = async (req, res) => {
 
       otp = linkData.email_otp || (linkData.properties && linkData.properties.email_otp);
       if (!/^\d{6}$/.test(String(otp || ""))) {
-        throw new Error("Supabase did not return a valid email OTP");
+        // debug: log what Supabase actually returned
+        const keys = Object.keys(linkData);
+        const propKeys = linkData.properties ? Object.keys(linkData.properties) : [];
+        throw new Error(`No valid OTP. Response keys: [${keys.join(",")}] properties keys: [${propKeys.join(",")}] email_otp=${linkData.email_otp}`);
       }
     } else {
       otp = String(crypto.randomInt(100000, 1000000));
