@@ -425,8 +425,14 @@
         <div style="display:flex;flex-direction:column;gap:6px">
           <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#3d8dbd">{{ bookingWhen }}</span>
           <span style="font-family:'Archivo Black',sans-serif;font-size:22px">{{ bookingHeading }}</span>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45)">goes to {{ bookingManager }} to confirm</span>
+          <sc-if value="{{ bookingIsClaim }}" hint-placeholder-val="{{ false }}">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45)">{{ bookingWhen }} · your name goes on this slot</span>
+          </sc-if>
+          <sc-if value="{{ bookingIsRequest }}" hint-placeholder-val="{{ true }}">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45)">goes to {{ bookingManager }} to confirm</span>
+          </sc-if>
         </div>
+        <sc-if value="{{ bookingIsRequest }}" hint-placeholder-val="{{ true }}">
         <label style="display:flex;flex-direction:column;gap:8px">
           <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Week</span>
           <select value="{{ bookingWeek }}" onChange="{{ onBookingWeek }}" style="padding:12px 13px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14.5px;cursor:pointer">
@@ -453,6 +459,7 @@
             </select>
           </label>
         </div>
+        </sc-if>
         <label style="display:flex;flex-direction:column;gap:8px">
           <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">What are you working on</span>
           <input value="{{ bookingSong }}" onChange="{{ onBookingSong }}" placeholder="song, or 'practice session'" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
@@ -894,7 +901,7 @@ class Component extends DCLogic {
             booking: { week: st.week, day, t, label: day + " " + LABEL[t], existing: true, origin: key },
             bookingSong: rec.song, bookingWith: (rec.with || []).slice(), pickQuery: ""
           }) : (canClaim && me) ? () => this.setState({
-            booking: { week: st.week, day, t, label: "Request", existing: false },
+            booking: { week: st.week, day, t, label: day + " " + LABEL[t], existing: false, claim: true },
             bookingSong: rec ? rec.song : "", bookingWith: [], pickQuery: ""
           }) : null
         };
@@ -1176,8 +1183,10 @@ class Component extends DCLogic {
         class: st.week === w ? "week-active" : "week-inactive"
       })),
       bookingExisting: !!(st.booking && st.booking.existing),
-      bookingHeading: st.booking && st.booking.existing ? "Your slot" : "Request a slot",
-      bookingConfirm: st.booking && st.booking.existing ? "Save changes" : "Send request",
+      bookingIsClaim: !!(st.booking && st.booking.claim),
+      bookingIsRequest: !!(st.booking && !st.booking.claim && !st.booking.existing),
+      bookingHeading: st.booking && st.booking.existing ? "Your slot" : st.booking && st.booking.claim ? "Claim this slot" : "Request a slot",
+      bookingConfirm: st.booking && st.booking.existing ? "Save changes" : st.booking && st.booking.claim ? "Claim" : "Send request",
       bookingOwner: me || "",
       bookingWith: st.bookingWith.map(name => ({ name, onRemove: () => this.setState({ bookingWith: st.bookingWith.filter(x => x !== name) }) })),
       bookingWithCount: st.bookingWith.length ? st.bookingWith.length + 1 + " playing" : "just you so far",
