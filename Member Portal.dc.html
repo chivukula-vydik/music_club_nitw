@@ -884,7 +884,7 @@ class Component extends DCLogic {
         const withList = (rec && rec.with) || [];
         const roll = rec ? [rec.by || "unclaimed"].concat(withList).join(", ") : "";
         const key = this.key(st.week, day, t);
-        const canClaim = !rec || rec.by === "unclaimed";
+        const canClaim = !rec || !rec.by || rec.by === "unclaimed";
         return {
           song: rec ? rec.song : "",
           by: rec && withList.length ? (rec.by || "unclaimed") + " +" + withList.length : roll,
