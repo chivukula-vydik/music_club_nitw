@@ -49,13 +49,19 @@ export async function signInWithGoogle() {
 }
 
 export async function sendEmailOtp(email) {
-  const c = await client();
-  return c.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+  const response = await fetch(new URL("./api/send-otp", window.location.href), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, redirectTo: window.location.href, supabaseAuth: true })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) return { data: null, error: new Error(data.error || "Failed to send OTP") };
+  return { data, error: null };
 }
 
 export async function verifyEmailOtp(email, token) {
   const c = await client();
-  return c.auth.verifyOtp({ email, token, type: "email" });
+  return c.auth.verifyOtp({ email, token, type: "magiclink" });
 }
 
 export async function setPassword(password) {

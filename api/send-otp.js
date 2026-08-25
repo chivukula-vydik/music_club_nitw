@@ -8,6 +8,8 @@ const SMTP_PORT = Number(process.env.SMTP_PORT) || 587;
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 const MAIL_FROM = process.env.MAIL_FROM || SMTP_USER;
+const SUPABASE_URL = process.env.SUPABASE_URL || "https://xejvrshbsyuxvdllazpn.supabase.co";
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const OTP_EXPIRY = 10 * 60 * 1000;
 
 function sign(email, otp, expires) {
@@ -30,9 +32,10 @@ module.exports = async (req, res) => {
     return res.status(500).json({ error: "Email service not configured" });
   }
 
-  const otp = String(crypto.randomInt(100000, 1000000));
-  const expires = Date.now() + OTP_EXPIRY;
-  const token = `${expires}.${sign(email, otp, expires)}`;
+  const redirectTo = String((req.body || {}).redirectTo || "").trim();
+  const supabaseAuth = !!(req.body || {}).supabaseAuth;
+  let otp = "";
+  let legacyToken = "";
 
   const transporter = nodemailer.createTransport({
     host: SMTP_HOST,
@@ -42,6 +45,40 @@ module.exports = async (req, res) => {
   });
 
   try {
+    if (supabaseAuth) {
+      if (!SUPABASE_SERVICE_ROLE_KEY) {
+        throw new Error("Supabase service role key not configured");
+      }
+
+      const linkResponse = await fetch(`${SUPABASE_URL}/auth/v1/admin/generate_link`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        },
+        body: JSON.stringify({
+          type: "magiclink",
+          email,
+          ...(redirectTo ? { redirect_to: redirectTo } : {}),
+        }),
+      });
+      const linkData = await linkResponse.json().catch(() => ({}));
+      if (!linkResponse.ok) {
+        throw new Error(linkData.msg || linkData.message || linkData.error || "Failed to generate Supabase OTP");
+      }
+
+      const properties = linkData.properties || linkData;
+      otp = properties.email_otp;
+      if (!/^\d{6}$/.test(String(otp || ""))) {
+        throw new Error("Supabase did not return a valid email OTP");
+      }
+    } else {
+      otp = String(crypto.randomInt(100000, 1000000));
+      const expires = Date.now() + OTP_EXPIRY;
+      legacyToken = `${expires}.${sign(email, otp, expires)}`;
+    }
+
     await transporter.sendMail({
       from: MAIL_FROM,
       to: email,
@@ -88,9 +125,9 @@ module.exports = async (req, res) => {
 </table>
 </body></html>`,
     });
-    res.status(200).json({ token });
+    res.status(200).json(supabaseAuth ? { sent: true } : { token: legacyToken });
   } catch (e) {
     console.error("Mail error:", e.message);
-    res.status(500).json({ error: "Failed to send email" });
+    res.status(500).json({ error: e.message || "Failed to send email" });
   }
 };
