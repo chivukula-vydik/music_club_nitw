@@ -276,6 +276,46 @@
       <button onClick="{{ openRequest }}" style="padding:13px 22px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Request a slot</button>
     </div>
 
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+      <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Team</span>
+        <span style="font-size:15px;font-weight:600">{{ myTeam }}</span>
+      </div>
+      <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Hours this week</span>
+        <span style="font-family:'Archivo Black',sans-serif;font-size:22px;color:#d1682e">{{ myHoursThisWeek }}</span>
+      </div>
+      <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Total hours</span>
+        <span style="font-family:'Archivo Black',sans-serif;font-size:22px">{{ myHoursTotal }}</span>
+      </div>
+      <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Next slot</span>
+        <span style="font-size:13px;font-weight:500;color:#7cb8db">{{ myNextSlot }}</span>
+      </div>
+    </div>
+
+    <sc-if value="{{ hasMySongs }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <span style="font-family:'Archivo Black',sans-serif;font-size:16px">My songs</span>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+        <sc-for list="{{ mySongCards }}" as="sc" hint-placeholder-count="3">
+          <div style="padding:16px 18px;background:#1a1a1a;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+              <span style="font-size:14px;font-weight:600">{{ sc.song }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:rgba(243,241,236,.4)">{{ sc.count }}x</span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px">
+              <sc-for list="{{ sc.band }}" as="bp" hint-placeholder-count="2">
+                <span style="padding:4px 10px;border-radius:999px;background:rgba(61,141,189,.15);border:1px solid rgba(61,141,189,.3);font-size:11px;color:#9cc8e4">{{ bp }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
     <div style="display:flex;flex-direction:column;gap:12px">
       <div style="display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
         <sc-for list="{{ mySlots }}" as="s" hint-placeholder-count="1">
@@ -1222,6 +1262,51 @@ class Component extends DCLogic {
           onDrop: () => this.writeBooking(key, null, { ...st.bookings, [key]: null }) };
       }),
       noMySlots: mine.length === 0,
+      myTeam: (ROSTER.find(r => r[0] === me) || [])[3] || "—",
+      myHoursThisWeek: (() => {
+        let h = 0;
+        DAYS.forEach(([day]) => TIMES.forEach(t => {
+          const rec = this.record(0, day, t);
+          if (rec && (rec.by === me || (rec.with || []).includes(me))) h++;
+        }));
+        return h;
+      })(),
+      myHoursTotal: (() => {
+        let h = 0;
+        [0, 1].forEach(w => DAYS.forEach(([day]) => TIMES.forEach(t => {
+          const rec = this.record(w, day, t);
+          if (rec && (rec.by === me || (rec.with || []).includes(me))) h++;
+        })));
+        return h;
+      })(),
+      myNextSlot: (() => {
+        const dayOrder = DAYS.map(d => d[0]);
+        const now = new Date();
+        const todayIdx = (now.getDay() + 6) % 7;
+        const hr = now.getHours();
+        for (const { week, day, t, rec } of mine) {
+          const di = dayOrder.indexOf(day);
+          if (week === 0 && (di > todayIdx || (di === todayIdx && parseInt(t) > hr)))
+            return day + " " + LABEL[t] + " — " + rec.song;
+        }
+        return mine.length ? mine[0].day + " " + LABEL[mine[0].t] : "—";
+      })(),
+      ...(() => {
+        const songMap = {};
+        [0, 1].forEach(w => DAYS.forEach(([day]) => TIMES.forEach(t => {
+          const rec = this.record(w, day, t);
+          if (!rec || (rec.by !== me && !(rec.with || []).includes(me))) return;
+          const s = rec.song;
+          if (!songMap[s]) songMap[s] = { count: 0, band: new Set() };
+          songMap[s].count++;
+          if (rec.by && rec.by !== me) songMap[s].band.add(rec.by);
+          for (const p of (rec.with || [])) { if (p !== me) songMap[s].band.add(p); }
+        })));
+        const cards = Object.entries(songMap).map(([song, d]) => ({
+          song, count: d.count, band: d.band.size ? [...d.band] : ["solo"]
+        }));
+        return { mySongCards: cards, hasMySongs: cards.length > 0 };
+      })(),
       ...(() => {
         const mgDay = DAYS.find(d => d[1] === me);
         if (!mgDay) return { managedDay: null };
