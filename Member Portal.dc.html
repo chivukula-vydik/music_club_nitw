@@ -40,6 +40,7 @@
   .tag-event{background:rgba(243,241,236,.1);color:rgba(243,241,236,.7)}
   .tag-admin{background:rgba(243,241,236,.06);color:rgba(243,241,236,.5)}
   .ev-past{opacity:.45}
+  .cal-sel{background:#252524 !important;outline:1px solid #d1682e;outline-offset:-1px}
 </style>
 </helmet>
 
@@ -177,23 +178,47 @@
   <sc-if value="{{ onEvents }}" hint-placeholder-val="{{ false }}">
   <section style="padding:32px 28px 56px;display:flex;flex-direction:column;gap:24px;max-width:860px">
     <div style="display:flex;flex-direction:column;gap:8px">
-      <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">Academic calendar</h2>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">NIT Warangal · Autumn 2026-27 · key dates for the semester</span>
+      <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">Events</h2>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">NIT Warangal · Autumn 2026-27</span>
     </div>
     <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
       <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(209,104,46,.4);border:1px solid #d1682e"></span>holiday</span>
       <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(61,141,189,.35);border:1px solid rgba(61,141,189,.6)"></span>exam</span>
-      <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(243,241,236,.15);border:1px solid rgba(243,241,236,.3)"></span>event</span>
+      <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(243,241,236,.15);border:1px solid rgba(243,241,236,.3)"></span>event / admin</span>
     </div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <button onClick="{{ calPrev }}" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:transparent;color:#f3f1ec;font-size:18px;cursor:pointer" style-hover="border-color:#d1682e">←</button>
+      <span style="font-family:'Archivo Black',sans-serif;font-size:20px;letter-spacing:-.01em">{{ calMonthLabel }}</span>
+      <button onClick="{{ calNext }}" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:transparent;color:#f3f1ec;font-size:18px;cursor:pointer" style-hover="border-color:#d1682e">→</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:rgba(243,241,236,.08);border:1px solid rgba(243,241,236,.12)">
+      <sc-for list="{{ calHeaders }}" as="h" hint-placeholder-count="7">
+        <div style="padding:10px 4px;text-align:center;background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">{{ h }}</div>
+      </sc-for>
+      <sc-for list="{{ calDays }}" as="d" hint-placeholder-count="35">
+        <div onClick="{{ d.onClick }}" class="{{ d.cellClass }}" style="min-height:72px;padding:6px 8px;background:#1a1a1a;cursor:pointer;position:relative" style-hover="background:#252524">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:{{ d.numColor }}">{{ d.num }}</span>
+          <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">
+            <sc-for list="{{ d.dots }}" as="dot" hint-placeholder-count="0">
+              <span style="width:8px;height:8px;border-radius:50%;background:{{ dot.color }}" title="{{ dot.title }}"></span>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{ calSelected }}" hint-placeholder-val="{{ false }}">
     <div style="display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
-      <sc-for list="{{ events }}" as="ev" hint-placeholder-count="8">
-        <div class="{{ ev.rowClass }}" style="display:flex;align-items:center;gap:16px;padding:16px 22px;background:#1a1a1a">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45);min-width:120px;white-space:nowrap">{{ ev.date }}</span>
-          <span style="flex:1;font-size:14.5px;font-weight:500">{{ ev.title }}</span>
+      <div style="padding:14px 22px;background:#201f1e">
+        <span style="font-family:'Archivo Black',sans-serif;font-size:16px">{{ calSelectedLabel }}</span>
+      </div>
+      <sc-for list="{{ calSelectedEvents }}" as="ev" hint-placeholder-count="1">
+        <div style="display:flex;align-items:center;gap:16px;padding:14px 22px;background:#1a1a1a">
+          <span style="flex:1;font-size:14px;font-weight:500">{{ ev.title }}</span>
           <span class="{{ ev.tagClass }}" style="padding:5px 11px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap">{{ ev.tag }}</span>
         </div>
       </sc-for>
     </div>
+    </sc-if>
   </section>
   </sc-if>
 
@@ -603,7 +628,7 @@ const KEY = "mc-portal-v1";
 const split = s => (s || "").split(",").map(x => x.trim()).filter(Boolean);
 
 class Component extends DCLogic {
-  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "" };
+  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "", calMonth: new Date().getFullYear() * 12 + new Date().getMonth(), calSelectedDay: null };
 
   async componentDidMount() {
     if (!SERVER) try {
@@ -855,18 +880,46 @@ class Component extends DCLogic {
       minutesTabClass: st.tab === "minutes" ? "tab-active" : "tab-inactive",
       eventsTabClass: st.tab === "events" ? "tab-active" : "tab-inactive",
       profileTabClass: st.tab === "profile" ? "tab-active" : "tab-inactive",
-      events: (() => {
+      ...(() => {
+        const cm = st.calMonth, yr = Math.floor(cm / 12), mo = cm % 12;
         const today = new Date().toISOString().slice(0, 10);
-        const fmt = d => new Date(d + "T00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short" });
-        return ACAD_EVENTS.map(ev => {
-          const past = (ev.end || ev.date) < today;
-          const dateStr = ev.end ? fmt(ev.date) + " – " + fmt(ev.end) : fmt(ev.date);
-          return {
-            date: dateStr, title: ev.title, tag: ev.tag,
-            tagClass: "tag-" + ev.tag,
-            rowClass: past ? "ev-past" : ""
-          };
-        });
+        const pad = n => String(n).padStart(2, "0");
+        const moKey = yr + "-" + pad(mo + 1);
+        const firstDay = new Date(yr, mo, 1).getDay();
+        const daysInMonth = new Date(yr, mo + 1, 0).getDate();
+        const tagColor = t => t === "holiday" ? "rgba(209,104,46,.7)" : t === "exam" ? "rgba(61,141,189,.7)" : "rgba(243,241,236,.45)";
+        const evByDay = {};
+        for (const ev of ACAD_EVENTS) {
+          const s = ev.date, e = ev.end || ev.date;
+          if (e < moKey + "-01" || s > moKey + "-" + pad(daysInMonth)) continue;
+          const d0 = Math.max(1, s >= moKey + "-01" ? +s.slice(8, 10) : 1);
+          const d1 = Math.min(daysInMonth, e <= moKey + "-" + pad(daysInMonth) ? +e.slice(8, 10) : daysInMonth);
+          for (let d = d0; d <= d1; d++) { (evByDay[d] = evByDay[d] || []).push(ev); }
+        }
+        const calDays = [];
+        for (let i = 0; i < firstDay; i++) calDays.push({ num: "", numColor: "transparent", dots: [], cellClass: "", onClick: () => {} });
+        for (let d = 1; d <= daysInMonth; d++) {
+          const iso = moKey + "-" + pad(d);
+          const isToday = iso === today;
+          const sel = st.calSelectedDay === iso;
+          const evs = evByDay[d] || [];
+          const dd = d;
+          calDays.push({
+            num: String(d), numColor: isToday ? "#d1682e" : sel ? "#f3f1ec" : "rgba(243,241,236,.55)",
+            dots: evs.slice(0, 4).map(e => ({ color: tagColor(e.tag), title: e.title })),
+            cellClass: sel ? "cal-sel" : "", onClick: () => this.setState({ calSelectedDay: iso })
+          });
+        }
+        const selEvs = st.calSelectedDay ? ACAD_EVENTS.filter(ev => st.calSelectedDay >= ev.date && st.calSelectedDay <= (ev.end || ev.date)) : [];
+        const fmtSel = st.calSelectedDay ? new Date(st.calSelectedDay + "T00:00").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }) : "";
+        return {
+          calHeaders: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+          calMonthLabel: new Date(yr, mo).toLocaleDateString("en-GB", { month: "long", year: "numeric" }),
+          calDays, calPrev: () => this.setState({ calMonth: cm - 1, calSelectedDay: null }),
+          calNext: () => this.setState({ calMonth: cm + 1, calSelectedDay: null }),
+          calSelected: selEvs.length > 0, calSelectedLabel: fmtSel,
+          calSelectedEvents: selEvs.map(ev => ({ title: ev.title, tag: ev.tag, tagClass: "tag-" + ev.tag }))
+        };
       })(),
       myTeam: this.teamOf(me),
       pwOld: st.pwOld, pwNew: st.pwNew, pwNote: st.pwNote,
