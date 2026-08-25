@@ -358,7 +358,7 @@
           <div style="display:grid;grid-template-columns:78px repeat(7,1fr);border-bottom:1px solid rgba(243,241,236,.08)">
             <div style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.5);background:#201f1e">{{ row.time }}</div>
             <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="7">
-              <div title="{{ c.title }}" class="{{ c.class }}" style="min-height:46px;padding:7px 9px;border-left:1px solid rgba(243,241,236,.08);display:flex;flex-direction:column;gap:2px;justify-content:center">
+              <div onClick="{{ c.onClick }}" title="{{ c.title }}" class="{{ c.class }}" style="min-height:46px;padding:7px 9px;border-left:1px solid rgba(243,241,236,.08);display:flex;flex-direction:column;gap:2px;justify-content:center;cursor:pointer" style-hover="background:#252524">
                 <span style="font-size:12px;font-weight:500;line-height:1.25">{{ c.song }}</span>
                 <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:rgba(243,241,236,.42)">{{ c.by }}</span>
               </div>
@@ -843,11 +843,20 @@ class Component extends DCLogic {
         const mine = rec && rec.by === me;
         const withList = (rec && rec.with) || [];
         const roll = rec ? [rec.by || "unclaimed"].concat(withList).join(", ") : "";
+        const key = this.key(st.week, day, t);
+        const canClaim = !rec || rec.by === "unclaimed";
         return {
           song: rec ? rec.song : "",
           by: rec && withList.length ? (rec.by || "unclaimed") + " +" + withList.length : roll,
           class: mine ? "cell-yours" : rec ? "cell-booked" : "cell-free",
-          title: (rec ? rec.song + " — " + roll : "free") + " · " + day + " " + LABEL[t]
+          title: (rec ? rec.song + " — " + roll : "free") + " · " + day + " " + LABEL[t],
+          onClick: mine ? () => this.setState({
+            booking: { week: st.week, day, t, label: day + " " + LABEL[t], existing: true, origin: key },
+            bookingSong: rec.song, bookingWith: (rec.with || []).slice(), pickQuery: ""
+          }) : (canClaim && me) ? () => this.setState({
+            booking: { week: st.week, day, t, label: "Request", existing: false },
+            bookingSong: rec ? rec.song : "", bookingWith: [], pickQuery: ""
+          }) : null
         };
       })
     }));
