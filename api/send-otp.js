@@ -73,8 +73,7 @@ module.exports = async (req, res) => {
         throw new Error(linkData.msg || linkData.message || linkData.error || "Failed to generate Supabase OTP");
       }
 
-      const properties = linkData.properties || linkData;
-      otp = properties.email_otp;
+      otp = linkData.email_otp || (linkData.properties && linkData.properties.email_otp);
       if (!/^\d{6}$/.test(String(otp || ""))) {
         throw new Error("Supabase did not return a valid email OTP");
       }

@@ -84,7 +84,8 @@
       </sc-if>
         <sc-if value="{{ emailLogin }}" hint-placeholder-val="{{ true }}">
           <sc-if value="{{ showSendOtp }}" hint-placeholder-val="{{ true }}">
-            <button onClick="{{ sendOtp }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Send OTP</button>
+            <button onClick="{{ signIn }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Sign in</button>
+            <button onClick="{{ sendOtp }}" style="padding:14px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:rgba(243,241,236,.7);font-size:14px;font-weight:500;cursor:pointer" style-hover="border-color:#f3f1ec;color:#f3f1ec">First time? Send OTP</button>
           </sc-if>
           <sc-if value="{{ showVerifyOtp }}" hint-placeholder-val="{{ false }}">
             <button onClick="{{ verifyOtp }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Verify OTP &amp; set password</button>
