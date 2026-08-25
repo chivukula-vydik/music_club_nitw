@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "dependencies": {
+    "googleapis": "^176.0.0",
+    "nodemailer": "^9.0.5"
+  }
+}
