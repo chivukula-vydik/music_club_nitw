@@ -35,6 +35,11 @@
   .filter-off{border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.6)}
   .chip-on{border:1px solid #3d8dbd;background:rgba(61,141,189,.2);color:#cfe4f0}
   .chip-off{border:1px solid rgba(243,241,236,.16);background:transparent;color:rgba(243,241,236,.55)}
+  .tag-holiday{background:rgba(209,104,46,.18);color:#e8ac86}
+  .tag-exam{background:rgba(61,141,189,.18);color:#7cb8db}
+  .tag-event{background:rgba(243,241,236,.1);color:rgba(243,241,236,.7)}
+  .tag-admin{background:rgba(243,241,236,.06);color:rgba(243,241,236,.5)}
+  .ev-past{opacity:.45}
 </style>
 </helmet>
 
@@ -116,6 +121,7 @@
     <button onClick="{{ goJam }}" class="tab {{ jamTabClass }}">Jam room</button>
     <button onClick="{{ goSkills }}" class="tab {{ skillsTabClass }}">Members &amp; skills</button>
     <button onClick="{{ goMinutes }}" class="tab {{ minutesTabClass }}">Minutes</button>
+    <button onClick="{{ goEvents }}" class="tab {{ eventsTabClass }}">Events</button>
     <button onClick="{{ goProfile }}" class="tab {{ profileTabClass }}">My profile</button>
   </div>
 
@@ -162,6 +168,29 @@
               <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.4)">noted by {{ m.author }}</span>
             </div>
           </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ onEvents }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:32px 28px 56px;display:flex;flex-direction:column;gap:24px;max-width:860px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">Academic calendar</h2>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">NIT Warangal · Autumn 2026-27 · key dates for the semester</span>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+      <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(209,104,46,.4);border:1px solid #d1682e"></span>holiday</span>
+      <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(61,141,189,.35);border:1px solid rgba(61,141,189,.6)"></span>exam</span>
+      <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(243,241,236,.15);border:1px solid rgba(243,241,236,.3)"></span>event</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+      <sc-for list="{{ events }}" as="ev" hint-placeholder-count="8">
+        <div class="{{ ev.rowClass }}" style="display:flex;align-items:center;gap:16px;padding:16px 22px;background:#1a1a1a">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45);min-width:120px;white-space:nowrap">{{ ev.date }}</span>
+          <span style="flex:1;font-size:14.5px;font-weight:500">{{ ev.title }}</span>
+          <span class="{{ ev.tagClass }}" style="padding:5px 11px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap">{{ ev.tag }}</span>
         </div>
       </sc-for>
     </div>
@@ -537,6 +566,38 @@ const CLUSTERS = [
 // the demo schedule and the team-restricted minutes all come from the database,
 // filtered by row-level rules before they ever reach the browser.
 
+// ponytail: academic calendar hardcoded from PDF, update each semester
+const ACAD_EVENTS = [
+  { date: "2026-07-13", end: "2026-07-19", title: "Registration for Autumn Semester", tag: "admin" },
+  { date: "2026-07-20", title: "Commencement of Classwork (continuing students)", tag: "event" },
+  { date: "2026-08-15", title: "Independence Day", tag: "holiday" },
+  { date: "2026-08-17", end: "2026-08-18", title: "First Class Review Committee Meeting", tag: "event" },
+  { date: "2026-08-22", title: "UG Orientation", tag: "event" },
+  { date: "2026-08-23", title: "PG Orientation", tag: "event" },
+  { date: "2026-08-24", title: "Commencement of Classwork (1st semester)", tag: "event" },
+  { date: "2026-08-26", title: "Milad-un-Nabi", tag: "holiday" },
+  { date: "2026-09-03", end: "2026-09-11", title: "Mid-Semester Exams (continuing students)", tag: "exam" },
+  { date: "2026-09-14", title: "Ganesh Chaturthi", tag: "holiday" },
+  { date: "2026-09-19", end: "2026-09-20", title: "24th Convocation", tag: "event" },
+  { date: "2026-10-02", title: "Mahatma Gandhi's Birthday", tag: "holiday" },
+  { date: "2026-10-05", end: "2026-10-09", title: "Mid-Semester Exams (1st semester)", tag: "exam" },
+  { date: "2026-10-10", title: "Foundation Day", tag: "event" },
+  { date: "2026-10-12", end: "2026-10-13", title: "Second Class Review Committee Meeting", tag: "event" },
+  { date: "2026-10-20", title: "Dussehra", tag: "holiday" },
+  { date: "2026-10-30", end: "2026-10-31", title: "Technozion", tag: "event" },
+  { date: "2026-11-08", title: "Diwali", tag: "holiday" },
+  { date: "2026-11-09", title: "Last Working Day (continuing students)", tag: "event" },
+  { date: "2026-11-11", end: "2026-11-18", title: "End-Semester Exams (continuing students)", tag: "exam" },
+  { date: "2026-11-16", title: "Last Working Day (1st semester)", tag: "event" },
+  { date: "2026-11-19", end: "2026-11-25", title: "End-Semester Exams (1st semester)", tag: "exam" },
+  { date: "2026-11-24", title: "Guru Nanak's Birthday", tag: "holiday" },
+  { date: "2026-12-01", end: "2026-12-11", title: "Winter Vacation (students)", tag: "holiday" },
+  { date: "2026-12-09", title: "Senate Meeting", tag: "event" },
+  { date: "2026-12-11", title: "Publication of Results", tag: "event" },
+  { date: "2026-12-12", end: "2026-12-17", title: "Registration for Spring Semester", tag: "admin" },
+  { date: "2026-12-18", title: "Spring Semester Classwork Begins", tag: "event" },
+  { date: "2026-12-25", title: "Christmas Day", tag: "holiday" },
+];
 const SEED_MOM = [];
 const KEY = "mc-portal-v1";
 const split = s => (s || "").split(",").map(x => x.trim()).filter(Boolean);
@@ -783,15 +844,30 @@ class Component extends DCLogic {
         if (this.db && this.db.serverMode) this.db.signOut();
         this.persist({ user: null, account: null, loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false });
       },
-      onMine: st.tab === "mine", onJam: st.tab === "jam", onSkills: st.tab === "skills", onProfile: st.tab === "profile", onMinutes: st.tab === "minutes",
+      onMine: st.tab === "mine", onJam: st.tab === "jam", onSkills: st.tab === "skills", onProfile: st.tab === "profile", onMinutes: st.tab === "minutes", onEvents: st.tab === "events",
       goMine: () => this.setState({ tab: "mine" }), goJam: () => this.setState({ tab: "jam" }), goSkills: () => this.setState({ tab: "skills" }),
       goMinutes: () => this.setState({ tab: "minutes" }),
+      goEvents: () => this.setState({ tab: "events" }),
       goProfile: () => { this.setState({ tab: "profile", saveNote: "", pwNote: "" }); this.loadProfile(me); },
       mineTabClass: st.tab === "mine" ? "tab-active" : "tab-inactive",
       jamTabClass: st.tab === "jam" ? "tab-active" : "tab-inactive",
       skillsTabClass: st.tab === "skills" ? "tab-active" : "tab-inactive",
       minutesTabClass: st.tab === "minutes" ? "tab-active" : "tab-inactive",
+      eventsTabClass: st.tab === "events" ? "tab-active" : "tab-inactive",
       profileTabClass: st.tab === "profile" ? "tab-active" : "tab-inactive",
+      events: (() => {
+        const today = new Date().toISOString().slice(0, 10);
+        const fmt = d => new Date(d + "T00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+        return ACAD_EVENTS.map(ev => {
+          const past = (ev.end || ev.date) < today;
+          const dateStr = ev.end ? fmt(ev.date) + " – " + fmt(ev.end) : fmt(ev.date);
+          return {
+            date: dateStr, title: ev.title, tag: ev.tag,
+            tagClass: "tag-" + ev.tag,
+            rowClass: past ? "ev-past" : ""
+          };
+        });
+      })(),
       myTeam: this.teamOf(me),
       pwOld: st.pwOld, pwNew: st.pwNew, pwNote: st.pwNote,
       onPwOld: e => this.setState({ pwOld: e.target.value, pwNote: "" }),
