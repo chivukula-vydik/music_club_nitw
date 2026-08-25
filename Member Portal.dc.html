@@ -70,7 +70,7 @@
           <input type="email" value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" placeholder="you@student.nitw.ac.in" autoComplete="email" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
         </label>
         <label style="display:flex;flex-direction:column;gap:8px">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Password</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">{{ passLabel }}</span>
           <input type="password" value="{{ loginPass }}" onChange="{{ onLoginPass }}" placeholder="••••••••" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
         </label>
         <sc-if value="{{ setupMode }}" hint-placeholder-val="{{ false }}">
@@ -708,6 +708,7 @@ class Component extends DCLogic {
       signinMode: st.loginMode === "signin",
       setupMode: st.loginMode === "setup" || st.loginMode === "forgot",
       forgotMode: st.loginMode === "forgot",
+      passLabel: st.loginMode === "forgot" ? "New password" : st.loginMode === "setup" ? "Set password" : "Password",
       setupTitle: st.loginMode === "forgot" ? "RESET PASSWORD" : "FIRST-TIME SETUP",
       setupDesc: st.loginMode === "forgot" ? "We'll send an OTP to verify your identity, then you can set a new password." : "Welcome! Verify your email with an OTP, then set your password to get started.",
       goSetup: () => this.setState({ loginMode: "setup", loginErr: "" }),
