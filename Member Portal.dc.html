@@ -76,7 +76,7 @@
         </label>
         <label style="display:flex;flex-direction:column;gap:8px">
           <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Email OTP</span>
-          <input inputmode="numeric" autocomplete="one-time-code" value="{{ otp }}" onChange="{{ onOtp }}" placeholder="6-digit code" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+          <input inputmode="numeric" autocomplete="one-time-code" value="{{ otp }}" onChange="{{ onOtp }}" placeholder="enter OTP from email" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
         </label>
         </sc-if>
       <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}">
@@ -707,7 +707,7 @@ class Component extends DCLogic {
       showVerifyOtp: !!st.otpSent,
       onLoginEmail: e => this.setState({ loginEmail: e.target.value, loginErr: "" }),
       onLoginPass: e => this.setState({ loginPass: e.target.value, loginErr: "" }),
-      onOtp: e => this.setState({ otp: e.target.value.replace(/\D/g, "").slice(0, 6), loginErr: "" }),
+      onOtp: e => this.setState({ otp: e.target.value.replace(/\D/g, "").slice(0, 8), loginErr: "" }),
       sendOtp: async () => {
         const email = st.loginEmail.trim().toLowerCase();
         if (!this.matchEmail(email)) return this.setState({ loginErr: "That email isn't on the club roster. Ask the Tech team to add you." });
@@ -728,7 +728,7 @@ class Component extends DCLogic {
         const email = st.loginEmail.trim().toLowerCase();
         const name = this.matchEmail(email);
         if (!name) return this.setState({ loginErr: "That email isn't on the club roster. Ask the Tech team to add you." });
-        if (!/^\d{6}$/.test(st.otp)) return this.setState({ loginErr: "Enter the 6-digit OTP from your email." });
+        if (!/^\d{6,8}$/.test(st.otp)) return this.setState({ loginErr: "Enter the OTP from your email." });
         if (st.loginPass.trim().length < 6) return this.setState({ loginErr: "Password needs at least 6 characters." });
         try {
           if (SERVER) {
