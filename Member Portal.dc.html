@@ -3,6 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a1a1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="assets/logo.png">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -42,6 +48,48 @@
   .ev-past{opacity:.45}
   .cal-sel{background:#252524 !important;outline:1px solid #d1682e;outline-offset:-1px}
   .tag-club{background:rgba(130,200,130,.18);color:#8ec88e}
+  @media(max-width:768px){
+    header{padding:10px 14px!important;gap:8px!important}
+    header a img{width:24px!important;height:24px!important}
+    header a span{font-size:11px!important}
+    header a span:last-child{display:none!important}
+    header>div{gap:8px!important}
+    header>div>div{gap:2px!important}
+    header>div>div>span:first-child{font-size:12px!important}
+    header>div>div>span:last-child{display:none!important}
+    header>div>button{padding:6px 10px!important;font-size:11px!important}
+    .mc-ptabs{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 32px!important;scrollbar-width:none;flex-wrap:nowrap!important}
+    .mc-ptabs::-webkit-scrollbar{display:none}
+    .tab{padding:12px 14px 10px!important;font-size:12px!important;white-space:nowrap;flex-shrink:0!important}
+    .mc-ptab-arr{position:absolute!important;top:0;bottom:0;width:30px;border:none;color:rgba(243,241,236,.8);font-size:18px;cursor:pointer;z-index:2;display:flex!important;align-items:center;justify-content:center;padding:0}
+    .mc-ptab-left{left:0;background:linear-gradient(to right,#1a1a1a 50%,transparent)!important}
+    .mc-ptab-right{right:0;background:linear-gradient(to left,#1a1a1a 50%,transparent)!important}
+    section{padding:24px 16px 40px!important}
+    h2{font-size:24px!important}
+    .mc-day-tabs{display:flex!important;gap:0;border:1px solid rgba(243,241,236,.14);border-bottom:none;overflow-x:auto}
+    .mc-day-tab{flex:1;min-width:0;padding:12px 2px;border:none;background:#242322;color:rgba(243,241,236,.5);font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center;cursor:pointer;border-bottom:2px solid transparent}
+    .mc-day-tab.active{color:#f3f1ec;background:#1a1a1a;border-bottom-color:#d1682e}
+    .mc-jam-grid{min-width:0!important}
+    .mc-jam-grid>.mc-jr:first-child{display:none!important}
+    .mc-jam-section .mc-jr{grid-template-columns:78px 1fr!important}
+    .mc-jam-section[data-day="0"] .mc-jr>:nth-child(n+3){display:none!important}
+    .mc-jam-section[data-day="1"] .mc-jr>:nth-child(2),.mc-jam-section[data-day="1"] .mc-jr>:nth-child(n+4){display:none!important}
+    .mc-jam-section[data-day="2"] .mc-jr>:nth-child(-n+3):not(:first-child),.mc-jam-section[data-day="2"] .mc-jr>:nth-child(n+5){display:none!important}
+    .mc-jam-section[data-day="3"] .mc-jr>:nth-child(-n+4):not(:first-child),.mc-jam-section[data-day="3"] .mc-jr>:nth-child(n+6){display:none!important}
+    .mc-jam-section[data-day="4"] .mc-jr>:nth-child(-n+5):not(:first-child),.mc-jam-section[data-day="4"] .mc-jr>:nth-child(n+7){display:none!important}
+    .mc-jam-section[data-day="5"] .mc-jr>:nth-child(-n+6):not(:first-child),.mc-jam-section[data-day="5"] .mc-jr>:nth-child(n+8){display:none!important}
+    .mc-jam-section[data-day="6"] .mc-jr>:nth-child(-n+7):not(:first-child){display:none!important}
+    .mc-mgr-list>div{display:none!important}
+    .mc-jam-section[data-day="0"] .mc-mgr-list>:nth-child(1),
+    .mc-jam-section[data-day="1"] .mc-mgr-list>:nth-child(2),
+    .mc-jam-section[data-day="2"] .mc-mgr-list>:nth-child(3),
+    .mc-jam-section[data-day="3"] .mc-mgr-list>:nth-child(4),
+    .mc-jam-section[data-day="4"] .mc-mgr-list>:nth-child(5),
+    .mc-jam-section[data-day="5"] .mc-mgr-list>:nth-child(6),
+    .mc-jam-section[data-day="6"] .mc-mgr-list>:nth-child(7){display:flex!important}
+    footer{padding:16px!important}
+  }
+  @media(min-width:769px){.mc-day-tabs{display:none!important}.mc-ptab-arr{display:none!important}}
 </style>
 </helmet>
 
@@ -118,13 +166,17 @@
 <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ true }}">
 <main style="flex:1;display:flex;flex-direction:column;gap:0">
 
-  <div style="display:flex;gap:4px;padding:0 28px;border-bottom:1px solid rgba(243,241,236,.1);background:#1a1a1a">
-    <button onClick="{{ goMine }}" class="tab {{ mineTabClass }}">My slots</button>
-    <button onClick="{{ goJam }}" class="tab {{ jamTabClass }}">Jam room</button>
-    <button onClick="{{ goSkills }}" class="tab {{ skillsTabClass }}">Members &amp; skills</button>
-    <button onClick="{{ goMinutes }}" class="tab {{ minutesTabClass }}">Minutes</button>
-    <button onClick="{{ goEvents }}" class="tab {{ eventsTabClass }}">Events</button>
-    <button onClick="{{ goProfile }}" class="tab {{ profileTabClass }}">My profile</button>
+  <div class="mc-ptabs-wrap" style="position:relative;border-bottom:1px solid rgba(243,241,236,.1);background:#1a1a1a">
+    <div class="mc-ptabs" style="display:flex;gap:4px;padding:0 28px">
+      <button onClick="{{ goMine }}" class="tab {{ mineTabClass }}">My slots</button>
+      <button onClick="{{ goJam }}" class="tab {{ jamTabClass }}">Jam room</button>
+      <button onClick="{{ goSkills }}" class="tab {{ skillsTabClass }}">Members &amp; skills</button>
+      <button onClick="{{ goMinutes }}" class="tab {{ minutesTabClass }}">Minutes</button>
+      <button onClick="{{ goEvents }}" class="tab {{ eventsTabClass }}">Events</button>
+      <button onClick="{{ goProfile }}" class="tab {{ profileTabClass }}">My profile</button>
+    </div>
+    <button class="mc-ptab-arr mc-ptab-left" aria-label="scroll left">‹</button>
+    <button class="mc-ptab-arr mc-ptab-right" aria-label="scroll right">›</button>
   </div>
 
   <sc-if value="{{ onMinutes }}" hint-placeholder-val="{{ false }}">
@@ -363,7 +415,7 @@
   </sc-if>
 
   <sc-if value="{{ onJam }}" hint-placeholder-val="{{ false }}">
-  <section style="padding:32px 28px 56px;display:flex;flex-direction:column;gap:24px">
+  <section class="mc-jam-section" data-day="0" style="padding:32px 28px 56px;display:flex;flex-direction:column;gap:24px">
     <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between">
       <div style="display:flex;flex-direction:column;gap:12px">
         <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">Jam room schedule</h2>
@@ -383,9 +435,18 @@
       </div>
     </div>
 
+    <div class="mc-day-tabs" style="display:none">
+      <button class="mc-day-tab active" data-day="0">Mon</button>
+      <button class="mc-day-tab" data-day="1">Tue</button>
+      <button class="mc-day-tab" data-day="2">Wed</button>
+      <button class="mc-day-tab" data-day="3">Thu</button>
+      <button class="mc-day-tab" data-day="4">Fri</button>
+      <button class="mc-day-tab" data-day="5">Sat</button>
+      <button class="mc-day-tab" data-day="6">Sun</button>
+    </div>
     <div style="overflow-x:auto;border:1px solid rgba(243,241,236,.14)">
-      <div style="min-width:900px">
-        <div style="display:grid;grid-template-columns:78px repeat(7,1fr);background:#242322;border-bottom:1px solid rgba(243,241,236,.14)">
+      <div class="mc-jam-grid" style="min-width:900px">
+        <div class="mc-jr" style="display:grid;grid-template-columns:78px repeat(7,1fr);background:#242322;border-bottom:1px solid rgba(243,241,236,.14)">
           <div style="padding:11px 10px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Time</div>
           <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
             <div style="padding:11px 10px;display:flex;flex-direction:column;gap:3px;border-left:1px solid rgba(243,241,236,.1)">
@@ -395,7 +456,7 @@
           </sc-for>
         </div>
         <sc-for list="{{ grid }}" as="row" hint-placeholder-count="14">
-          <div style="display:grid;grid-template-columns:78px repeat(7,1fr);border-bottom:1px solid rgba(243,241,236,.08)">
+          <div class="mc-jr" style="display:grid;grid-template-columns:78px repeat(7,1fr);border-bottom:1px solid rgba(243,241,236,.08)">
             <div style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.5);background:#201f1e">{{ row.time }}</div>
             <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="7">
               <div onClick="{{ c.onClick }}" title="{{ c.title }}" class="{{ c.class }}" style="min-height:46px;padding:7px 9px;border-left:1px solid rgba(243,241,236,.08);display:flex;flex-direction:column;gap:2px;justify-content:center;cursor:pointer" style-hover="background:#252524">
@@ -408,7 +469,7 @@
       </div>
     </div>
 
-    <div style="display:flex;flex-wrap:wrap;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+    <div class="mc-mgr-list" style="display:flex;flex-wrap:wrap;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
       <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
         <div style="flex:1 1 140px;padding:16px 18px;background:#1a1a1a;display:flex;flex-direction:column;gap:5px">
           <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">{{ d.name }} manager</span>
@@ -629,6 +690,23 @@
 
 </div>
 </x-dc>
+<script>
+document.addEventListener('click',function(e){
+  var tab=e.target.closest('.mc-day-tab');
+  if(tab){
+    var day=tab.getAttribute('data-day');
+    var section=tab.closest('.mc-jam-section');
+    if(section)section.setAttribute('data-day',day);
+    var tabs=tab.parentElement.querySelectorAll('.mc-day-tab');
+    for(var i=0;i<tabs.length;i++)tabs[i].classList.remove('active');
+    tab.classList.add('active');
+  }
+  var al=e.target.closest('.mc-ptab-left');
+  if(al){var p=al.parentElement.querySelector('.mc-ptabs');if(p)p.scrollBy({left:-120,behavior:'smooth'});}
+  var ar=e.target.closest('.mc-ptab-right');
+  if(ar){var p=ar.parentElement.querySelector('.mc-ptabs');if(p)p.scrollBy({left:120,behavior:'smooth'});}
+});
+</script>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
 const DAYS = [
   ["Monday", "Saumitra"], ["Tuesday", "Yashaswini"], ["Wednesday", "Kaivalya Kappaganthula"],
