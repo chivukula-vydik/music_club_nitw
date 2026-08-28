@@ -2,13 +2,14 @@ const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const path = require("path");
 
-const SECRET = process.env.OTP_SECRET || "mc-nitw-otp-fallback";
+const SECRET = process.env.OTP_SECRET;
+if (!SECRET) console.warn("OTP_SECRET not set — OTP signing will fail at runtime");
 const SMTP_HOST = process.env.SMTP_HOST || "smtp.gmail.com";
 const SMTP_PORT = Number(process.env.SMTP_PORT) || 587;
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 const MAIL_FROM = process.env.MAIL_FROM || SMTP_USER;
-const SUPABASE_URL = process.env.SUPABASE_URL || "https://xejvrshbsyuxvdllazpn.supabase.co";
+const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const OTP_EXPIRY = 10 * 60 * 1000;
 
@@ -17,7 +18,7 @@ function sign(email, otp, expires) {
 }
 
 module.exports = async (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", process.env.ALLOWED_ORIGIN || "");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
