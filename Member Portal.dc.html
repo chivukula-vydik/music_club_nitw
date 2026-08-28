@@ -923,7 +923,9 @@ class Component extends DCLogic {
     const q = (input || "").trim().toLowerCase();
     if (!q) return null;
     const match = ROSTER.find(r => (r[7] || "").toLowerCase() === q);
-    return match ? match[0] : null;
+    if (match) return match[0];
+    if (SERVER && ROSTER.length === 0 && /^[^\s@]+@student\.nitw\.ac\.in$/.test(q)) return q.split("@")[0];
+    return null;
   }
   teamOf(name) { return ((ROSTER.find(r => r[0] === name) || [])[3] || "Core"); }
   canSee(aud, name) {
