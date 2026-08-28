@@ -96,24 +96,35 @@ function localState() {
   try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "{}"); } catch (e) { return {}; }
 }
 
+// Minutes older than 4 months get permanently deleted.
+function minutesCutoff() {
+  const d = new Date();
+  d.setMonth(d.getMonth() - 4);
+  return d.toISOString().slice(0, 10);
+}
+
 // Returns { members, bookings, profiles, minutes } in the shape the portal uses.
 export async function load() {
   if (!serverMode) {
     const s = localState();
+    const cut = minutesCutoff();
+    const kept = (s.moms || []).filter(m => m.date >= cut);
+    if (kept.length !== (s.moms || []).length) saveLocal({ moms: kept });
     return {
       members: null, // portal falls back to its built-in roster
       bookings: s.bookings || {},
       profiles: s.profiles || {},
-      minutes: s.moms || []
+      minutes: kept
     };
   }
 
   const c = await client();
+  const cut = minutesCutoff();
   const [members, bookings, profiles, minutes] = await Promise.all([
     c.from("members").select("name,branch,year,team,major_skill,minor_skill,vibe,email").order("name"),
     c.from("bookings").select("week,day,slot,song,booked_by,players"),
     c.from("profiles").select("member_name,major_skill,minor_skill,vibe"),
-    c.from("minutes").select("id,meeting_date,title,audience,author,body").order("meeting_date", { ascending: false })
+    c.from("minutes").select("id,meeting_date,title,audience,author,body").gte("meeting_date", cut).order("meeting_date", { ascending: false })
   ]);
 
   const err = [members, bookings, profiles, minutes].find(r => r.error);

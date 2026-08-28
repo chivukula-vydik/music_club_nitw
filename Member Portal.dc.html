@@ -37,6 +37,10 @@
   .cell-yours{background:rgba(209,104,46,.28);color:#f3d5c2}
   .week-active{border:1px solid #d1682e;background:rgba(209,104,46,.2);color:#f3f1ec}
   .week-inactive{border:1px solid rgba(243,241,236,.18);background:transparent;color:rgba(243,241,236,.55)}
+  .week-disabled{opacity:.25;pointer-events:none}
+  .notif-event{background:rgba(209,104,46,.15);color:#d1682e}
+  .notif-slot{background:rgba(61,141,189,.15);color:#7cb8db}
+  .notif-info{background:rgba(243,241,236,.08);color:rgba(243,241,236,.5)}
   .filter-on{border:1px solid #d1682e;background:rgba(209,104,46,.2);color:#f3f1ec}
   .filter-off{border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.6)}
   .chip-on{border:1px solid #3d8dbd;background:rgba(61,141,189,.2);color:#cfe4f0}
@@ -107,14 +111,43 @@
         <span style="font-size:13.5px;font-weight:600">{{ me.name }}</span>
         <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.45)">{{ me.meta }}</span>
       </div>
+      <div style="position:relative">
+        <button onClick="{{ toggleNotifs }}" style="position:relative;width:34px;height:34px;border-radius:8px;border:1px solid rgba(243,241,236,.18);background:transparent;color:rgba(243,241,236,.7);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="border-color:#d1682e;color:#f3f1ec">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13a2 2 0 0 0 4 0"/><path d="M13 6c0-2.76-2.24-5-5-5S3 3.24 3 6c0 3.5-1.5 5-1.5 5h13S13 9.5 13 6z"/></svg>
+          <sc-if value="{{ hasNotifs }}" hint-placeholder-val="{{ false }}">
+            <span style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:#d1682e"></span>
+          </sc-if>
+        </button>
+        <sc-if value="{{ notifsOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:42px;right:0;width:320px;max-height:400px;overflow-y:auto;border:1px solid rgba(243,241,236,.14);background:#1a1a1a;box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:50;display:flex;flex-direction:column">
+            <div style="padding:14px 16px;border-bottom:1px solid rgba(243,241,236,.1);display:flex;align-items:center;justify-content:space-between">
+              <span style="font-family:'Archivo Black',sans-serif;font-size:14px">Notifications</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(243,241,236,.4)">{{ notifCount }}</span>
+            </div>
+            <sc-for list="{{ notifs }}" as="n" hint-placeholder-count="3">
+              <div onClick="{{ n.onClick }}" style="padding:14px 16px;border-bottom:1px solid rgba(243,241,236,.06);cursor:pointer;display:flex;gap:12px;align-items:flex-start;transition:background .15s" style-hover="background:#222">
+                <div class="{{ n.iconClass }}" style="flex-shrink:0;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px">{{ n.icon }}</div>
+                <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                  <span style="font-size:13px;font-weight:600;line-height:1.3">{{ n.title }}</span>
+                  <span style="font-size:12px;color:rgba(243,241,236,.55);line-height:1.4">{{ n.detail }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:rgba(243,241,236,.35)">{{ n.when }}</span>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noNotifs }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:32px 16px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.35)">nothing right now</div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
       <button onClick="{{ signOut }}" style="padding:8px 14px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:rgba(243,241,236,.7);font-size:12.5px;font-weight:500;cursor:pointer" style-hover="border-color:#f3f1ec;color:#f3f1ec">Sign out</button>
     </div>
   </sc-if>
 </header>
 
 <sc-if value="{{ signedOut }}" hint-placeholder-val="{{ true }}">
-<main style="flex:1;display:flex;align-items:center;justify-content:center;padding:56px 24px">
-  <div style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:26px;animation:mcin .3s ease both">
+<main style="flex:1;display:flex;align-items:center;justify-content:center;padding:56px 24px;overflow-y:auto">
+  <div style="width:100%;max-width:420px;flex-shrink:0;display:flex;flex-direction:column;gap:26px;animation:mcin .3s ease both">
     <div style="display:flex;flex-direction:column;gap:12px">
       <h1 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:40px;line-height:.98;letter-spacing:-.02em;text-shadow:2px 0 rgba(194,85,31,.85),-2px 0 rgba(28,107,150,.85)">MEMBER<br><span style="color:#d1682e">LOGIN</span></h1>
       <p style="margin:0;font-size:15px;line-height:1.6;color:rgba(243,241,236,.6)">Book jam-room slots and keep your skills up to date.</p>
@@ -142,7 +175,7 @@
         <span style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.5;color:#e8886a">{{ loginErr }}</span>
       </sc-if>
         <sc-if value="{{ signinMode }}" hint-placeholder-val="{{ true }}">
-          <button onClick="{{ signIn }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Sign in</button>
+          <button onClick="{{ signIn }}" style="width:100%;margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Sign in</button>
           <div style="display:flex;justify-content:space-between">
             <button onClick="{{ goSetup }}" style="padding:0;border:none;background:transparent;color:rgba(243,241,236,.45);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer" style-hover="color:#d1682e">First time? Set up with OTP →</button>
             <button onClick="{{ goForgot }}" style="padding:0;border:none;background:transparent;color:rgba(243,241,236,.45);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer" style-hover="color:#d1682e">Forgot password?</button>
@@ -150,10 +183,10 @@
         </sc-if>
         <sc-if value="{{ setupMode }}" hint-placeholder-val="{{ false }}">
           <sc-if value="{{ showSendOtp }}" hint-placeholder-val="{{ true }}">
-            <button onClick="{{ sendOtp }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Send OTP to my email</button>
+            <button onClick="{{ sendOtp }}" style="width:100%;margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Send OTP to my email</button>
           </sc-if>
           <sc-if value="{{ showVerifyOtp }}" hint-placeholder-val="{{ false }}">
-            <button onClick="{{ verifyOtp }}" style="margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">{{ forgotMode ? "Verify OTP & reset password" : "Verify OTP & set password" }}</button>
+            <button onClick="{{ verifyOtp }}" style="width:100%;margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">{{ forgotMode ? "Verify OTP & reset password" : "Verify OTP & set password" }}</button>
           </sc-if>
           <button onClick="{{ goSignin }}" style="padding:0;border:none;background:transparent;color:rgba(243,241,236,.45);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;text-align:left" style-hover="color:#d1682e">← Back to sign in</button>
         </sc-if>
@@ -419,15 +452,15 @@
     <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between">
       <div style="display:flex;flex-direction:column;gap:12px">
         <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">Jam room schedule</h2>
-        <div style="display:flex;gap:8px">
-          <sc-for list="{{ weekTabs }}" as="w" hint-placeholder-count="2">
-            <button onClick="{{ w.onClick }}" class="{{ w.class }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:9px 15px;border-radius:8px;cursor:pointer;font-family:inherit;text-align:left">
-              <span style="font-size:13px;font-weight:600">{{ w.label }}</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;opacity:.7">{{ w.range }}</span>
-            </button>
-          </sc-for>
+        <div style="display:flex;align-items:center;gap:12px">
+          <button onClick="{{ weekPrev }}" class="{{ weekPrevClass }}" style="width:32px;height:32px;border-radius:6px;border:1px solid rgba(243,241,236,.2);background:transparent;color:#f3f1ec;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="border-color:#d1682e;color:#d1682e">&#8249;</button>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:140px">
+            <span style="font-size:14px;font-weight:600">{{ weekLabel }}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(243,241,236,.5)">{{ weekRange }}</span>
+          </div>
+          <button onClick="{{ weekNext }}" class="{{ weekNextClass }}" style="width:32px;height:32px;border-radius:6px;border:1px solid rgba(243,241,236,.2);background:transparent;color:#f3f1ec;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="border-color:#d1682e;color:#d1682e">&#8250;</button>
         </div>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">read-only view · slots go through your day's manager</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">{{ jamNote }}</span>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
         <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(61,141,189,.35);border:1px solid rgba(61,141,189,.6)"></span>booked</span>
@@ -645,7 +678,8 @@
       </label>
       <div style="display:flex;align-items:center;gap:14px">
         <button onClick="{{ saveProfile }}" style="padding:13px 24px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:14.5px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Save</button>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7cb8db">{{ saveNote }}</span>
+        <sc-if value="{{ saveOk }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;background:rgba(90,180,100,.12);border:1px solid rgba(90,180,100,.3);font-family:'JetBrains Mono',monospace;font-size:11px;color:#6abf75">&#10003; {{ saveNote }}</span></sc-if>
+        <sc-if value="{{ saveErr }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;background:rgba(209,104,46,.1);border:1px solid rgba(209,104,46,.3);font-family:'JetBrains Mono',monospace;font-size:11px;color:#d1682e">&#10005; {{ saveNote }}</span></sc-if>
       </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:14px;padding:24px;border:1px solid rgba(243,241,236,.14);background:#201f1e">
@@ -656,7 +690,8 @@
       </div>
       <div style="display:flex;align-items:center;gap:14px">
         <button onClick="{{ changePassword }}" style="padding:12px 22px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:#f3f1ec;font-size:14px;font-weight:600;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Update password</button>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7cb8db">{{ pwNote }}</span>
+        <sc-if value="{{ pwOk }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;background:rgba(90,180,100,.12);border:1px solid rgba(90,180,100,.3);font-family:'JetBrains Mono',monospace;font-size:11px;color:#6abf75">&#10003; {{ pwNote }}</span></sc-if>
+        <sc-if value="{{ pwErr }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;background:rgba(209,104,46,.1);border:1px solid rgba(209,104,46,.3);font-family:'JetBrains Mono',monospace;font-size:11px;color:#d1682e">&#10005; {{ pwNote }}</span></sc-if>
       </div>
     </div>
 
@@ -845,7 +880,7 @@ const KEY = "mc-portal-v1";
 const split = s => (s || "").split(",").map(x => x.trim()).filter(Boolean);
 
 class Component extends DCLogic {
-  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "", calMonth: new Date().getFullYear() * 12 + new Date().getMonth(), calSelectedDay: null, dbEvents: [], evForm: false, evTitle: "", evDesc: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [] };
+  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "", calMonth: new Date().getFullYear() * 12 + new Date().getMonth(), calSelectedDay: null, dbEvents: [], evForm: false, evTitle: "", evDesc: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], notifsOpen: false };
 
   async componentDidMount() {
     if (!SERVER) try {
@@ -970,12 +1005,13 @@ class Component extends DCLogic {
         const roll = rec ? [rec.by || "unclaimed"].concat(withList).join(", ") : "";
         const key = this.key(st.week, day, t);
         const canClaim = !rec || !rec.by || rec.by === "unclaimed";
+        const isPast = st.week < 0;
         return {
           song: rec ? rec.song : "",
           by: rec && withList.length ? (rec.by || "unclaimed") + " +" + withList.length : roll,
           class: mine ? "cell-yours" : rec ? "cell-booked" : "cell-free",
           title: (rec ? rec.song + " — " + roll : "free") + " · " + day + " " + LABEL[t],
-          onClick: mine ? () => this.setState({
+          onClick: isPast ? null : mine ? () => this.setState({
             booking: { week: st.week, day, t, label: day + " " + LABEL[t], existing: true, origin: key },
             bookingSong: rec.song, bookingWith: (rec.with || []).slice(), pickQuery: ""
           }) : (canClaim && me) ? () => this.setState({
@@ -1009,9 +1045,53 @@ class Component extends DCLogic {
       };
     });
 
+    // build notifications: upcoming events + today's jam slots
+    const notifs = [];
+    const today = new Date().toISOString().slice(0, 10);
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+    const allEvs = [
+      ...ACAD_EVENTS,
+      ...(st.dbEvents || []).map(e => ({ date: e.event_date, title: e.title, tag: "club", time: e.event_time, desc: e.description }))
+    ];
+    for (const ev of allEvs) {
+      const end = ev.end || ev.date;
+      if (ev.date <= tomorrow && end >= today) {
+        const isToday = ev.date <= today && end >= today;
+        const timeStr = ev.time ? ev.time.slice(0, 5) : "";
+        notifs.push({
+          icon: "E", iconClass: "notif-event",
+          title: ev.title,
+          detail: (ev.desc || ev.tag) + (timeStr ? " · " + timeStr : ""),
+          when: isToday ? "Today" : "Tomorrow",
+          onClick: () => this.setState({ tab: "events", notifsOpen: false, calSelectedDay: ev.date })
+        });
+      }
+    }
+    // jam slots today
+    const todayDayIdx = (new Date().getDay() + 6) % 7;
+    const todayDayName = DAYS[todayDayIdx] ? DAYS[todayDayIdx][0] : "";
+    if (me && todayDayName) {
+      TIMES.forEach(t => {
+        const rec = this.record(0, todayDayName, t);
+        if (rec && (rec.by === me || (rec.with || []).includes(me))) {
+          notifs.push({
+            icon: "J", iconClass: "notif-slot",
+            title: rec.song,
+            detail: todayDayName + " · " + LABEL[t] + ((rec.with || []).length ? " · with " + (rec.by === me ? (rec.with || []).join(", ") : [rec.by].concat((rec.with || []).filter(p => p !== me)).join(", ")) : " · solo"),
+            when: "Today",
+            onClick: () => this.setState({ tab: "jam", week: 0, notifsOpen: false })
+          });
+        }
+      });
+    }
+
     return {
       signedIn: !!me, signedOut: !me,
       me: me ? { name: me, meta: (ROSTER.find(r => r[0] === me) || [])[1] || "member" } : { name: "", meta: "" },
+      toggleNotifs: () => this.setState({ notifsOpen: !st.notifsOpen }),
+      notifsOpen: !!st.notifsOpen,
+      notifs, notifCount: notifs.length + (notifs.length === 1 ? " notification" : " notifications"),
+      hasNotifs: notifs.length > 0, noNotifs: notifs.length === 0,
       roster: ROSTER.map(r => ({ name: r[0] })),
       loginEmail: st.loginEmail, loginPass: st.loginPass, otp: st.otp, loginErr: st.loginErr,
       loginPassLabel: (() => { const n = this.matchEmail(st.loginEmail); return n && st.creds[n] ? "Password" : "Set a password"; })(),
@@ -1039,7 +1119,7 @@ class Component extends DCLogic {
             const { error } = await this.db.sendEmailOtp(email);
             if (error) throw error;
           } else {
-            const response = await fetch(new URL("./api/send-otp", window.location.href), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+            const response = await fetch(new URL("./api/send-otp", window.location.href), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, reason: st.loginMode === "forgot" ? "reset" : "setup" }) });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || "Failed to send OTP");
             this.setState({ otpToken: data.token });
@@ -1099,7 +1179,7 @@ class Component extends DCLogic {
       goMine: () => this.setState({ tab: "mine" }), goJam: () => this.setState({ tab: "jam" }), goSkills: () => this.setState({ tab: "skills" }),
       goMinutes: () => this.setState({ tab: "minutes" }),
       goEvents: () => this.setState({ tab: "events" }),
-      goProfile: () => { this.setState({ tab: "profile", saveNote: "", pwNote: "" }); this.loadProfile(me); },
+      goProfile: () => { this.setState({ tab: "profile", saveNote: "", saveStatus: "", pwNote: "", pwStatus: "" }); this.loadProfile(me); },
       mineTabClass: st.tab === "mine" ? "tab-active" : "tab-inactive",
       jamTabClass: st.tab === "jam" ? "tab-active" : "tab-inactive",
       skillsTabClass: st.tab === "skills" ? "tab-active" : "tab-inactive",
@@ -1190,14 +1270,14 @@ class Component extends DCLogic {
         } catch (e) { this.setState({ evErr: e.message || "Failed to create event" }); }
       },
       myTeam: this.teamOf(me),
-      pwOld: st.pwOld, pwNew: st.pwNew, pwNote: st.pwNote,
-      onPwOld: e => this.setState({ pwOld: e.target.value, pwNote: "" }),
-      onPwNew: e => this.setState({ pwNew: e.target.value, pwNote: "" }),
+      pwOld: st.pwOld, pwNew: st.pwNew, pwNote: st.pwNote, pwOk: st.pwStatus === "ok" && !!st.pwNote, pwErr: st.pwStatus === "err" && !!st.pwNote,
+      onPwOld: e => this.setState({ pwOld: e.target.value, pwNote: "", pwStatus: "" }),
+      onPwNew: e => this.setState({ pwNew: e.target.value, pwNote: "", pwStatus: "" }),
       changePassword: async () => {
-        if (st.creds[me] && (await this.hash(me, st.pwOld)) !== st.creds[me]) return this.setState({ pwNote: "current password doesn't match" });
-        if (st.pwNew.trim().length < 6) return this.setState({ pwNote: "new password needs 6+ characters" });
+        if (st.creds[me] && (await this.hash(me, st.pwOld)) !== st.creds[me]) return this.setState({ pwNote: "current password doesn't match", pwStatus: "err" });
+        if (st.pwNew.trim().length < 6) return this.setState({ pwNote: "new password needs 6+ characters", pwStatus: "err" });
         this.persist({ creds: { ...st.creds, [me]: await this.hash(me, st.pwNew.trim()) } });
-        this.setState({ pwOld: "", pwNew: "", pwNote: "password updated ✓" });
+        this.setState({ pwOld: "", pwNew: "", pwNote: "password updated", pwStatus: "ok" });
       },
       minutes: SEED_MOM.concat(st.moms).filter(m => this.canSee(m.audience, me))
         .sort((a, b) => (a.date < b.date ? 1 : -1))
@@ -1226,6 +1306,7 @@ class Component extends DCLogic {
           this.db.addMinutes(entry).then(() => this.pull()).catch(e => this.setState({ dbErr: String(e.message || e) }));
         }
       },
+      jamNote: st.week < 0 ? "past week · read-only" : "read-only view · slots go through your day's manager",
       days: DAYS.map(([name, manager]) => ({ name, manager })),
       grid, myCount: mine.length,
       booking: !!st.booking, bookingSong: st.bookingSong,
@@ -1255,11 +1336,12 @@ class Component extends DCLogic {
         });
       },
       week: st.week,
-      weekTabs: [0, 1].map(w => ({
-        label: w ? "Next week" : "This week", range: this.weekLabel(w),
-        onClick: () => this.setState({ week: w }),
-        class: st.week === w ? "week-active" : "week-inactive"
-      })),
+      weekLabel: st.week === 0 ? "This week" : st.week === 1 ? "Next week" : Math.abs(st.week) + "w ago",
+      weekRange: this.weekLabel(st.week),
+      weekPrev: () => this.setState({ week: Math.max(st.week - 1, -4) }),
+      weekNext: () => this.setState({ week: Math.min(st.week + 1, 1) }),
+      weekPrevClass: st.week <= -4 ? "week-disabled" : "",
+      weekNextClass: st.week >= 1 ? "week-disabled" : "",
       bookingExisting: !!(st.booking && st.booking.existing),
       bookingIsClaim: !!(st.booking && st.booking.claim),
       bookingIsRequest: !!(st.booking && !st.booking.claim && !st.booking.existing),
@@ -1327,14 +1409,14 @@ class Component extends DCLogic {
           class: on ? "chip-on" : "chip-off" };
       }),
       members, shownCount: members.length, totalCount: ROSTER.length, noResults: members.length === 0,
-      pMajor: st.pMajor, pMinor: st.pMinor, pVibe: st.pVibe, saveNote: st.saveNote,
+      pMajor: st.pMajor, pMinor: st.pMinor, pVibe: st.pVibe, saveNote: st.saveNote, saveOk: st.saveStatus === "ok" && !!st.saveNote, saveErr: st.saveStatus === "err" && !!st.saveNote,
       onPMajor: e => this.setState({ pMajor: e.target.value }),
       onPMinor: e => this.setState({ pMinor: e.target.value }),
       onPVibe: e => this.setState({ pVibe: e.target.value }),
       saveProfile: async () => {
         const p = { major: st.pMajor, minor: st.pMinor, vibe: st.pVibe };
         this.persist({ profiles: { ...st.profiles, [me]: p } });
-        this.setState({ saveNote: "saved ✓" });
+        this.setState({ saveNote: "saved", saveStatus: "ok" });
         if (this.db && this.db.serverMode) {
           try { await this.db.saveProfile(me, p); } catch (e) { this.setState({ saveNote: "", dbErr: String(e.message || e) }); }
         }
