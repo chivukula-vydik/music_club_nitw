@@ -518,10 +518,10 @@
     <div style="position:fixed;inset:0;z-index:60;background:rgba(12,12,12,.72);display:flex;align-items:center;justify-content:center;padding:24px">
       <div style="width:100%;max-width:440px;max-height:88vh;overflow-y:auto;padding:26px;border:1px solid rgba(243,241,236,.16);background:#201f1e;display:flex;flex-direction:column;gap:18px;animation:mcin .18s ease both">
         <div style="display:flex;flex-direction:column;gap:6px">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#3d8dbd">{{ bookingWhen }}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:{{ bookingWhenColor }}">{{ bookingWhen }}</span>
           <span style="font-family:'Archivo Black',sans-serif;font-size:22px">{{ bookingHeading }}</span>
           <sc-if value="{{ bookingIsClaim }}" hint-placeholder-val="{{ false }}">
-            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45)">{{ bookingWhen }} · your name goes on this slot</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45)">your name goes on this slot</span>
           </sc-if>
           <sc-if value="{{ bookingIsRequest }}" hint-placeholder-val="{{ true }}">
             <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45)">goes to {{ bookingManager }} to confirm</span>
@@ -1302,7 +1302,8 @@ class Component extends DCLogic {
       days: DAYS.map(([name, manager]) => ({ name, manager })),
       grid, myCount: mine.length,
       booking: !!st.booking, bookingSong: st.bookingSong,
-      bookingWhen: st.booking && st.booking.existing ? st.booking.label : "Request",
+      bookingWhen: st.booking && st.booking.existing ? st.booking.label : st.booking && st.booking.claim ? st.booking.label : "Request",
+      bookingWhenColor: st.booking && st.booking.claim ? "#d1682e" : "#3d8dbd",
       bookingDay: st.booking ? st.booking.day : DAYS[0][0],
       bookingTime: st.booking ? st.booking.t : TIMES[0],
       bookingManager: (DAYS.find(d => d[0] === (st.booking ? st.booking.day : "")) || DAYS[0])[1],
