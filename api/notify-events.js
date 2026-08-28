@@ -53,8 +53,20 @@ module.exports = async (req, res) => {
 
     const whoList = ev.all_members ? "All members" : (ev.participants || []).map(p => { const m = members ? members.find(x => x.email && x.email.toLowerCase() === p.toLowerCase()) : null; return m ? m.name : p; }).join(", ") || "—";
 
+    const gcalDate = ev.event_date.replace(/-/g, "");
+    let gcalDates;
+    if (timeStr) {
+      const t = timeStr.replace(":", "") + "00";
+      const [h, m] = timeStr.split(":").map(Number);
+      const et = String(h + 1).padStart(2, "0") + String(m).padStart(2, "0") + "00";
+      gcalDates = gcalDate + "T" + t + "/" + gcalDate + "T" + et;
+    } else {
+      gcalDates = gcalDate + "/" + gcalDate;
+    }
+    const gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(ev.title) + "&dates=" + gcalDates + "&details=" + encodeURIComponent(ev.description || "") + "&ctz=Asia/Kolkata";
+
     const subject = `Music Club: "${ev.title}" is ${label}`;
-    const text = `${ev.title}\n\n${ev.description || "(no description)"}\n\nLead: ${leadName}\nWhen: ${dateFmt} at ${timeStr}\nWho: ${ev.all_members ? "All members" : (ev.participants || []).join(", ")}\n\nThis event is ${label}!`;
+    const text = `${ev.title}\n\n${ev.description || "(no description)"}\n\nLead: ${leadName}\nWhen: ${dateFmt} at ${timeStr}\nWho: ${ev.all_members ? "All members" : (ev.participants || []).join(", ")}\n\nThis event is ${label}!\n\nAdd to Google Calendar: ${gcalUrl}`;
     const html = `
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -86,6 +98,9 @@ module.exports = async (req, res) => {
     </table>
     <div style="margin:20px 0 0;padding:14px;background:rgba(209,104,46,.15);border-radius:8px;text-align:center;font-weight:600;font-size:15px;color:#d1682e">
       This event is ${label}!
+    </div>
+    <div style="margin:20px 0 0;text-align:center">
+      <a href="${gcalUrl}" target="_blank" style="display:inline-block;padding:12px 28px;background:#d1682e;color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:999px">Add to Google Calendar</a>
     </div>
   </td></tr>
   <tr><td style="padding:0 36px 28px">
