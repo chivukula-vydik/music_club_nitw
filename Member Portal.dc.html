@@ -39,6 +39,7 @@
   .week-inactive{border:1px solid rgba(243,241,236,.18);background:transparent;color:rgba(243,241,236,.55)}
   .week-disabled{opacity:.25;pointer-events:none}
   .notif-event{background:rgba(209,104,46,.15);color:#d1682e}
+  .notif-task{background:rgba(220,190,90,.15);color:#d4b84a}
   .notif-slot{background:rgba(61,141,189,.15);color:#7cb8db}
   .notif-info{background:rgba(243,241,236,.08);color:rgba(243,241,236,.5)}
   .filter-on{border:1px solid #d1682e;background:rgba(209,104,46,.2);color:#f3f1ec}
@@ -52,6 +53,7 @@
   .ev-past{opacity:.45}
   .cal-sel{background:#252524 !important;outline:1px solid #d1682e;outline-offset:-1px}
   .tag-club{background:rgba(130,200,130,.18);color:#8ec88e}
+  .tag-task{background:rgba(220,190,90,.18);color:#d4b84a}
   @media(max-width:768px){
     header{padding:10px 14px!important;gap:8px!important}
     header a img{width:24px!important;height:24px!important}
@@ -272,7 +274,11 @@
     </div>
     <sc-if value="{{ evForm }}" hint-placeholder-val="{{ false }}">
     <div style="display:flex;flex-direction:column;gap:14px;padding:22px;border:1px solid rgba(243,241,236,.14);background:#201f1e">
-      <input value="{{ evTitle }}" onChange="{{ onEvTitle }}" placeholder="Event title" style="padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+      <div style="display:flex;gap:8px">
+        <button onClick="{{ setEvTypeEvent }}" style="flex:1;padding:10px;border-radius:8px;border:1px solid {{ evTypeEventBorder }};background:{{ evTypeEventBg }};color:{{ evTypeEventColor }};font-size:13px;font-weight:600;cursor:pointer">Event</button>
+        <button onClick="{{ setEvTypeTask }}" style="flex:1;padding:10px;border-radius:8px;border:1px solid {{ evTypeTaskBorder }};background:{{ evTypeTaskBg }};color:{{ evTypeTaskColor }};font-size:13px;font-weight:600;cursor:pointer">Task</button>
+      </div>
+      <input value="{{ evTitle }}" onChange="{{ onEvTitle }}" placeholder="{{ evTitlePlaceholder }}" style="padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
       <input value="{{ evDesc }}" onChange="{{ onEvDesc }}" placeholder="Description (optional)" style="padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
       <div style="display:flex;flex-wrap:wrap;gap:10px">
         <input type="date" value="{{ evDate }}" onChange="{{ onEvDate }}" style="flex:1;min-width:160px;padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14px">
@@ -306,6 +312,7 @@
       <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(61,141,189,.35);border:1px solid rgba(61,141,189,.6)"></span>exam</span>
       <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(243,241,236,.15);border:1px solid rgba(243,241,236,.3)"></span>event</span>
       <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(130,200,130,.5);border:1px solid rgba(130,200,130,.7)"></span>club event</span>
+      <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(220,190,90,.5);border:1px solid rgba(220,190,90,.7)"></span>task</span>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between">
       <button onClick="{{ calPrev }}" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:transparent;color:#f3f1ec;font-size:18px;cursor:pointer" style-hover="border-color:#d1682e">←</button>
@@ -853,7 +860,7 @@ const KEY = "mc-portal-v1";
 const split = s => (s || "").split(",").map(x => x.trim()).filter(Boolean);
 
 class Component extends DCLogic {
-  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "", calMonth: new Date().getFullYear() * 12 + new Date().getMonth(), calSelectedDay: null, dbEvents: [], evForm: false, evTitle: "", evDesc: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], notifsOpen: false };
+  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "", calMonth: new Date().getFullYear() * 12 + new Date().getMonth(), calSelectedDay: null, dbEvents: [], evForm: false, evType: "event", evTitle: "", evDesc: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], notifsOpen: false };
 
   async componentDidMount() {
     if (!SERVER) try {
@@ -885,6 +892,8 @@ class Component extends DCLogic {
     if (!account) return this.setState({ user: null, account: null });
     try {
       const [d, dbEvents] = await Promise.all([this.db.load(), this.db.loadEvents().catch(() => [])]);
+      // ponytail: poor-man's cron — every portal visit triggers the reminder check
+      fetch(new URL("./api/notify-events", window.location.href)).catch(() => {});
       // RLS returns empty members list for non-club accounts — hard block them
       if (!d.members || !d.members.length) {
         await this.db.signOut();
@@ -1027,23 +1036,28 @@ class Component extends DCLogic {
     const notifs = [];
     const today = new Date().toISOString().slice(0, 10);
     const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-    const allEvs = [
-      ...ACAD_EVENTS,
-      ...(st.dbEvents || []).map(e => ({ date: e.event_date, title: e.title, tag: "club", time: e.event_time, desc: e.description }))
-    ];
+    const myEmail = (st.account?.email || "").toLowerCase();
+    const clubEvs = (st.dbEvents || []).filter(e => {
+      if (e.all_members) return true;
+      return (e.participants || []).some(p => p.toLowerCase() === myEmail);
+    }).map(e => ({ date: e.event_date, title: e.title, tag: e.event_type === "task" ? "task" : "club", time: e.event_time, desc: e.description }));
+    const allEvs = [...ACAD_EVENTS, ...clubEvs];
     for (const ev of allEvs) {
       const end = ev.end || ev.date;
-      if (ev.date <= tomorrow && end >= today) {
-        const isToday = ev.date <= today && end >= today;
-        const timeStr = ev.time ? ev.time.slice(0, 5) : "";
-        notifs.push({
-          icon: "E", iconClass: "notif-event",
-          title: ev.title,
-          detail: (ev.desc || ev.tag) + (timeStr ? " · " + timeStr : ""),
-          when: isToday ? "Today" : "Tomorrow",
-          onClick: () => this.setState({ tab: "events", notifsOpen: false, calSelectedDay: ev.date })
-        });
-      }
+      if (end < today) continue;
+      const isToday = ev.date <= today && end >= today;
+      const isTomorrow = !isToday && ev.date === tomorrow;
+      const timeStr = ev.time ? ev.time.slice(0, 5) : "";
+      const dateObj = new Date(ev.date + "T00:00");
+      const whenLabel = isToday ? "Today" : isTomorrow ? "Tomorrow" : dateObj.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+      const isTask = ev.tag === "task";
+      notifs.push({
+        icon: isTask ? "T" : "E", iconClass: isTask ? "notif-task" : "notif-event",
+        title: ev.title,
+        detail: (ev.desc || (isTask ? "task" : ev.tag)) + (timeStr ? " · " + timeStr : ""),
+        when: whenLabel,
+        onClick: () => this.setState({ tab: "events", notifsOpen: false, calSelectedDay: ev.date })
+      });
     }
     // jam slots today
     const todayDayIdx = (new Date().getDay() + 6) % 7;
@@ -1171,10 +1185,12 @@ class Component extends DCLogic {
         const moKey = yr + "-" + pad(mo + 1);
         const firstDay = new Date(yr, mo, 1).getDay();
         const daysInMonth = new Date(yr, mo + 1, 0).getDate();
-        const tagColor = t => t === "holiday" ? "rgba(209,104,46,.7)" : t === "exam" ? "rgba(61,141,189,.7)" : t === "club" ? "rgba(130,200,130,.7)" : "rgba(243,241,236,.45)";
+        const tagColor = t => t === "holiday" ? "rgba(209,104,46,.7)" : t === "exam" ? "rgba(61,141,189,.7)" : t === "club" ? "rgba(130,200,130,.7)" : t === "task" ? "rgba(220,190,90,.7)" : "rgba(243,241,236,.45)";
+        const myEv = (st.account?.email || "").toLowerCase();
+        const myClubEvs = (st.dbEvents || []).filter(e => e.all_members || (e.participants || []).some(p => p.toLowerCase() === myEv));
         const allEvs = [
           ...ACAD_EVENTS,
-          ...(st.dbEvents || []).map(e => ({ date: e.event_date, title: e.title, tag: "club", id: e.id, time: e.event_time, desc: e.description, createdBy: e.created_by }))
+          ...myClubEvs.map(e => ({ date: e.event_date, title: e.title, tag: e.event_type === "task" ? "task" : "club", id: e.id, time: e.event_time, desc: e.description, createdBy: e.created_by }))
         ];
         const evByDay = {};
         for (const ev of allEvs) {
@@ -1220,15 +1236,24 @@ class Component extends DCLogic {
             const gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(ev.title) + "&dates=" + dates + "&details=" + encodeURIComponent(ev.desc || "") + "&ctz=Asia/Kolkata";
             return {
               title: ev.title + (ev.time ? " · " + ev.time.slice(0, 5) : ""), tag: ev.tag, tagClass: "tag-" + ev.tag,
-              isClub: ev.tag === "club", id: ev.id, desc: ev.desc || "", gcalUrl,
+              isClub: ev.tag === "club" || ev.tag === "task", id: ev.id, desc: ev.desc || "", gcalUrl,
               onDelete: ev.id ? () => { this.db.deleteEvent(ev.id).then(() => this.pull()); } : null
             };
           })
         };
       })(),
-      toggleEvForm: () => this.setState({ evForm: !st.evForm, evErr: "" }),
+      toggleEvForm: () => this.setState({ evForm: !st.evForm, evType: "event", evErr: "" }),
       evForm: !!st.evForm, evTitle: st.evTitle, evDesc: st.evDesc, evDate: st.evDate, evTime: st.evTime,
       evAllMembers: !!st.evAllMembers, evPickMembers: !st.evAllMembers, evErr: st.evErr || "",
+      setEvTypeEvent: () => this.setState({ evType: "event" }),
+      setEvTypeTask: () => this.setState({ evType: "task" }),
+      evTypeEventBorder: st.evType === "event" ? "rgba(130,200,130,.7)" : "rgba(243,241,236,.15)",
+      evTypeEventBg: st.evType === "event" ? "rgba(130,200,130,.15)" : "transparent",
+      evTypeEventColor: st.evType === "event" ? "#8ec88e" : "rgba(243,241,236,.5)",
+      evTypeTaskBorder: st.evType === "task" ? "rgba(220,190,90,.7)" : "rgba(243,241,236,.15)",
+      evTypeTaskBg: st.evType === "task" ? "rgba(220,190,90,.15)" : "transparent",
+      evTypeTaskColor: st.evType === "task" ? "#d4b84a" : "rgba(243,241,236,.5)",
+      evTitlePlaceholder: st.evType === "task" ? "Task title (e.g. Reel shoot)" : "Event title",
       onEvTitle: e => this.setState({ evTitle: e.target.value }),
       onEvDesc: e => this.setState({ evDesc: e.target.value }),
       onEvDate: e => this.setState({ evDate: e.target.value }),
@@ -1251,13 +1276,18 @@ class Component extends DCLogic {
         const email = st.account?.email || st.loginEmail || "";
         const participants = st.evAllMembers ? [] : (st.evParticipants || []);
         try {
-          await this.db.addEvent({
+          const evPayload = {
             title: st.evTitle.trim(), description: st.evDesc.trim(),
             event_date: st.evDate, event_time: st.evTime,
+            event_type: st.evType || "event",
             created_by: email, all_members: !!st.evAllMembers,
             participants: participants.map(p => { const r = ROSTER.find(r => r[0] === p); return r ? (r[7] || p) : p; })
-          });
-          this.setState({ evForm: false, evTitle: "", evDesc: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], evErr: "" });
+          };
+          await this.db.addEvent(evPayload);
+          fetch(new URL("./api/notify-new-event", window.location.href), {
+            method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(evPayload)
+          }).catch(() => {});
+          this.setState({ evForm: false, evType: "event", evTitle: "", evDesc: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], evErr: "" });
           await this.pull();
         } catch (e) { this.setState({ evErr: e.message || "Failed to create event" }); }
       },

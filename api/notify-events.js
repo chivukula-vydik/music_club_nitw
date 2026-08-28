@@ -11,6 +11,10 @@ const SMTP_PASS = process.env.SMTP_PASS;
 const MAIL_FROM = process.env.MAIL_FROM || SMTP_USER;
 
 module.exports = async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", process.env.ALLOWED_ORIGIN || "");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  if (req.method === "OPTIONS") return res.status(200).end();
   if (!SUPABASE_SERVICE_ROLE_KEY) return res.status(500).json({ error: "Missing service role key" });
 
   const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
