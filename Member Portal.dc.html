@@ -748,7 +748,6 @@
 </sc-if>
 
 <footer style="padding:22px 28px;border-top:1px solid rgba(243,241,236,.1);display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center">
-  <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.35)">{{ storageNote }}</span>
   <a href="Music Club NITW.dc.html" style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase">← Back to the site</a>
 </footer>
 
@@ -1223,7 +1222,7 @@ class Component extends DCLogic {
         this.loadProfile(n);
       },
       server: SERVER || !!st.server, emailLogin: true,
-      storageNote: SERVER || st.server ? "prototype · bookings and profile edits save to the club database" : "prototype · bookings and profile edits save in this browser only",
+
       dbErr: st.dbErr || "",
       googleSignIn: () => { if (this.db) this.db.signInWithGoogle(); },
       signOut: () => {
