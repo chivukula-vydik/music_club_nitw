@@ -85,8 +85,8 @@ module.exports = async (req, res) => {
       legacyToken = `${expires}.${sign(email, otp, expires)}`;
     }
 
-    const subjectLabel = isReset ? "Password Reset" : "First Login";
-    const headerLabel = isReset ? "Password Reset" : "First Login";
+    const subjectLabel = isReset ? "Password Reset" : "Verification";
+    const headerLabel = isReset ? "Password Reset" : "Verify Your Email";
     const greeting = isReset
       ? "You requested a password reset. Here’s your verification code:"
       : "Hey! Here’s your one-time verification code:";
@@ -97,7 +97,7 @@ module.exports = async (req, res) => {
     await transporter.sendMail({
       from: MAIL_FROM,
       to: email,
-      subject: `Music Club NITW — ${subjectLabel} OTP`,
+      subject: `Music Club NITW - ${subjectLabel} OTP`,
       text: `Music Club NITW\n\n${greeting}\n\nYour OTP is: ${otp}\n\nValid for 10 minutes. If you didn't request this, ignore it.`,
       attachments: [{
         filename: "logo.png",
