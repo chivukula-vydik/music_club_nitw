@@ -985,6 +985,7 @@ class Component extends DCLogic {
   }
   teamOf(name) { return ((ROSTER.find(r => r[0] === name) || [])[3] || "Core"); }
   canSee(aud, name) {
+    if (!name) return false;
     if (aud === "Combined") return true;
     if (aud.toLowerCase() === "tech" && ["jaeden","niyati","vydik"].includes(name.toLowerCase())) return true;
     return this.teamOf(name).toLowerCase().includes(aud.toLowerCase());
