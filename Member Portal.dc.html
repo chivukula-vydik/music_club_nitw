@@ -858,7 +858,7 @@ const SEED = {
 // Empty — populated from Supabase after login. No member data ships in the page source.
 const ROSTER = [];
 const CHIPS = ["Vocals","Guitar","Keyboard","Drums","Bass","Tabla","Flute","Violin","Beatbox","Cajon","Hosting","Photography","Graphic design","Video editing","Stage Design","Videography","Ukulele","Clarinet","Piano"];
-const EVENT_ADMINS = ["Jaeden","Niyati","Abinav","Srihan","Vydik"];
+const EVENT_ADMINS = ["Jaeden","Niyati","Abhinav Madathil","Saisrihan","Chivukula Vydik"];
 // Song clusters — fixed performance groups. Edit this list as songs get assigned.
 // Each entry: { song: "song name", members: ["Name1", "Name2", ...] }
 const CLUSTERS = [
@@ -987,7 +987,7 @@ class Component extends DCLogic {
   canSee(aud, name) {
     if (!name) return false;
     if (aud === "Combined") return true;
-    if (aud.toLowerCase() === "tech" && ["jaeden","niyati","vydik"].includes(name.toLowerCase())) return true;
+    if (aud.toLowerCase() === "tech" && ["jaeden","niyati","chivukula vydik"].includes(name.toLowerCase())) return true;
     return this.teamOf(name).toLowerCase().includes(aud.toLowerCase());
   }
   loadProfile(name) {
@@ -1572,7 +1572,7 @@ class Component extends DCLogic {
         const cards = Object.entries(songMap).map(([song, d]) => ({
           song, count: d.count, hours: d.count + "h", band: d.band.size ? [...d.band] : ["solo"], next: d.next || "—"
         }));
-        const isCore = this.teamOf(me).toLowerCase().includes("core") || me.toLowerCase() === "vydik";
+        const isCore = this.teamOf(me).toLowerCase().includes("core") || me.toLowerCase() === "chivukula vydik";
         return { mySongCards: cards, hasMySongs: cards.length > 0, noMySongs: cards.length === 0, isCore };
       })(),
       ...(() => {
