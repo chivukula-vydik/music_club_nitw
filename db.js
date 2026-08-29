@@ -197,6 +197,17 @@ export async function addMinutes(entry) {
   if (error) throw error;
 }
 
+export async function deleteMinutes(id) {
+  if (!serverMode) {
+    const s = localState();
+    saveLocal({ moms: (s.moms || []).filter(m => m.id !== id) });
+    return;
+  }
+  const c = await client();
+  const { error } = await c.from("minutes").delete().eq("id", id);
+  if (error) throw error;
+}
+
 /* ---------- events ---------- */
 
 export async function loadEvents() {

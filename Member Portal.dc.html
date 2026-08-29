@@ -260,7 +260,12 @@
           <sc-if value="{{ m.open }}" hint-placeholder-val="{{ false }}">
             <div style="padding:0 22px 22px 142px;display:flex;flex-direction:column;gap:10px">
               <span style="font-size:15px;line-height:1.7;color:rgba(243,241,236,.75);white-space:pre-line;text-wrap:pretty">{{ m.body }}</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.4)">noted by {{ m.author }}</span>
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.4)">noted by {{ m.author }}</span>
+                <sc-if value="{{ m.onDelete }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ m.onDelete }}" style="padding:4px 10px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.5);font-size:10.5px;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Delete</button>
+                </sc-if>
+              </div>
             </div>
           </sc-if>
         </div>
@@ -394,24 +399,30 @@
       </div>
     </div>
 
-    <sc-if value="{{ hasMySongs }}" hint-placeholder-val="{{ true }}">
+    <sc-if value="{{ isCore }}" hint-placeholder-val="{{ true }}">
     <div style="display:flex;flex-direction:column;gap:10px">
       <span style="font-family:'Archivo Black',sans-serif;font-size:16px">My songs</span>
+      <sc-if value="{{ hasMySongs }}" hint-placeholder-val="{{ true }}">
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
         <sc-for list="{{ mySongCards }}" as="sc" hint-placeholder-count="3">
           <div style="padding:16px 18px;background:#1a1a1a;display:flex;flex-direction:column;gap:8px">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
               <span style="font-size:14px;font-weight:600">{{ sc.song }}</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:rgba(243,241,236,.4)">{{ sc.count }}x</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#d1682e">{{ sc.hours }}</span>
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:5px">
               <sc-for list="{{ sc.band }}" as="bp" hint-placeholder-count="2">
                 <span style="padding:4px 10px;border-radius:999px;background:rgba(61,141,189,.15);border:1px solid rgba(61,141,189,.3);font-size:11px;color:#9cc8e4">{{ bp }}</span>
               </sc-for>
             </div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(243,241,236,.45)">next: {{ sc.next }}</span>
           </div>
         </sc-for>
       </div>
+      </sc-if>
+      <sc-if value="{{ noMySongs }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:20px;border:1px solid rgba(243,241,236,.12);background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.4)">no songs yet — book a slot to get started</div>
+      </sc-if>
     </div>
     </sc-if>
 
@@ -449,6 +460,7 @@
               <span style="font-size:14px;font-weight:600">{{ ms.song }}</span>
               <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.5)">{{ ms.time }} · {{ ms.by }}<sc-if value="{{ ms.players }}" hint-placeholder-val="{{ false }}"> + {{ ms.players }}</sc-if></span>
             </div>
+            <button onClick="{{ ms.onDelete }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.5);font-size:11px;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Delete</button>
           </div>
         </sc-for>
         <sc-if value="{{ noManagedSlots }}" hint-placeholder-val="{{ false }}">
@@ -846,6 +858,7 @@ const SEED = {
 // Empty — populated from Supabase after login. No member data ships in the page source.
 const ROSTER = [];
 const CHIPS = ["Vocals","Guitar","Keyboard","Drums","Bass","Tabla","Flute","Violin","Beatbox","Cajon","Hosting","Photography","Graphic design","Video editing","Stage Design","Videography","Ukulele","Clarinet","Piano"];
+const EVENT_ADMINS = ["Jaeden","Niyati","Abinav","Srihan","Vydik"];
 // Song clusters — fixed performance groups. Edit this list as songs get assigned.
 // Each entry: { song: "song name", members: ["Name1", "Name2", ...] }
 const CLUSTERS = [
@@ -1022,6 +1035,7 @@ class Component extends DCLogic {
       cells: DAYS.map(([day]) => {
         const rec = this.record(st.week, day, t);
         const mine = rec && rec.by === me;
+        const inTeam = rec && (rec.with || []).includes(me);
         const withList = (rec && rec.with) || [];
         const roll = rec ? [rec.by || "unclaimed"].concat(withList).join(", ") : "";
         const key = this.key(st.week, day, t);
@@ -1030,9 +1044,9 @@ class Component extends DCLogic {
         return {
           song: rec ? rec.song : "",
           by: rec && withList.length ? (rec.by || "unclaimed") + " +" + withList.length : roll,
-          class: mine ? "cell-yours" : rec ? "cell-booked" : "cell-free",
+          class: (mine || inTeam) ? "cell-yours" : rec ? "cell-booked" : "cell-free",
           title: (rec ? rec.song + " — " + roll : "free") + " · " + day + " " + LABEL[t],
-          onClick: isPast ? null : mine ? () => this.setState({
+          onClick: isPast ? null : (mine || inTeam) ? () => this.setState({
             booking: { week: st.week, day, t, label: day + " " + LABEL[t], existing: true, origin: key },
             bookingSong: rec.song, bookingWith: (rec.with || []).slice(), pickQuery: ""
           }) : (canClaim && me) ? () => this.setState({
@@ -1046,7 +1060,7 @@ class Component extends DCLogic {
     const mine = [];
     [0, 1].forEach(w => DAYS.forEach(([day]) => TIMES.forEach(t => {
       const rec = this.record(w, day, t);
-      if (rec && rec.by === me) mine.push({ key: this.key(w, day, t), week: w, day, t, rec });
+      if (rec && (rec.by === me || (rec.with || []).includes(me))) mine.push({ key: this.key(w, day, t), week: w, day, t, rec });
     })));
 
     const q = st.query.trim().toLowerCase();
@@ -1281,7 +1295,7 @@ class Component extends DCLogic {
             return {
               title: ev.title + (ev.time ? " · " + ev.time.slice(0, 5) : ""), tag: ev.tag, tagClass: "tag-" + ev.tag,
               isClub: ev.tag === "club" || ev.tag === "task", id: ev.id, desc: ev.desc || "", gcalUrl,
-              onDelete: ev.id ? () => { this.db.deleteEvent(ev.id).then(() => this.pull()); } : null
+              onDelete: ev.id && EVENT_ADMINS.some(a => a.toLowerCase() === me.toLowerCase()) ? () => { this.db.deleteEvent(ev.id).then(() => this.pull()); } : null
             };
           })
         };
@@ -1350,12 +1364,17 @@ class Component extends DCLogic {
         .sort((a, b) => (a.date < b.date ? 1 : -1))
         .map(m => {
           const open = st.momOpen === m.id;
+          const isAdmin = EVENT_ADMINS.some(a => a.toLowerCase() === me.toLowerCase());
           return {
             id: m.id, title: m.title, author: m.author, audience: m.audience,
             date: new Date(m.date + "T00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }),
             audienceClass: "audience-" + m.audience.toLowerCase(),
             open, body: m.body, caret: open ? "−" : "+",
-            onToggle: () => this.setState({ momOpen: open ? null : m.id })
+            onToggle: () => this.setState({ momOpen: open ? null : m.id }),
+            onDelete: m.id && isAdmin ? () => {
+              if (this.db && this.db.serverMode) { this.db.deleteMinutes(m.id).then(() => this.pull()); }
+              else { this.persist({ moms: st.moms.filter(x => x.id !== m.id) }); }
+            } : null
           };
         }),
       momForm: st.momForm, momTitle: st.momTitle, momBody: st.momBody, momAudience: st.momAudience,
@@ -1530,19 +1549,33 @@ class Component extends DCLogic {
       })(),
       ...(() => {
         const songMap = {};
+        const dayOrder = DAYS.map(d => d[0]);
+        const now = new Date();
+        const todayIdx = (now.getDay() + 6) % 7;
+        const hr = now.getHours();
         [0, 1].forEach(w => DAYS.forEach(([day]) => TIMES.forEach(t => {
           const rec = this.record(w, day, t);
           if (!rec || (rec.by !== me && !(rec.with || []).includes(me))) return;
           const s = rec.song;
-          if (!songMap[s]) songMap[s] = { count: 0, band: new Set() };
+          if (!songMap[s]) songMap[s] = { count: 0, band: new Set(), next: null };
           songMap[s].count++;
           if (rec.by && rec.by !== me) songMap[s].band.add(rec.by);
           for (const p of (rec.with || [])) { if (p !== me) songMap[s].band.add(p); }
+          if (!songMap[s].next) {
+            const di = dayOrder.indexOf(day);
+            if (w > 0 || di > todayIdx || (di === todayIdx && parseInt(t) > hr))
+              songMap[s].next = (w ? "Next wk · " : "") + day + " " + LABEL[t];
+          }
         })));
         const cards = Object.entries(songMap).map(([song, d]) => ({
-          song, count: d.count, band: d.band.size ? [...d.band] : ["solo"]
+          song, count: d.count, hours: d.count + "h", band: d.band.size ? [...d.band] : ["solo"], next: d.next || "—"
         }));
-        return { mySongCards: cards, hasMySongs: cards.length > 0 };
+        const coreOverrides = ["vydik"];
+        const techOverrides = ["niyati", "jaeden"];
+        const myTeamLower = this.teamOf(me).toLowerCase();
+        const meLower = me.toLowerCase();
+        const isCore = (myTeamLower.includes("core") && !techOverrides.includes(meLower)) || coreOverrides.includes(meLower);
+        return { mySongCards: cards, hasMySongs: cards.length > 0, noMySongs: cards.length === 0, isCore };
       })(),
       ...(() => {
         const mgDay = DAYS.find(d => d[1] === me);
@@ -1551,7 +1584,8 @@ class Component extends DCLogic {
         const slots = [];
         [0, 1].forEach(w => TIMES.forEach(t => {
           const rec = this.record(w, dayName, t);
-          if (rec) slots.push({ time: (w ? "Next wk · " : "") + LABEL[t], song: rec.song, by: rec.by, players: (rec.with || []).length ? rec.with.join(", ") : "" });
+          const k = this.key(w, dayName, t);
+          if (rec) slots.push({ time: (w ? "Next wk · " : "") + LABEL[t], song: rec.song, by: rec.by, players: (rec.with || []).length ? rec.with.join(", ") : "", onDelete: () => this.writeBooking(k, null, { ...st.bookings, [k]: null }) });
         }));
         return { managedDay: dayName, managedSlots: slots, managedCount: slots.length + " booked", noManagedSlots: slots.length === 0 };
       })()
