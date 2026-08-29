@@ -19,6 +19,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="./supabase-config.js"></script>
 <style>
+  @view-transition{navigation:auto}
+  ::view-transition-old(root){animation:mcfade .2s ease-out}
+  ::view-transition-new(root){animation:mcfade .2s ease-in reverse}
+  @keyframes mcfade{to{opacity:0}}
   *{box-sizing:border-box}
   body{margin:0;background:#1a1a1a;color:#f3f1ec;font-family:Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   a{color:#d1682e;text-decoration:none}
