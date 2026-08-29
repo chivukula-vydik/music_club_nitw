@@ -986,6 +986,7 @@ class Component extends DCLogic {
   teamOf(name) { return ((ROSTER.find(r => r[0] === name) || [])[3] || "Core"); }
   canSee(aud, name) {
     if (aud === "Combined") return true;
+    if (aud.toLowerCase() === "tech" && ["jaeden","niyati","vydik"].includes(name.toLowerCase())) return true;
     return this.teamOf(name).toLowerCase().includes(aud.toLowerCase());
   }
   loadProfile(name) {
@@ -1570,11 +1571,7 @@ class Component extends DCLogic {
         const cards = Object.entries(songMap).map(([song, d]) => ({
           song, count: d.count, hours: d.count + "h", band: d.band.size ? [...d.band] : ["solo"], next: d.next || "—"
         }));
-        const coreOverrides = ["vydik"];
-        const techOverrides = ["niyati", "jaeden"];
-        const myTeamLower = this.teamOf(me).toLowerCase();
-        const meLower = me.toLowerCase();
-        const isCore = (myTeamLower.includes("core") && !techOverrides.includes(meLower)) || coreOverrides.includes(meLower);
+        const isCore = this.teamOf(me).toLowerCase().includes("core") || me.toLowerCase() === "vydik";
         return { mySongCards: cards, hasMySongs: cards.length > 0, noMySongs: cards.length === 0, isCore };
       })(),
       ...(() => {
