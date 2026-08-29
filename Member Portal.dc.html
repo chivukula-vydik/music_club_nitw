@@ -129,7 +129,12 @@
           <div class="notif-panel" style="position:absolute;top:42px;right:0;width:320px;max-height:400px;overflow-y:auto;border:1px solid rgba(243,241,236,.14);background:#1a1a1a;box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:50;display:flex;flex-direction:column;border-radius:12px">
             <div style="padding:14px 16px;border-bottom:1px solid rgba(243,241,236,.1);display:flex;align-items:center;justify-content:space-between">
               <span style="font-family:'Archivo Black',sans-serif;font-size:14px">Notifications</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(243,241,236,.4)">{{ notifCount }}</span>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(243,241,236,.4)">{{ notifCount }}</span>
+                <sc-if value="{{ dismissAll }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ dismissAll }}" style="padding:4px 10px;border-radius:999px;border:1px solid rgba(243,241,236,.18);background:transparent;color:rgba(243,241,236,.5);font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Clear all</button>
+                </sc-if>
+              </div>
             </div>
             <sc-for list="{{ notifs }}" as="n" hint-placeholder-count="3">
               <div class="notif-item" onClick="{{ n.onClick }}" style="padding:14px 16px;border-bottom:1px solid rgba(243,241,236,.06);cursor:pointer;display:flex;gap:12px;align-items:flex-start;transition:transform .2s,opacity .2s,background .15s;position:relative" style-hover="background:#222">
@@ -916,7 +921,7 @@ class Component extends DCLogic {
       const s = JSON.parse(localStorage.getItem(KEY) || "{}");
       let creds = {};
       try { creds = JSON.parse(sessionStorage.getItem(KEY + "-auth") || "{}"); } catch (e) {}
-      this.setState({ user: s.user || null, bookings: s.bookings || {}, profiles: s.profiles || {}, creds, moms: s.moms || [] }, () => {
+      this.setState({ user: s.user || null, bookings: s.bookings || {}, profiles: s.profiles || {}, creds, moms: s.moms || [], dismissedNotifs: s.dismissedNotifs || [] }, () => {
         if (s.user) this.loadProfile(s.user);
       });
     } catch (e) {}
@@ -960,7 +965,7 @@ class Component extends DCLogic {
 
   persist(next) {
     const s = { ...this.state, ...next };
-    try { localStorage.setItem(KEY, JSON.stringify({ user: s.user, bookings: s.bookings, profiles: s.profiles, moms: s.moms })); } catch (e) {}
+    try { localStorage.setItem(KEY, JSON.stringify({ user: s.user, bookings: s.bookings, profiles: s.profiles, moms: s.moms, dismissedNotifs: s.dismissedNotifs || [] })); } catch (e) {}
     if (next.creds) try { sessionStorage.setItem(KEY + "-auth", JSON.stringify(s.creds)); } catch (e) {}
     this.setState(next);
   }
@@ -1093,8 +1098,8 @@ class Component extends DCLogic {
       if (e.all_members) return true;
       return (e.participants || []).some(p => p.toLowerCase() === myEmail);
     }).map(e => ({ date: e.event_date, title: e.title, tag: e.event_type === "task" ? "task" : "club", time: e.event_time, desc: e.description }));
-    const allEvs = [...ACAD_EVENTS, ...clubEvs];
-    for (const ev of allEvs) {
+    // ponytail: only club events & tasks get notifications, not academic calendar
+    for (const ev of clubEvs) {
       const end = ev.end || ev.date;
       if (end < today) continue;
       const isToday = ev.date <= today && end >= today;
@@ -1112,7 +1117,7 @@ class Component extends DCLogic {
           detail: (ev.desc || (isTask ? "task" : ev.tag)) + (timeStr ? " · " + timeStr : ""),
           when: whenLabel,
           onClick: () => this.setState({ tab: "events", notifsOpen: false, calSelectedDay: ev.date }),
-          dismiss: (e) => { e.stopPropagation(); this.setState({ dismissedNotifs: [...(st.dismissedNotifs || []), nid] }); }
+          dismiss: (e) => { e.stopPropagation(); this.persist({ dismissedNotifs: [...(st.dismissedNotifs || []), nid] }); }
         });
       }
     }
@@ -1132,7 +1137,7 @@ class Component extends DCLogic {
               detail: todayDayName + " · " + LABEL[t] + ((rec.with || []).length ? " · with " + (rec.by === me ? (rec.with || []).join(", ") : [rec.by].concat((rec.with || []).filter(p => p !== me)).join(", ")) : " · solo"),
               when: "Today",
               onClick: () => this.setState({ tab: "jam", week: 0, notifsOpen: false }),
-              dismiss: (e) => { e.stopPropagation(); this.setState({ dismissedNotifs: [...(st.dismissedNotifs || []), sid] }); }
+              dismiss: (e) => { e.stopPropagation(); this.persist({ dismissedNotifs: [...(st.dismissedNotifs || []), sid] }); }
             });
           }
         }
@@ -1146,6 +1151,7 @@ class Component extends DCLogic {
       notifsOpen: !!st.notifsOpen,
       notifs, notifCount: notifs.length + (notifs.length === 1 ? " notification" : " notifications"),
       hasNotifs: notifs.length > 0, noNotifs: notifs.length === 0,
+      dismissAll: notifs.length > 0 ? () => this.persist({ dismissedNotifs: [...(st.dismissedNotifs || []), ...notifs.map(n => n.id)], notifsOpen: false }) : null,
       roster: ROSTER.map(r => ({ name: r[0] })),
       loginEmail: st.loginEmail, loginPass: st.loginPass, otp: st.otp, loginErr: st.loginErr,
       loginPassLabel: (() => { const n = this.matchEmail(st.loginEmail); return n && st.creds[n] ? "Password" : "Set a password"; })(),
