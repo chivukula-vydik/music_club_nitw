@@ -1449,6 +1449,7 @@ class Component extends DCLogic {
       },
       dropBooking: () => {
         const b = st.booking; if (!b) return;
+        if (!confirm("Delete this slot? This can't be undone.")) return;
         const k = b.origin || this.key(b.week || 0, b.day, b.t);
         this.writeBooking(k, null, { ...st.bookings, [k]: null });
         this.setState({ booking: null, bookingSong: "", bookingWith: [], pickQuery: "" });
@@ -1485,7 +1486,7 @@ class Component extends DCLogic {
             booking: { week, day, t, label: when, existing: true, origin: key },
             bookingSong: rec.song, bookingWith: (rec.with || []).slice(), pickQuery: ""
           }),
-          onDrop: () => this.writeBooking(key, null, { ...st.bookings, [key]: null }) };
+          onDrop: () => { if (confirm("Delete this slot?")) this.writeBooking(key, null, { ...st.bookings, [key]: null }); } };
       }),
       noMySlots: mine.length === 0,
       myTeam: (ROSTER.find(r => r[0] === me) || [])[3] || "—",
@@ -1551,7 +1552,7 @@ class Component extends DCLogic {
         [0, 1].forEach(w => TIMES.forEach(t => {
           const rec = this.record(w, dayName, t);
           const k = this.key(w, dayName, t);
-          if (rec) slots.push({ time: (w ? "Next wk · " : "") + LABEL[t], song: rec.song, by: rec.by, players: (rec.with || []).length ? rec.with.join(", ") : "", onDelete: () => this.writeBooking(k, null, { ...st.bookings, [k]: null }) });
+          if (rec) slots.push({ time: (w ? "Next wk · " : "") + LABEL[t], song: rec.song, by: rec.by, players: (rec.with || []).length ? rec.with.join(", ") : "", onDelete: () => { if (confirm("Delete " + rec.by + "'s slot (" + rec.song + ")?")) this.writeBooking(k, null, { ...st.bookings, [k]: null }); } });
         }));
         return { managedDay: dayName, managedSlots: slots, managedCount: slots.length + " booked", noManagedSlots: slots.length === 0 };
       })()
