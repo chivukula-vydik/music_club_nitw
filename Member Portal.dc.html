@@ -1257,7 +1257,7 @@ class Component extends DCLogic {
             return {
               title: ev.title + (ev.time ? " · " + ev.time.slice(0, 5) : ""), tag: ev.tag, tagClass: "tag-" + ev.tag,
               isClub: ev.tag === "club" || ev.tag === "task", id: ev.id, desc: ev.desc || "", gcalUrl,
-              onDelete: ev.id && EVENT_ADMINS.some(a => a.toLowerCase() === me.toLowerCase()) ? () => { this.db.deleteEvent(ev.id).then(() => this.pull()); } : null
+              onDelete: ev.id && (EVENT_ADMINS.some(a => a.toLowerCase() === me.toLowerCase()) || (ev.createdBy || "").toLowerCase() === me.toLowerCase()) ? () => { if (confirm("Delete " + (ev.tag === "task" ? "task" : "event") + " \"" + (ev.title || "") + "\"?")) this.db.deleteEvent(ev.id).then(() => this.pull()); } : null
             };
           })
         };
@@ -1334,6 +1334,7 @@ class Component extends DCLogic {
             open, body: m.body, caret: open ? "−" : "+",
             onToggle: () => this.setState({ momOpen: open ? null : m.id }),
             onDelete: m.id && isAdmin ? () => {
+              if (!confirm("Delete minutes \"" + (m.title || "") + "\"?")) return;
               if (this.db && this.db.serverMode) { this.db.deleteMinutes(m.id).then(() => this.pull()); }
               else { this.persist({ moms: st.moms.filter(x => x.id !== m.id) }); }
             } : null
