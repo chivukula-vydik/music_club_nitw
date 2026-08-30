@@ -22,7 +22,7 @@
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{margin:0;background:#1a1a1a;color:#f3f1ec;font-family:Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-  a{color:#d1682e;text-decoration:none}
+  a{color:#e07832;text-decoration:none}
   a:hover{color:#3d8dbd}
   .mc-burger{display:none;background:none;border:none;cursor:pointer;padding:4px}
   .mc-burger span{display:block;width:22px;height:2px;background:#f3f1ec;margin:5px 0;transition:transform .3s,opacity .3s}
@@ -126,7 +126,7 @@
     <img src="assets/logo.png" alt="Music Club NITW" style="width:30px;height:30px;border-radius:999px;display:block">
     <span style="font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:.02em">MUSIC CLUB</span>
   </a>
-  <button class="mc-burger" aria-label="Menu" onclick="this.nextElementSibling.classList.toggle('open')"><span></span><span></span><span></span></button>
+  <button class="mc-burger mc-mburger" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav class="mc-mnav" style="position:absolute;top:100%;left:0;right:0">
     <a href="Music%20Club%20NITW.dc.html" style="color:inherit">Home</a>
     <a href="Music%20Club%20NITW.dc.html#m-about" style="color:inherit">About</a>
@@ -173,6 +173,16 @@
 </footer>
 
 </div>
+
+<script>
+document.addEventListener('click',function(e){
+  var b=e.target.closest('.mc-mburger');
+  if(b){var n=document.querySelector('.mc-mnav');if(n){n.classList.toggle('open');b.classList.toggle('active');}return;}
+  var a=e.target.closest('.mc-mnav a');
+  if(a){var n=document.querySelector('.mc-mnav'),bb=document.querySelector('.mc-mburger');if(n)n.classList.remove('open');if(bb)bb.classList.remove('active');}
+});
+</script>
+
 </x-dc>
 </body>
 </html>
