@@ -555,9 +555,6 @@
         <div style="display:flex;flex-direction:column;gap:6px">
           <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:{{ bookingWhenColor }}">{{ bookingWhen }}</span>
           <span style="font-family:'Archivo Black',sans-serif;font-size:22px">{{ bookingHeading }}</span>
-          <sc-if value="{{ bookingIsClaim }}" hint-placeholder-val="{{ false }}">
-            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45)">your name goes on this slot</span>
-          </sc-if>
           <sc-if value="{{ bookingIsRequest }}" hint-placeholder-val="{{ true }}">
             <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45)">goes to {{ bookingManager }} to confirm</span>
           </sc-if>
@@ -1023,7 +1020,6 @@ class Component extends DCLogic {
         const withList = (rec && rec.with) || [];
         const roll = rec ? [rec.by || "unclaimed"].concat(withList).join(", ") : "";
         const key = this.key(st.week, day, t);
-        const canClaim = !rec || !rec.by || rec.by === "unclaimed";
         const isPast = st.week < 0;
         return {
           song: rec ? rec.song : "",
@@ -1033,9 +1029,9 @@ class Component extends DCLogic {
           onClick: isPast ? null : (mine || inTeam) ? () => this.setState({
             booking: { week: st.week, day, t, label: day + " " + LABEL[t], existing: true, origin: key },
             bookingSong: rec.song, bookingWith: (rec.with || []).slice(), pickQuery: ""
-          }) : (canClaim && me) ? () => this.setState({
-            booking: { week: st.week, day, t, label: day + " " + LABEL[t], existing: false, claim: true },
-            bookingSong: rec ? rec.song : "", bookingWith: [], pickQuery: ""
+          }) : (!rec && me) ? () => this.setState({
+            booking: { week: st.week, day, t, label: "Request", existing: false },
+            bookingSong: "", bookingWith: [], pickQuery: ""
           }) : null
         };
       })
@@ -1387,8 +1383,8 @@ class Component extends DCLogic {
       })(),
       grid, myCount: mine.length,
       booking: !!st.booking, bookingSong: st.bookingSong,
-      bookingWhen: st.booking && st.booking.existing ? st.booking.label : st.booking && st.booking.claim ? st.booking.label : "Request",
-      bookingWhenColor: st.booking && st.booking.claim ? "#d1682e" : "#3d8dbd",
+      bookingWhen: st.booking && st.booking.existing ? st.booking.label : "Request",
+      bookingWhenColor: st.booking && st.booking.existing ? "#3d8dbd" : "#d1682e",
       bookingDay: st.booking ? st.booking.day : DAYS[0][0],
       bookingTime: st.booking ? st.booking.t : TIMES[0],
       bookingManager: (DAYS.find(d => d[0] === (st.booking ? st.booking.day : "")) || DAYS[0])[1],
@@ -1422,10 +1418,9 @@ class Component extends DCLogic {
       weekPrevClass: st.week <= -4 ? "week-disabled" : "",
       weekNextClass: st.week >= 1 ? "week-disabled" : "",
       bookingExisting: !!(st.booking && st.booking.existing),
-      bookingIsClaim: !!(st.booking && st.booking.claim),
-      bookingIsRequest: !!(st.booking && !st.booking.claim && !st.booking.existing),
-      bookingHeading: st.booking && st.booking.existing ? "Your slot" : st.booking && st.booking.claim ? "Claim this slot" : "Request a slot",
-      bookingConfirm: st.booking && st.booking.existing ? "Save changes" : st.booking && st.booking.claim ? "Claim" : "Send request",
+      bookingIsRequest: !!(st.booking && !st.booking.existing),
+      bookingHeading: st.booking && st.booking.existing ? "Your slot" : "Request a slot",
+      bookingConfirm: st.booking && st.booking.existing ? "Save changes" : "Send request",
       bookingOwner: me || "",
       bookingWith: st.bookingWith.map(name => ({ name, onRemove: () => this.setState({ bookingWith: st.bookingWith.filter(x => x !== name) }) })),
       bookingWithCount: st.bookingWith.length ? st.bookingWith.length + 1 + " playing" : "just you so far",
