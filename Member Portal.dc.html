@@ -760,20 +760,25 @@
 </div>
 </x-dc>
 <script>
-// ponytail: default jam room mobile tab to today
+// ponytail: default jam room mobile tab to today — observer handles late sc-if render
 (function(){
   var todayIdx=(new Date().getDay()+6)%7;
+  var done=false;
   function initDayTabs(){
     var section=document.querySelector('.mc-jam-section');
-    if(!section)return;
+    if(!section||done)return;
+    done=true;
     section.setAttribute('data-day',String(todayIdx));
     var tabs=section.querySelectorAll('.mc-day-tab');
     for(var i=0;i<tabs.length;i++){
       tabs[i].classList.toggle('active',i===todayIdx);
     }
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initDayTabs);
-  else initDayTabs();
+  initDayTabs();
+  if(!done){
+    new MutationObserver(function(_, obs){ initDayTabs(); if(done) obs.disconnect(); })
+      .observe(document.body,{childList:true,subtree:true});
+  }
 })();
 document.addEventListener('click',function(e){
   var tab=e.target.closest('.mc-day-tab');
