@@ -483,7 +483,7 @@
   </sc-if>
 
   <sc-if value="{{ onJam }}" hint-placeholder-val="{{ false }}">
-  <section class="mc-jam-section" data-day="0" style="padding:32px 28px 56px;display:flex;flex-direction:column;gap:24px">
+  <section class="mc-jam-section" style="padding:32px 28px 56px;display:flex;flex-direction:column;gap:24px"><script>document.currentScript.parentElement.setAttribute('data-day',String((new Date().getDay()+6)%7))</script>
     <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between">
       <div style="display:flex;flex-direction:column;gap:12px">
         <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">Jam room schedule</h2>
@@ -504,13 +504,14 @@
     </div>
 
     <div class="mc-day-tabs" style="display:none">
-      <button class="mc-day-tab active" data-day="0">Mon</button>
+      <button class="mc-day-tab" data-day="0">Mon</button>
       <button class="mc-day-tab" data-day="1">Tue</button>
       <button class="mc-day-tab" data-day="2">Wed</button>
       <button class="mc-day-tab" data-day="3">Thu</button>
       <button class="mc-day-tab" data-day="4">Fri</button>
       <button class="mc-day-tab" data-day="5">Sat</button>
       <button class="mc-day-tab" data-day="6">Sun</button>
+      <script>!function(){var d=String((new Date().getDay()+6)%7),tabs=document.currentScript.parentElement.querySelectorAll('.mc-day-tab');for(var i=0;i<tabs.length;i++)tabs[i].classList.toggle('active',tabs[i].getAttribute('data-day')===d)}()</script>
     </div>
     <div style="overflow-x:auto;border:1px solid rgba(243,241,236,.14)">
       <div class="mc-jam-grid" style="min-width:900px">
@@ -760,32 +761,33 @@
 </div>
 </x-dc>
 <script>
-// ponytail: default jam room mobile tab to today — observer handles late sc-if render
+// ponytail: default jam room mobile tab to today — observer re-applies after DC re-renders
 (function(){
   var todayIdx=(new Date().getDay()+6)%7;
-  var done=false;
+  var todayStr=String(todayIdx);
   function initDayTabs(){
     var section=document.querySelector('.mc-jam-section');
-    if(!section||done)return;
-    done=true;
-    section.setAttribute('data-day',String(todayIdx));
-    var tabs=section.querySelectorAll('.mc-day-tab');
-    for(var i=0;i<tabs.length;i++){
-      tabs[i].classList.toggle('active',i===todayIdx);
+    if(!section)return false;
+    if(section.getAttribute('data-day')!==todayStr&&!section._userPicked){
+      section.setAttribute('data-day',todayStr);
     }
+    var tabs=section.querySelectorAll('.mc-day-tab');
+    var cur=section.getAttribute('data-day');
+    for(var i=0;i<tabs.length;i++){
+      tabs[i].classList.toggle('active',tabs[i].getAttribute('data-day')===cur);
+    }
+    return true;
   }
   initDayTabs();
-  if(!done){
-    new MutationObserver(function(_, obs){ initDayTabs(); if(done) obs.disconnect(); })
-      .observe(document.body,{childList:true,subtree:true});
-  }
+  new MutationObserver(function(){ initDayTabs(); })
+    .observe(document.body,{childList:true,subtree:true});
 })();
 document.addEventListener('click',function(e){
   var tab=e.target.closest('.mc-day-tab');
   if(tab){
     var day=tab.getAttribute('data-day');
     var section=tab.closest('.mc-jam-section');
-    if(section)section.setAttribute('data-day',day);
+    if(section){section.setAttribute('data-day',day);section._userPicked=true;}
     var tabs=tab.parentElement.querySelectorAll('.mc-day-tab');
     for(var i=0;i<tabs.length;i++)tabs[i].classList.remove('active');
     tab.classList.add('active');
