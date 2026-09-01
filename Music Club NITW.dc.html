@@ -610,17 +610,32 @@ class Component extends DCLogic {
         { no: "04", name: "Production", blurb: "Recording the club, mixing originals, running live sound." },
         { no: "05", name: "Tech Team", blurb: "Graphics, stage design, videography, photo, editing, and event hosting." }
       ],
-      events: [
-        { track: "A1", day: "30", month: "Aug", title: "Freshers Event", where: "Student Activity Centre · 6 PM", kind: "Open to all" },
-        { track: "A2", day: "11", month: "Sep", title: "Jam Night 2", where: "Student Activity Centre · 6 PM", kind: "Open to all" },
-        { track: "A3", day: "18", month: "Sep", title: "Jam Night 3", where: "Student Activity Centre · 6 PM", kind: "Open to all" },
-        { track: "A4", day: "26", month: "Sep", title: "Workshop 1", where: "Student Activity Centre", kind: "Workshop" },
-        { track: "A5", day: "09", month: "Oct", title: "Themed Event", where: "Student Activity Centre", kind: "Gig" },
-        { track: "B1", day: "29", month: "Oct", title: "TZ Flagship Event", where: "Technozion · main stage", kind: "Flagship" }
-      ],
-      archive: [
-        { year: "2026", title: "Jam Night 1", note: "7 Aug, Student Activity Centre." }
-      ],
+      // ponytail: auto-archive — one list, split by today's date
+      ...(() => {
+        const ALL = [
+          { day: "07", month: "Aug", year: "2026", title: "Jam Night 1", where: "Student Activity Centre", kind: "Open to all" },
+          { day: "30", month: "Aug", year: "2026", title: "Freshers Event", where: "Student Activity Centre · 6 PM", kind: "Open to all" },
+          { day: "11", month: "Sep", year: "2026", title: "Jam Night 2", where: "Student Activity Centre · 6 PM", kind: "Open to all" },
+          { day: "18", month: "Sep", year: "2026", title: "Jam Night 3", where: "Student Activity Centre · 6 PM", kind: "Open to all" },
+          { day: "26", month: "Sep", year: "2026", title: "Workshop 1", where: "Student Activity Centre", kind: "Workshop" },
+          { day: "09", month: "Oct", year: "2026", title: "Themed Event", where: "Student Activity Centre", kind: "Gig" },
+          { day: "29", month: "Oct", year: "2026", title: "TZ Flagship Event", where: "Technozion · main stage", kind: "Flagship" }
+        ];
+        const MO = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+        const today = new Date(); today.setHours(0,0,0,0);
+        const past = [], upcoming = [];
+        let ai = 0, ui = 0;
+        ALL.forEach(e => {
+          const d = new Date(+e.year, MO[e.month], +e.day);
+          if (d < today) {
+            past.push({ year: e.year, title: e.title, note: e.day + " " + e.month + ", " + (e.where || "").split("·")[0].trim() + "." });
+          } else {
+            ui++;
+            upcoming.push({ track: "A" + ui, day: e.day, month: e.month, title: e.title, where: e.where, kind: e.kind });
+          }
+        });
+        return { events: upcoming, archive: past };
+      })(),
       offers: [
         { title: "Spring Spree Flagship · ₹80,000", body: "Our flagship concert at Spring Spree, 4,000+ footfall last edition." },
         { title: "TZ Flagship Event · ₹50,000", body: "Day 0 of Technozion, 4,000+ footfall last edition." },

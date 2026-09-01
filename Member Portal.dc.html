@@ -574,7 +574,7 @@
           <label style="flex:1;display:flex;flex-direction:column;gap:8px">
             <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Day</span>
             <select value="{{ bookingDay }}" onChange="{{ onBookingDay }}" style="padding:12px 13px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14.5px;cursor:pointer">
-              <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
+              <sc-for list="{{ bookingDays }}" as="d" hint-placeholder-count="7">
                 <option value="{{ d.name }}">{{ d.name }}</option>
               </sc-for>
             </select>
@@ -760,6 +760,21 @@
 </div>
 </x-dc>
 <script>
+// ponytail: default jam room mobile tab to today
+(function(){
+  var todayIdx=(new Date().getDay()+6)%7;
+  function initDayTabs(){
+    var section=document.querySelector('.mc-jam-section');
+    if(!section)return;
+    section.setAttribute('data-day',String(todayIdx));
+    var tabs=section.querySelectorAll('.mc-day-tab');
+    for(var i=0;i<tabs.length;i++){
+      tabs[i].classList.toggle('active',i===todayIdx);
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initDayTabs);
+  else initDayTabs();
+})();
 document.addEventListener('click',function(e){
   var tab=e.target.closest('.mc-day-tab');
   if(tab){
@@ -809,8 +824,8 @@ const DAYS = [
   ["Monday", "Saumitra"], ["Tuesday", "Yashaswini"], ["Wednesday", "Kaivalya Kappaganthula"],
   ["Thursday", "Arkadeep"], ["Friday", "Divya"], ["Saturday", "Joshua"], ["Sunday", "Balla Sri Sathwik"]
 ];
-const TIMES = ["9-10","10-11","11-12","12-1","1-2","2-3","3-4","4-5","5-6","6-7","7-8","8-9","9-10*","10-11*"];
-const LABEL = { "9-10":"9–10 AM","10-11":"10–11 AM","11-12":"11–12","12-1":"12–1 PM","1-2":"1–2 PM","2-3":"2–3 PM","3-4":"3–4 PM","4-5":"4–5 PM","5-6":"5–6 PM","6-7":"6–7 PM","7-8":"7–8 PM","8-9":"8–9 PM","9-10*":"9–10 PM","10-11*":"10–11 PM" };
+const TIMES = ["9-10","10-11","11-12","12-1","1-2","2-3","3-4","4-5","5-6","6-7","7-8","8-9","9-10*","10-11*","11-12*","12-1*"];
+const LABEL = { "9-10":"9–10 AM","10-11":"10–11 AM","11-12":"11–12","12-1":"12–1 PM","1-2":"1–2 PM","2-3":"2–3 PM","3-4":"3–4 PM","4-5":"4–5 PM","5-6":"5–6 PM","6-7":"6–7 PM","7-8":"7–8 PM","8-9":"8–9 PM","9-10*":"9–10 PM","10-11*":"10–11 PM","11-12*":"11 PM–12","12-1*":"12–1 AM" };
 const SERVER = !!(typeof window !== "undefined" && window.MC_SUPABASE && window.MC_SUPABASE.url && window.MC_SUPABASE.anonKey);
 const cfg = (typeof window !== "undefined" && window.MC_SUPABASE) || {};
 const SEED = {};
@@ -1358,6 +1373,11 @@ class Component extends DCLogic {
       },
       jamNote: st.week < 0 ? "past week · read-only" : "read-only view · slots go through your day's manager",
       days: DAYS.map(([name, manager]) => ({ name, manager })),
+      bookingDays: (() => {
+        const todayIdx = (new Date().getDay() + 6) % 7;
+        const bw = st.booking ? (st.booking.week || 0) : (st.week || 0);
+        return DAYS.filter((_, i) => bw !== 0 || i >= todayIdx).map(([name]) => ({ name }));
+      })(),
       grid, myCount: mine.length,
       booking: !!st.booking, bookingSong: st.bookingSong,
       bookingWhen: st.booking && st.booking.existing ? st.booking.label : st.booking && st.booking.claim ? st.booking.label : "Request",
@@ -1380,7 +1400,8 @@ class Component extends DCLogic {
       },
       onBookingTime: e => this.setState({ booking: { ...st.booking, t: e.target.value } }),
       openRequest: () => {
-        const day = DAYS[0][0];
+        const todayIdx = (new Date().getDay() + 6) % 7;
+        const day = st.week === 0 ? DAYS[Math.max(todayIdx, 0)][0] : DAYS[0][0];
         this.setState({
           booking: { week: st.week, day, t: this.freeFor(st.week, day)[0], label: "Request", existing: false },
           bookingSong: "", bookingWith: [], pickQuery: ""
