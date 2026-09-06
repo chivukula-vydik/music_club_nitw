@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<meta name="theme-color" content="#1a1a1a">
+<script src="./support.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  @view-transition{navigation:auto}
+  ::view-transition-old(root){animation:mcfade .2s ease-out}
+  ::view-transition-new(root){animation:mcfade .2s ease-in reverse}
+  @keyframes mcfade{to{opacity:0}}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#1a1a1a;color:#f3f1ec;font-family:Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:#e07832;text-decoration:none}
+  a:hover{color:#3d8dbd}
+  .mc-burger{display:none;background:none;border:none;cursor:pointer;padding:4px}
+  .mc-burger span{display:block;width:22px;height:2px;background:#f3f1ec;margin:5px 0;transition:transform .3s,opacity .3s}
+  .mc-desktop{display:block}
+  .mc-mobile{display:none}
+  .mc-mnav{display:none;flex-direction:column;align-items:stretch;gap:0;background:#1a1a1a;padding:12px 20px 20px;font-size:16px}
+  .mc-mnav.open{display:flex}
+  .mc-mnav a{padding:14px 0;border-bottom:1px solid rgba(243,241,236,.08)}
+  .mc-mnav a:last-child{border-bottom:none}
+  @media(max-width:768px){
+    .mc-desktop{display:none!important}
+    .mc-mobile{display:block!important}
+    .mc-burger{display:block}
+  }
+  @keyframes mcpulse-dot{0%,100%{opacity:.4}50%{opacity:1}}
+</style>
+</helmet>
+
+<!-- Desktop -->
+<div class="mc-desktop" style="max-width:100%;overflow-x:hidden">
+
+<header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:12px 32px;background:rgba(26,26,26,.85);backdrop-filter:blur(14px);">
+  <a href="Music%20Club%20NITW.dc.html" style="display:flex;align-items:center;gap:11px;color:#f3f1ec">
+    <img src="assets/logo.png" alt="Music Club NITW" style="width:36px;height:36px;border-radius:999px;display:block">
+    <span style="font-family:'Archivo Black',sans-serif;font-size:14px;letter-spacing:.02em">MUSIC CLUB <span style="color:rgba(243,241,236,.45)">NITW</span></span>
+  </a>
+  <nav style="display:flex;align-items:center;gap:26px;font-size:13px;font-weight:500;color:rgba(243,241,236,.62)">
+    <a href="Music%20Club%20NITW.dc.html#recruit" style="color:inherit">Auditions</a>
+    <a href="Music%20Club%20NITW.dc.html#about" style="color:inherit">About</a>
+    <a href="Music%20Club%20NITW.dc.html#events" style="color:inherit">Events</a>
+    <a href="Gallery.dc.html" style="color:inherit">Gallery</a>
+    <a href="Announcements.dc.html" style="color:#e07832;font-weight:700">Announcements</a>
+    <a href="Music%20Club%20NITW.dc.html#sponsors" style="color:inherit">Sponsors</a>
+    <a href="Member%20Portal.dc.html" style="display:inline-flex;align-items:center;padding:9px 16px;border-radius:999px;border:1px solid rgba(61,141,189,.5);background:rgba(61,141,189,.15);color:#7cb8db;font-weight:600;font-size:13px">Member login</a>
+  </nav>
+</header>
+
+<section style="padding:56px 32px 20px">
+  <div style="max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:14px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#3d8dbd">05 / Announcements</div>
+    <span style="display:block;width:100%;max-width:210px;height:11px;background:repeating-linear-gradient(to bottom,rgba(243,241,236,.16) 0 1px,transparent 1px 3px)"></span>
+    <h1 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:clamp(30px,5vw,50px);line-height:1.02;letter-spacing:-.02em">What's new.</h1>
+    <p style="margin:0;font-size:16.5px;line-height:1.7;color:rgba(243,241,236,.6)">Latest updates from the club.</p>
+  </div>
+</section>
+
+<section style="padding:12px 32px 64px">
+  <div style="max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:16px">
+    <sc-for list="{{ announcements }}" as="a" hint-placeholder-count="4">
+      <div style="padding:28px 32px;background:#201f1e;border-radius:20px;display:flex;flex-direction:column;gap:12px;border-left:3px solid rgba(224,120,50,.5)">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;border:1px solid rgba(224,120,50,.25);color:#e07832">{{ a.tag }}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.35)">{{ a.date }}</span>
+          <sc-if value="{{ a.live }}" hint-placeholder-val="{{ true }}">
+            <span style="display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#4ade80">
+              <span style="width:6px;height:6px;border-radius:999px;background:#4ade80;animation:mcpulse-dot 1.5s ease-in-out infinite"></span>
+              LIVE
+            </span>
+          </sc-if>
+        </div>
+        <h3 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:22px;line-height:1.2">{{ a.title }}</h3>
+        <p style="margin:0;font-size:15.5px;line-height:1.65;color:rgba(243,241,236,.7)">{{ a.body }}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px">
+          <sc-if value="{{ a.link }}" hint-placeholder-val="{{ '#' }}">
+            <a href="{{ a.link }}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:999px;background:#e07832;color:#1a1a1a;font-weight:600;font-size:13px">{{ a.linkText }} →</a>
+          </sc-if>
+          <sc-if value="{{ a.link2 }}" hint-placeholder-val="{{ '#' }}">
+            <a href="{{ a.link2 }}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:999px;border:1.5px solid rgba(61,141,189,.6);background:rgba(61,141,189,.18);color:#7cb8db;font-weight:600;font-size:13px">{{ a.linkText2 }} →</a>
+          </sc-if>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<footer style="padding:36px 32px 40px;border-top:1px solid rgba(243,241,236,.06)">
+  <div style="max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:12px">
+      <img src="assets/logo.png" alt="" style="width:32px;height:32px;border-radius:999px;display:block">
+      <span style="font-family:'Archivo Black',sans-serif;font-size:15px">MUSIC CLUB NITW</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#e07832">#highonmusic</span>
+    </div>
+    <a href="Music%20Club%20NITW.dc.html" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.06em">← Back to home</a>
+  </div>
+</footer>
+
+</div>
+
+<!-- Mobile -->
+<div class="mc-mobile" style="max-width:100%;overflow-x:hidden">
+
+<header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(26,26,26,.92);backdrop-filter:blur(14px)">
+  <a href="Music%20Club%20NITW.dc.html" style="display:flex;align-items:center;gap:8px;color:#f3f1ec">
+    <img src="assets/logo.png" alt="Music Club NITW" style="width:30px;height:30px;border-radius:999px;display:block">
+    <span style="font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:.02em">MUSIC CLUB <span style="color:rgba(243,241,236,.45)">NITW</span></span>
+  </a>
+  <button class="mc-burger mc-mburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</header>
+<nav class="mc-mnav" style="font-size:13px;font-weight:500;color:rgba(243,241,236,.62)">
+  <a href="Music%20Club%20NITW.dc.html#m-recruit" style="color:inherit">Auditions</a>
+  <a href="Music%20Club%20NITW.dc.html#m-about" style="color:inherit">About</a>
+  <a href="Music%20Club%20NITW.dc.html#m-events" style="color:inherit">Events</a>
+  <a href="Gallery.dc.html" style="color:inherit">Gallery</a>
+  <a href="Announcements.dc.html" style="color:#e07832;font-weight:700">Announcements</a>
+  <a href="Member%20Portal.dc.html" style="display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;border-radius:999px;border:1px solid rgba(61,141,189,.5);background:rgba(61,141,189,.15);color:#7cb8db;font-weight:600;font-size:14px">Member login</a>
+</nav>
+
+<section style="padding:40px 20px 16px">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#3d8dbd">05 / Announcements</div>
+    <h1 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:28px;line-height:1.05;letter-spacing:-.02em">What's new.</h1>
+  </div>
+</section>
+
+<section style="padding:8px 16px 48px">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <sc-for list="{{ announcements }}" as="a" hint-placeholder-count="4">
+      <div style="padding:20px;background:#201f1e;border-radius:16px;display:flex;flex-direction:column;gap:10px;border-left:3px solid rgba(224,120,50,.5)">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="padding:4px 10px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;border:1px solid rgba(224,120,50,.25);color:#e07832">{{ a.tag }}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(243,241,236,.35)">{{ a.date }}</span>
+          <sc-if value="{{ a.live }}" hint-placeholder-val="{{ true }}">
+            <span style="display:inline-flex;align-items:center;gap:4px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#4ade80">
+              <span style="width:5px;height:5px;border-radius:999px;background:#4ade80;animation:mcpulse-dot 1.5s ease-in-out infinite"></span>
+              LIVE
+            </span>
+          </sc-if>
+        </div>
+        <h3 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:17px;line-height:1.2">{{ a.title }}</h3>
+        <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(243,241,236,.65)">{{ a.body }}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:2px">
+          <sc-if value="{{ a.link }}" hint-placeholder-val="{{ '#' }}">
+            <a href="{{ a.link }}" target="_blank" style="display:inline-flex;padding:9px 18px;border-radius:999px;background:#e07832;color:#1a1a1a;font-weight:600;font-size:12px">{{ a.linkText }} →</a>
+          </sc-if>
+          <sc-if value="{{ a.link2 }}" hint-placeholder-val="{{ '#' }}">
+            <a href="{{ a.link2 }}" target="_blank" style="display:inline-flex;padding:9px 18px;border-radius:999px;border:1.5px solid rgba(61,141,189,.6);background:rgba(61,141,189,.18);color:#7cb8db;font-weight:600;font-size:12px">{{ a.linkText2 }} →</a>
+          </sc-if>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<footer style="padding:24px 20px;border-top:1px solid rgba(243,241,236,.06)">
+  <div style="display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center">
+    <div style="display:flex;align-items:center;gap:8px">
+      <img src="assets/logo.png" alt="" style="width:24px;height:24px;border-radius:999px;display:block">
+      <span style="font-family:'Archivo Black',sans-serif;font-size:13px">MUSIC CLUB NITW</span>
+    </div>
+    <a href="Music%20Club%20NITW.dc.html" style="font-family:'JetBrains Mono',monospace;font-size:11px">← Home</a>
+  </div>
+</footer>
+
+</div>
+
+</x-dc>
+<script>
+document.addEventListener('click',function(e){
+  var b=e.target.closest('.mc-mburger');
+  if(b){var n=document.querySelector('.mc-mnav');if(n){n.classList.toggle('open');b.classList.toggle('active');}return;}
+  var a=e.target.closest('.mc-mnav a');
+  if(a){var n=document.querySelector('.mc-mnav'),bb=document.querySelector('.mc-mburger');if(n)n.classList.remove('open');if(bb)bb.classList.remove('active');}
+});
+</script>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      announcements: [
+        {
+          tag: "Auditions",
+          date: "06 Sep 2026",
+          live: true,
+          title: "Core & Tech Team Auditions Are Open!",
+          body: "Registration is live for both Core Team (Vocals, Band, Classical, Production) and Tech Team (Graphics, Video, Photo, Stage). Registration closes 13 Sept, auditions run 15-18 Sept. All years welcome.",
+          link: "https://docs.google.com/forms/d/e/1FAIpQLSeWpdrZf1lbTGiLGaY4zbUS80-Buy6p0xYd24MYOkLj4E_O8Q/viewform?usp=dialog",
+          linkText: "Register for Core",
+          link2: "https://docs.google.com/forms/d/e/1FAIpQLScqyohU_RCVhiTME2yMfPaXf9bdPEwR-X40d0VofkoftWLB1w/viewform",
+          linkText2: "Register for Tech"
+        },
+        {
+          tag: "Event",
+          date: "28 Aug 2026",
+          live: false,
+          title: "Freshers Event — 30 Aug, 6 PM",
+          body: "Welcome batch of 2030! Join us at the Student Activity Centre for an evening of live music, introductions, and good vibes. Open to all freshers.",
+          link: null,
+          linkText: null
+        },
+        {
+          tag: "Jam Night",
+          date: "05 Aug 2026",
+          live: false,
+          title: "Jam Night 1 Wrap-Up",
+          body: "First jam night of the semester went off. Thanks to everyone who showed up and played. Next one on 11 Sept — bring your instruments.",
+          link: null,
+          linkText: null
+        },
+        {
+          tag: "General",
+          date: "01 Aug 2026",
+          live: false,
+          title: "Welcome Back — Sem 1 2026-27",
+          body: "New semester, new lineup. Keep an eye on this page and our Instagram for all updates on events, workshops, and auditions this semester.",
+          link: "https://www.instagram.com/musicclubdenitw/",
+          linkText: "Follow us"
+        }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
