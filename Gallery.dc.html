@@ -242,7 +242,7 @@ document.addEventListener('click',function(e){
 });
 // ponytail: scroll-triggered sound prompt — appears after 150px scroll, any click unlocks audio
 (function(){
-  if(sessionStorage.getItem('mc-beat-unlocked'))return;
+  if(localStorage.getItem('mc-beat-unlocked'))return;
   var s=document.createElement('style');
   s.textContent='@keyframes mcpulse{0%,100%{box-shadow:0 4px 20px rgba(224,120,50,.4)}50%{box-shadow:0 4px 30px rgba(224,120,50,.7)}}@keyframes mcslideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
   document.head.appendChild(s);
@@ -255,7 +255,7 @@ document.addEventListener('click',function(e){
     pill.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(224,120,50,.95);color:#1a1a1a;font-family:Archivo,system-ui,sans-serif;font-weight:600;font-size:14px;padding:10px 24px;border-radius:999px;cursor:pointer;z-index:10000;animation:mcslideUp .4s ease-out,mcpulse 2s ease-in-out infinite;white-space:nowrap';
     pill.textContent='♪  Tap anywhere for sound';
     document.body.appendChild(pill);
-    function dismiss(){sessionStorage.setItem('mc-beat-unlocked','1');var el=document.getElementById('mc-sound-prompt');if(el)el.remove();document.removeEventListener('click',dismiss,true);document.removeEventListener('touchstart',dismiss,true);}
+    function dismiss(){localStorage.setItem('mc-beat-unlocked','1');var el=document.getElementById('mc-sound-prompt');if(el)el.remove();document.removeEventListener('click',dismiss,true);document.removeEventListener('touchstart',dismiss,true);}
     document.addEventListener('click',dismiss,true);
     document.addEventListener('touchstart',dismiss,true);
   }
