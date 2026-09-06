@@ -743,6 +743,7 @@ if(new Date()>=new Date('2026-09-14')){document.querySelectorAll('#recruit,#m-re
   audio.loop=true;
   audio.volume=0.35;
   audio.preload='auto';
+  audio.autoplay=true;
 
   var btn=document.createElement('button');
   btn.id='mc-music-toggle';
@@ -760,9 +761,9 @@ if(new Date()>=new Date('2026-09-14')){document.querySelectorAll('#recruit,#m-re
   function play(){audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});}
   function pause(){audio.pause();playing=false;updateBtn(false);}
 
-  // try autoplay immediately on load
+  // try autoplay immediately
   play();
-  // fallback: if browser blocked autoplay, start on first interaction
+  // if browser blocked, silently start on first interaction
   function autoStart(){if(playing)return;play();document.removeEventListener('click',autoStart);document.removeEventListener('scroll',autoStart);document.removeEventListener('keydown',autoStart);document.removeEventListener('touchstart',autoStart);}
   document.addEventListener('click',autoStart);
   document.addEventListener('scroll',autoStart);
