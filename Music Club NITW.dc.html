@@ -771,15 +771,19 @@ if(new Date()>=new Date('2026-09-14')){document.querySelectorAll('#recruit,#m-re
     removeAutoStart();
   }
   function removeAutoStart(){
+    document.removeEventListener('scroll',autoStart,true);
+    document.removeEventListener('wheel',autoStart,true);
+    document.removeEventListener('touchmove',autoStart,true);
     document.removeEventListener('click',autoStart,true);
     document.removeEventListener('touchstart',autoStart,true);
-    document.removeEventListener('touchend',autoStart,true);
     document.removeEventListener('keydown',autoStart,true);
     document.removeEventListener('pointerdown',autoStart,true);
   }
+  document.addEventListener('scroll',autoStart,true);
+  document.addEventListener('wheel',autoStart,true);
+  document.addEventListener('touchmove',autoStart,true);
   document.addEventListener('click',autoStart,true);
   document.addEventListener('touchstart',autoStart,true);
-  document.addEventListener('touchend',autoStart,true);
   document.addEventListener('keydown',autoStart,true);
   document.addEventListener('pointerdown',autoStart,true);
 
