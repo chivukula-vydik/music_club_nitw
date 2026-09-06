@@ -59,6 +59,8 @@
 
 <div class="mc-desktop" style="max-width:100%;overflow-x:hidden">
 
+<a href="#recruit" class="mc-topbar" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 16px;background:#e07832;color:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;text-align:center">Auditions are open — Core & Tech teams · Register now →</a>
+
 <header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:12px 32px;background:rgba(26,26,26,.85);backdrop-filter:blur(14px);">
   <a href="#top" style="display:flex;align-items:center;gap:11px;color:#f3f1ec">
     <img src="assets/logo.png" alt="Music Club NITW" style="width:36px;height:36px;border-radius:999px;display:block">
@@ -423,6 +425,8 @@
 <!-- ====== MOBILE LAYOUT ====== -->
 <div class="mc-mobile" style="max-width:100%;overflow-x:hidden">
 
+<a href="#m-recruit" class="mc-topbar" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 12px;background:#e07832;color:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;text-align:center">Auditions open · Register now →</a>
+
 <header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(26,26,26,.92);backdrop-filter:blur(14px)">
   <a href="#top" style="display:flex;align-items:center;gap:8px;color:#f3f1ec">
     <img src="assets/logo.png" alt="Music Club NITW" style="width:30px;height:30px;border-radius:999px;display:block">
@@ -727,6 +731,8 @@ document.addEventListener('click',function(e){
 });
 // ponytail: scroll to hash after React mount — native scroll fires before dc-runtime renders
 if(location.hash){var _h=location.hash;var _t=setInterval(function(){var el=document.querySelector(_h);if(el){clearInterval(_t);el.scrollIntoView({behavior:'smooth'});}},60);setTimeout(function(){clearInterval(_t)},3000);}
+// ponytail: hide auditions after Sept 14 2026
+if(new Date()>=new Date('2026-09-14')){document.querySelectorAll('#recruit,#m-recruit,.mc-topbar').forEach(function(s){s.hidden=true});document.querySelectorAll('a[href="#recruit"],a[href="#m-recruit"]').forEach(function(a){a.hidden=true});}
 </script>
 <script type="text/x-dc" data-dc-script data-props="{&quot;showPastEvents&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;},&quot;showSponsors&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;}}">
 class Component extends DCLogic {
