@@ -767,8 +767,7 @@ if(new Date()>=new Date('2026-09-14')){document.querySelectorAll('#recruit,#m-re
   // fallback: play on first interaction
   function autoStart(){
     if(playing)return;
-    audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});
-    removeAutoStart();
+    audio.play().then(function(){playing=true;updateBtn(true);removeAutoStart();}).catch(function(){});
   }
   function removeAutoStart(){
     document.removeEventListener('scroll',autoStart,true);
@@ -791,6 +790,9 @@ if(new Date()>=new Date('2026-09-14')){document.querySelectorAll('#recruit,#m-re
     e.stopPropagation();
     if(playing)pause();else play();
   });
+  // ponytail: persist play state across page navigations
+  try{var ss=sessionStorage.getItem('mc-beat');if(ss){var st=JSON.parse(ss);if(st.t)audio.currentTime=st.t;if(st.m){updateBtn(false);}}}catch(e){}
+  window.addEventListener('pagehide',function(){try{sessionStorage.setItem('mc-beat',JSON.stringify({p:playing,t:audio.currentTime,m:!playing}));}catch(e){}});
 })();
 </script>
 <script type="text/x-dc" data-dc-script data-props="{&quot;showPastEvents&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;},&quot;showSponsors&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;}}">

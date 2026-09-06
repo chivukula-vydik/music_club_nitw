@@ -206,10 +206,13 @@ document.addEventListener('click',function(e){
   function play(){audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});}
   function pause(){audio.pause();playing=false;updateBtn(false);}
   audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});
-  function autoStart(){if(playing)return;audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});removeAutoStart();}
+  function autoStart(){if(playing)return;audio.play().then(function(){playing=true;updateBtn(true);removeAutoStart();}).catch(function(){});}
   function removeAutoStart(){['scroll','wheel','touchmove','click','touchstart','keydown','pointerdown'].forEach(function(e){document.removeEventListener(e,autoStart,true);});}
   ['scroll','wheel','touchmove','click','touchstart','keydown','pointerdown'].forEach(function(e){document.addEventListener(e,autoStart,true);});
   btn.addEventListener('click',function(e){e.stopPropagation();if(playing)pause();else play();});
+  // ponytail: persist play state across page navigations
+  try{var ss=sessionStorage.getItem('mc-beat');if(ss){var st=JSON.parse(ss);if(st.t)audio.currentTime=st.t;if(st.m){updateBtn(false);}}}catch(e){}
+  window.addEventListener('pagehide',function(){try{sessionStorage.setItem('mc-beat',JSON.stringify({p:playing,t:audio.currentTime,m:!playing}));}catch(e){}});
 })();
 </script>
 <script type="text/x-dc" data-dc-script data-props="{}">
