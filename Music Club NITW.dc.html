@@ -59,7 +59,7 @@
 
 <div class="mc-desktop" style="max-width:100%;overflow-x:hidden">
 
-<a href="#recruit" class="mc-topbar" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 16px;background:#e07832;color:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;text-align:center">Auditions close in <span class="mc-countdown" style="color:#fff"></span> · Register now →</a>
+<a href="#recruit" class="mc-topbar" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 16px;background:#e07832;color:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;text-align:center">Deadline extended! Auditions close in <span class="mc-countdown" style="color:#fff"></span> · Register now →</a>
 
 <header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:12px 32px;background:rgba(26,26,26,.85);backdrop-filter:blur(14px);">
   <a href="#top" style="display:flex;align-items:center;gap:11px;color:#f3f1ec">
@@ -165,7 +165,7 @@
         <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-end">
           <div style="display:flex;flex-direction:column;align-items:center;padding:20px 24px;background:rgba(224,120,50,.12);border-radius:18px;border:1px solid rgba(224,120,50,.2)">
             <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(243,241,236,.4)">Reg. closes</span>
-            <span style="font-family:'Archivo Black',sans-serif;font-size:32px;line-height:1;color:#e07832;margin-top:4px">13</span>
+            <span style="font-family:'Archivo Black',sans-serif;font-size:32px;line-height:1;color:#e07832;margin-top:4px">14</span>
             <span style="font-family:'Archivo Black',sans-serif;font-size:14px;color:#e07832;letter-spacing:.06em">SEPT</span>
           </div>
           <div style="display:flex;flex-direction:column;align-items:center;padding:20px 24px;background:rgba(61,141,189,.1);border-radius:18px;border:1px solid rgba(61,141,189,.2)">
@@ -525,7 +525,7 @@
         <div style="display:flex;gap:16px">
           <div style="padding:12px 16px;background:rgba(224,120,50,.12);border-radius:14px;border:1px solid rgba(224,120,50,.18);text-align:center">
             <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.4);display:block">Closes</span>
-            <span style="font-family:'Archivo Black',sans-serif;font-size:22px;line-height:1;color:#e07832">13</span>
+            <span style="font-family:'Archivo Black',sans-serif;font-size:22px;line-height:1;color:#e07832">14</span>
             <span style="font-family:'Archivo Black',sans-serif;font-size:11px;color:#e07832;display:block">SEPT</span>
           </div>
           <div style="padding:12px 16px;background:rgba(61,141,189,.1);border-radius:14px;border:1px solid rgba(61,141,189,.18);text-align:center">
@@ -779,11 +779,11 @@ document.addEventListener('click',function(e){
 });
 // ponytail: scroll to hash after React mount — native scroll fires before dc-runtime renders
 if(location.hash){var _h=location.hash;var _t=setInterval(function(){var el=document.querySelector(_h);if(el){clearInterval(_t);el.scrollIntoView({behavior:'smooth'});}},60);setTimeout(function(){clearInterval(_t)},3000);}
-// ponytail: hide auditions after Sept 14 2026
-if(new Date()>=new Date('2026-09-14')){document.querySelectorAll('#recruit,#m-recruit,.mc-topbar').forEach(function(s){s.hidden=true});document.querySelectorAll('a[href="#recruit"],a[href="#m-recruit"]').forEach(function(a){a.hidden=true});}
-// ponytail: countdown to Sept 13 23:59:59
+// ponytail: hide auditions after Sept 15 2026
+if(new Date()>=new Date('2026-09-15')){document.querySelectorAll('#recruit,#m-recruit,.mc-topbar').forEach(function(s){s.hidden=true});document.querySelectorAll('a[href="#recruit"],a[href="#m-recruit"]').forEach(function(a){a.hidden=true});}
+// ponytail: countdown to Sept 14 23:59:59
 (function(){
-  var deadline=new Date('2026-09-13T23:59:59').getTime();
+  var deadline=new Date('2026-09-14T23:59:59').getTime();
   function tick(){
     var now=Date.now(),diff=deadline-now;
     if(diff<=0){document.querySelectorAll('.mc-countdown').forEach(function(s){s.textContent='CLOSED';});return;}
@@ -914,7 +914,8 @@ class Component extends DCLogic {
 <div id="mc-popup" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);cursor:pointer">
   <div style="position:relative;max-width:min(90vw,520px);max-height:90vh">
     <button id="mc-popup-close" style="position:absolute;top:-14px;right:-14px;width:36px;height:36px;border-radius:50%;border:none;background:#e07832;color:#1a1a1a;font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.4);z-index:1">&times;</button>
-    <img src="assets/audition-poster.jpg" alt="Music Club Auditions" style="width:100%;height:auto;border-radius:12px;display:block;box-shadow:0 8px 40px rgba(0,0,0,.5)">
+    <img src="uploads/WhatsApp Image 2026-09-13 at 18.30.23.jpeg" alt="Music Club Auditions" style="width:100%;height:auto;border-radius:12px 12px 0 0;display:block;box-shadow:0 8px 40px rgba(0,0,0,.5)">
+    <div style="background:#e07832;color:#1a1a1a;padding:12px 20px;border-radius:0 0 12px 12px;text-align:center;font-family:'Archivo Black',sans-serif;font-size:14px;letter-spacing:.04em;text-transform:uppercase">Deadline extended to 14 Sept!</div>
   </div>
 </div>
 <script>
