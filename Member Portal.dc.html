@@ -757,6 +757,7 @@
 
 </div>
 </x-dc>
+<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js")</script>
 <script>
 // ponytail: default jam room mobile tab to today — observer re-applies after DC re-renders
 (function(){
@@ -979,12 +980,18 @@ class Component extends DCLogic {
     return { major: p.major ?? row[4], minor: p.minor ?? row[5], vibe: p.vibe ?? row[6] };
   }
 
-  key(week, day, t) { return (week ? "w" + week + "|" : "") + day + "|" + t; }
+  // ponytail: absolute Monday date as key so bookings don't drift when the week rolls over
+  mondayOf(weekOffset) {
+    const now = new Date();
+    const mon = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay() + 6) % 7) + weekOffset * 7);
+    return mon.getFullYear() * 10000 + (mon.getMonth() + 1) * 100 + mon.getDate();
+  }
+
+  key(week, day, t) { return "w" + this.mondayOf(week) + "|" + day + "|" + t; }
 
   record(week, day, t) {
     const st = this.state, k = this.key(week, day, t);
     if (k in st.bookings) return st.bookings[k];
-    if (!week && SEED[k]) return { song: SEED[k][0], by: SEED[k][1], with: [] };
     return null;
   }
 

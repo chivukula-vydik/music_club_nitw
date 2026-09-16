@@ -122,7 +122,7 @@ export async function load() {
   const cut = minutesCutoff();
   const [members, bookings, profiles, minutes] = await Promise.all([
     c.from("members").select("name,branch,year,team,major_skill,minor_skill,vibe,email").order("name"),
-    c.from("bookings").select("week,day,slot,song,booked_by,players"),
+    c.from("bookings").select("week,day,slot,song,booked_by,players,created_at"),
     c.from("profiles").select("member_name,major_skill,minor_skill,vibe"),
     c.from("minutes").select("id,meeting_date,title,audience,author,body").gte("meeting_date", cut).order("meeting_date", { ascending: false })
   ]);
@@ -132,7 +132,14 @@ export async function load() {
 
   const bookingMap = {};
   for (const b of bookings.data) {
-    const key = (b.week ? "w" + b.week + "|" : "") + b.day + "|" + b.slot;
+    let w = b.week;
+    // ponytail: old rows have relative week (0,1,-1…); convert to absolute Monday YYYYMMDD using created_at
+    if (w < 10000 && b.created_at) {
+      const d = new Date(b.created_at);
+      const mon = new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 6) % 7) + w * 7);
+      w = mon.getFullYear() * 10000 + (mon.getMonth() + 1) * 100 + mon.getDate();
+    }
+    const key = (w ? "w" + w + "|" : "") + b.day + "|" + b.slot;
     bookingMap[key] = { song: b.song, by: b.booked_by, with: b.players || [] };
   }
 
