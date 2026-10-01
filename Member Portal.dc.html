@@ -45,6 +45,7 @@
   .week-disabled{opacity:.25;pointer-events:none}
   .notif-event{background:rgba(209,104,46,.15);color:#d1682e}
   .notif-task{background:rgba(220,190,90,.15);color:#d4b84a}
+  .notif-meeting{background:rgba(170,140,220,.15);color:#b9a3e3}
   .notif-slot{background:rgba(61,141,189,.15);color:#7cb8db}
   .notif-info{background:rgba(243,241,236,.08);color:rgba(243,241,236,.5)}
   .filter-on{border:1px solid #d1682e;background:rgba(209,104,46,.2);color:#f3f1ec}
@@ -59,6 +60,7 @@
   .cal-sel{background:#252524 !important;outline:1px solid #d1682e;outline-offset:-1px}
   .tag-club{background:rgba(130,200,130,.18);color:#8ec88e}
   .tag-task{background:rgba(220,190,90,.18);color:#d4b84a}
+  .tag-meeting{background:rgba(170,140,220,.18);color:#b9a3e3}
   @media(max-width:768px){
     header{padding:10px 14px!important;gap:8px!important}
     header a img{width:24px!important;height:24px!important}
@@ -294,13 +296,16 @@
       <div style="display:flex;gap:8px">
         <button onClick="{{ setEvTypeEvent }}" style="flex:1;padding:10px;border-radius:8px;border:1px solid {{ evTypeEventBorder }};background:{{ evTypeEventBg }};color:{{ evTypeEventColor }};font-size:13px;font-weight:600;cursor:pointer">Event</button>
         <button onClick="{{ setEvTypeTask }}" style="flex:1;padding:10px;border-radius:8px;border:1px solid {{ evTypeTaskBorder }};background:{{ evTypeTaskBg }};color:{{ evTypeTaskColor }};font-size:13px;font-weight:600;cursor:pointer">Task</button>
+        <button onClick="{{ setEvTypeMeeting }}" style="flex:1;padding:10px;border-radius:8px;border:1px solid {{ evTypeMeetingBorder }};background:{{ evTypeMeetingBg }};color:{{ evTypeMeetingColor }};font-size:13px;font-weight:600;cursor:pointer">Meeting</button>
       </div>
       <input value="{{ evTitle }}" onChange="{{ onEvTitle }}" placeholder="{{ evTitlePlaceholder }}" style="padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
       <input value="{{ evDesc }}" onChange="{{ onEvDesc }}" placeholder="Description (optional)" style="padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+      <sc-if value="{{ evIsMeeting }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex;gap:8px">
         <input type="url" value="{{ evMeet }}" onChange="{{ onEvMeet }}" placeholder="Google Meet link (optional)" style="flex:1;min-width:0;padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
         <button onClick="{{ genMeet }}" style="padding:0 16px;border-radius:8px;border:1px solid rgba(243,241,236,.22);background:transparent;color:#f3f1ec;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap" style-hover="border-color:#d1682e;color:#d1682e">{{ genMeetText }}</button>
       </div>
+      </sc-if>
       <div style="display:flex;flex-wrap:wrap;gap:10px">
         <input type="date" value="{{ evDate }}" onChange="{{ onEvDate }}" style="flex:1;min-width:160px;padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14px">
         <input type="time" value="{{ evTime }}" onChange="{{ onEvTime }}" style="flex:1;min-width:120px;padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14px">
@@ -338,6 +343,7 @@
       <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(243,241,236,.15);border:1px solid rgba(243,241,236,.3)"></span>event</span>
       <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(130,200,130,.5);border:1px solid rgba(130,200,130,.7)"></span>club event</span>
       <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(220,190,90,.5);border:1px solid rgba(220,190,90,.7)"></span>task</span>
+      <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(170,140,220,.5);border:1px solid rgba(170,140,220,.7)"></span>meeting</span>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between">
       <button onClick="{{ calPrev }}" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:transparent;color:#f3f1ec;font-size:18px;cursor:pointer" style-hover="border-color:#d1682e">←</button>
@@ -849,6 +855,7 @@ const SEED = {};
 // Empty — populated from Supabase after login. No member data ships in the page source.
 const ROSTER = [];
 const CHIPS = ["Vocals","Guitar","Keyboard","Drums","Bass","Tabla","Flute","Violin","Beatbox","Cajon","Hosting","Photography","Graphic design","Video editing","Stage Design","Videography","Ukulele","Clarinet","Piano"];
+const evTag = e => e.event_type === "task" ? "task" : e.event_type === "meeting" ? "meeting" : "club";
 const EVENT_ADMINS = ["Jaeden","Niyati","Abhinav Madathil","Saisrihan","Chivukula Vydik"];
 // Song clusters — fixed performance groups. Edit this list as songs get assigned.
 // Each entry: { song: "song name", members: ["Name1", "Name2", ...] }
@@ -1086,7 +1093,7 @@ class Component extends DCLogic {
     const clubEvs = (st.dbEvents || []).filter(e => {
       if (e.all_members) return true;
       return (e.participants || []).some(p => p.toLowerCase() === myEmail);
-    }).map(e => ({ date: e.event_date, title: e.title, tag: e.event_type === "task" ? "task" : "club", time: e.event_time, desc: e.description }));
+    }).map(e => ({ date: e.event_date, title: e.title, tag: evTag(e), time: e.event_time, desc: e.description }));
     // ponytail: only club events & tasks get notifications, not academic calendar
     for (const ev of clubEvs) {
       const end = ev.end || ev.date;
@@ -1101,7 +1108,7 @@ class Component extends DCLogic {
       if (!(st.dismissedNotifs || []).includes(nid)) {
         notifs.push({
           id: nid,
-          icon: isTask ? "T" : "E", iconClass: isTask ? "notif-task" : "notif-event",
+          icon: isTask ? "T" : ev.tag === "meeting" ? "M" : "E", iconClass: isTask ? "notif-task" : ev.tag === "meeting" ? "notif-meeting" : "notif-event",
           title: ev.title,
           detail: (ev.desc || (isTask ? "task" : ev.tag)) + (timeStr ? " · " + timeStr : ""),
           when: whenLabel,
@@ -1242,12 +1249,12 @@ class Component extends DCLogic {
         const moKey = yr + "-" + pad(mo + 1);
         const firstDay = new Date(yr, mo, 1).getDay();
         const daysInMonth = new Date(yr, mo + 1, 0).getDate();
-        const tagColor = t => t === "holiday" ? "rgba(209,104,46,.7)" : t === "exam" ? "rgba(61,141,189,.7)" : t === "club" ? "rgba(130,200,130,.7)" : t === "task" ? "rgba(220,190,90,.7)" : "rgba(243,241,236,.45)";
+        const tagColor = t => t === "holiday" ? "rgba(209,104,46,.7)" : t === "exam" ? "rgba(61,141,189,.7)" : t === "club" ? "rgba(130,200,130,.7)" : t === "task" ? "rgba(220,190,90,.7)" : t === "meeting" ? "rgba(170,140,220,.7)" : "rgba(243,241,236,.45)";
         const myEv = (st.account?.email || "").toLowerCase();
         const myClubEvs = (st.dbEvents || []).filter(e => e.all_members || (e.participants || []).some(p => p.toLowerCase() === myEv));
         const allEvs = [
           ...ACAD_EVENTS,
-          ...myClubEvs.map(e => ({ date: e.event_date, title: e.title, tag: e.event_type === "task" ? "task" : "club", id: e.id, time: e.event_time, desc: e.description, meet: e.meet_link, createdBy: e.created_by }))
+          ...myClubEvs.map(e => ({ date: e.event_date, title: e.title, tag: evTag(e), id: e.id, time: e.event_time, desc: e.description, meet: e.meet_link, createdBy: e.created_by }))
         ];
         const evByDay = {};
         for (const ev of allEvs) {
@@ -1304,14 +1311,19 @@ class Component extends DCLogic {
       evAllMembers: !!st.evAllMembers, evPickMembers: !st.evAllMembers, evErr: st.evErr || "",
       setEvTypeEvent: () => this.setState({ evType: "event", evAllMembers: true, evParticipants: [] }),
       setEvTypeTask: () => this.setState({ evType: "task", evAllMembers: false }),
+      setEvTypeMeeting: () => this.setState({ evType: "meeting" }),
+      evIsMeeting: st.evType === "meeting",
+      evTypeMeetingBorder: st.evType === "meeting" ? "rgba(170,140,220,.7)" : "rgba(243,241,236,.15)",
+      evTypeMeetingBg: st.evType === "meeting" ? "rgba(170,140,220,.15)" : "transparent",
+      evTypeMeetingColor: st.evType === "meeting" ? "#b9a3e3" : "rgba(243,241,236,.5)",
       evTypeEventBorder: st.evType === "event" ? "rgba(130,200,130,.7)" : "rgba(243,241,236,.15)",
       evTypeEventBg: st.evType === "event" ? "rgba(130,200,130,.15)" : "transparent",
       evTypeEventColor: st.evType === "event" ? "#8ec88e" : "rgba(243,241,236,.5)",
       evTypeTaskBorder: st.evType === "task" ? "rgba(220,190,90,.7)" : "rgba(243,241,236,.15)",
       evTypeTaskBg: st.evType === "task" ? "rgba(220,190,90,.15)" : "transparent",
       evTypeTaskColor: st.evType === "task" ? "#d4b84a" : "rgba(243,241,236,.5)",
-      evTitlePlaceholder: st.evType === "task" ? "Task title (e.g. Reel shoot)" : "Event title",
-      submitBtnText: st.evType === "task" ? "Set task" : "Set event",
+      evTitlePlaceholder: st.evType === "task" ? "Task title (e.g. Reel shoot)" : st.evType === "meeting" ? "Meeting title (e.g. Core sync)" : "Event title",
+      submitBtnText: st.evType === "task" ? "Set task" : st.evType === "meeting" ? "Set meeting" : "Set event",
       onEvTitle: e => this.setState({ evTitle: e.target.value }),
       onEvDesc: e => this.setState({ evDesc: e.target.value }),
       onEvMeet: e => this.setState({ evMeet: e.target.value }),
@@ -1345,7 +1357,7 @@ class Component extends DCLogic {
         if (!st.evTitle.trim()) return this.setState({ evErr: "Title is required" });
         if (!st.evDate) return this.setState({ evErr: "Date is required" });
         if (!st.evTime) return this.setState({ evErr: "Time is required" });
-        const meet = (st.evMeet || "").trim();
+        const meet = st.evType === "meeting" ? (st.evMeet || "").trim() : "";
         if (meet && !/^https:\/\/meet\.google\.com\/[\w-]+$/.test(meet)) return this.setState({ evErr: "Meet link must look like https://meet.google.com/abc-defg-hij" });
         const email = st.account?.email || st.loginEmail || "";
         const participants = st.evAllMembers ? [] : (st.evParticipants || []);
