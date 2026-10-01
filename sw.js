@@ -1,4 +1,4 @@
-const CACHE = "mc-v1";
+const CACHE = "mc-v2";
 const PRECACHE = [
   "assets/logo.png",
   "assets/photo-band-strip.png"
@@ -16,12 +16,12 @@ self.addEventListener("activate", e => {
   self.clients.claim();
 });
 
-// ponytail: cache-first for assets, network-first for pages
+// cache-first for images/fonts only; code (js/css) and pages go network-first so updates land
 self.addEventListener("fetch", e => {
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;
 
-  const isAsset = /\.(png|jpe?g|webp|gif|svg|css|js|woff2?)$/i.test(url.pathname);
+  const isAsset = /\.(png|jpe?g|webp|gif|svg|woff2?)$/i.test(url.pathname);
 
   e.respondWith(
     isAsset
