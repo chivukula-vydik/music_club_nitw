@@ -164,3 +164,31 @@ live updates between devices.
   down to 0 each Monday, or the slot managers can clear it manually at first.
 - **Backups** → Supabase keeps daily backups on the free tier. Worth exporting the
   members table to the club Drive once a semester.
+
+## Google Meet links on events
+
+Run once in the SQL Editor:
+
+```sql
+alter table events add column if not exists meet_link text;
+```
+
+## Auto-generate Meet links (the "Generate" button)
+
+The portal creates the Meet on the club Gmail's calendar, so it needs a refresh
+token for that account. Do this signed in as musicclub.nitw@gmail.com.
+
+1. Google Cloud console → **APIs & Services → Library** → enable **Google Calendar API**.
+2. **OAuth consent screen** → add scope `https://www.googleapis.com/auth/calendar.events`.
+   Set publishing status to **In production** — in "Testing" the token dies after 7 days.
+   (Unverified is fine; you'll just click through a warning once.)
+3. **Credentials → Create OAuth client ID** (type: Web application). Add
+   `https://developers.google.com/oauthplayground` as an authorized redirect URI.
+4. Open https://developers.google.com/oauthplayground → gear icon → tick
+   "Use your own OAuth credentials" → paste the client ID and secret.
+5. In the scope box type `https://www.googleapis.com/auth/calendar.events` →
+   **Authorize APIs** → sign in as the club Gmail → **Exchange authorization code for tokens**.
+6. Copy the **Refresh token**.
+7. Vercel → Project → Settings → Environment Variables, add
+   `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`
+   (plus `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` if not already there) → redeploy.

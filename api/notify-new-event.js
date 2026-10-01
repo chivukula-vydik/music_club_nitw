@@ -21,6 +21,8 @@ module.exports = async (req, res) => {
     return res.status(500).json({ error: "Email service not configured" });
 
   const { title, description, event_date, event_time, created_by, all_members, participants } = req.body || {};
+  // only real Meet URLs — this goes straight into the email HTML
+  const meet = /^https:\/\/meet\.google\.com\/[\w-]+$/.test(req.body?.meet_link || "") ? req.body.meet_link : "";
   if (!title || !event_date) return res.status(400).json({ error: "title and event_date required" });
 
   const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
@@ -51,10 +53,10 @@ module.exports = async (req, res) => {
   } else {
     gcalDates = gcalDate + "/" + gcalDate;
   }
-  const gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(title) + "&dates=" + gcalDates + "&details=" + encodeURIComponent(description || "") + "&ctz=Asia/Kolkata";
+  const gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(title) + "&dates=" + gcalDates + "&details=" + encodeURIComponent((description || "") + (meet ? "\n\nGoogle Meet: " + meet : "")) + (meet ? "&location=" + encodeURIComponent(meet) : "") + "&ctz=Asia/Kolkata";
 
   const subject = `Music Club: New Event — "${title}"`;
-  const text = `${title}\n\n${description || "(no description)"}\n\nLead: ${leadName}\nWhen: ${dateFmt} at ${timeStr}\nWho: ${all_members ? "All members" : (participants || []).join(", ")}\n\nAdd to Google Calendar: ${gcalUrl}`;
+  const text = `${title}\n\n${description || "(no description)"}\n\nLead: ${leadName}\nWhen: ${dateFmt} at ${timeStr}\nWho: ${all_members ? "All members" : (participants || []).join(", ")}${meet ? "\nGoogle Meet: " + meet : ""}\n\nAdd to Google Calendar: ${gcalUrl}`;
   const html = `
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -84,6 +86,7 @@ module.exports = async (req, res) => {
         <td style="padding:8px 0">${whoList}</td>
       </tr>
     </table>
+    ${meet ? `<div style="margin:20px 0 0;text-align:center"><a href="${meet}" target="_blank" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:999px">Join Google Meet</a></div>` : ""}
     <div style="margin:20px 0 0;text-align:center">
       <a href="${gcalUrl}" target="_blank" style="display:inline-block;padding:12px 28px;background:#d1682e;color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:999px">Add to Google Calendar</a>
     </div>

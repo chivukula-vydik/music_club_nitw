@@ -297,16 +297,24 @@
       </div>
       <input value="{{ evTitle }}" onChange="{{ onEvTitle }}" placeholder="{{ evTitlePlaceholder }}" style="padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
       <input value="{{ evDesc }}" onChange="{{ onEvDesc }}" placeholder="Description (optional)" style="padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+      <div style="display:flex;gap:8px">
+        <input type="url" value="{{ evMeet }}" onChange="{{ onEvMeet }}" placeholder="Google Meet link (optional)" style="flex:1;min-width:0;padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+        <button onClick="{{ genMeet }}" style="padding:0 16px;border-radius:8px;border:1px solid rgba(243,241,236,.22);background:transparent;color:#f3f1ec;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap" style-hover="border-color:#d1682e;color:#d1682e">{{ genMeetText }}</button>
+      </div>
       <div style="display:flex;flex-wrap:wrap;gap:10px">
         <input type="date" value="{{ evDate }}" onChange="{{ onEvDate }}" style="flex:1;min-width:160px;padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14px">
         <input type="time" value="{{ evTime }}" onChange="{{ onEvTime }}" style="flex:1;min-width:120px;padding:12px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:14px">
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
         <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Notify</span>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-right:6px">
           <input type="checkbox" checked="{{ evAllMembers }}" onChange="{{ onEvAll }}" style="accent-color:#d1682e;width:16px;height:16px">
           <span style="font-size:14px;color:rgba(243,241,236,.7)">All members</span>
         </label>
+          <button onClick="{{ evPickCore }}" style="padding:6px 14px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.7);font-size:12.5px;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Core team</button>
+          <button onClick="{{ evPickTech }}" style="padding:6px 14px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.7);font-size:12.5px;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Tech team</button>
+        </div>
         <sc-if value="{{ evPickMembers }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;flex-wrap:wrap;gap:6px;max-height:120px;overflow-y:auto;padding:8px;border:1px solid rgba(243,241,236,.1);border-radius:8px;background:#171716">
           <sc-for list="{{ evMemberList }}" as="m" hint-placeholder-count="4">
@@ -364,6 +372,9 @@
               <span style="font-size:12px;color:rgba(243,241,236,.45)">{{ ev.desc }}</span>
             </sc-if>
           </div>
+          <sc-if value="{{ ev.meet }}" hint-placeholder-val="{{ false }}">
+            <a href="{{ ev.meet }}" target="_blank" rel="noopener" style="padding:5px 12px;border-radius:999px;background:#d1682e;color:#1a1a1a;font-size:11.5px;font-weight:600;text-decoration:none;white-space:nowrap">Join Meet</a>
+          </sc-if>
           <span class="{{ ev.tagClass }}" style="padding:5px 11px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap">{{ ev.tag }}</span>
           <a href="{{ ev.gcalUrl }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;border:1px solid rgba(243,241,236,.2);background:transparent;cursor:pointer;text-decoration:none;flex-shrink:0" style-hover="border-color:#d1682e" title="Add to Google Calendar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(243,241,236,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg></a>
           <sc-if value="{{ ev.onDelete }}" hint-placeholder-val="{{ false }}">
@@ -887,7 +898,7 @@ const KEY = "mc-portal-v1";
 const split = s => (s || "").split(",").map(x => x.trim()).filter(Boolean);
 
 class Component extends DCLogic {
-  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "", calMonth: new Date().getFullYear() * 12 + new Date().getMonth(), calSelectedDay: null, dbEvents: [], evForm: false, evType: "event", evTitle: "", evDesc: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], notifsOpen: false };
+  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "", calMonth: new Date().getFullYear() * 12 + new Date().getMonth(), calSelectedDay: null, dbEvents: [], evForm: false, evType: "event", evTitle: "", evDesc: "", evMeet: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], notifsOpen: false };
 
   async componentDidMount() {
     if (!SERVER) try {
@@ -1236,7 +1247,7 @@ class Component extends DCLogic {
         const myClubEvs = (st.dbEvents || []).filter(e => e.all_members || (e.participants || []).some(p => p.toLowerCase() === myEv));
         const allEvs = [
           ...ACAD_EVENTS,
-          ...myClubEvs.map(e => ({ date: e.event_date, title: e.title, tag: e.event_type === "task" ? "task" : "club", id: e.id, time: e.event_time, desc: e.description, createdBy: e.created_by }))
+          ...myClubEvs.map(e => ({ date: e.event_date, title: e.title, tag: e.event_type === "task" ? "task" : "club", id: e.id, time: e.event_time, desc: e.description, meet: e.meet_link, createdBy: e.created_by }))
         ];
         const evByDay = {};
         for (const ev of allEvs) {
@@ -1279,17 +1290,17 @@ class Component extends DCLogic {
               const end = ev.end ? ev.end.replace(/-/g, "") : d;
               dates = d + "/" + end;
             }
-            const gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(ev.title) + "&dates=" + dates + "&details=" + encodeURIComponent(ev.desc || "") + "&ctz=Asia/Kolkata";
+            const gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(ev.title) + "&dates=" + dates + "&details=" + encodeURIComponent((ev.desc || "") + (ev.meet ? "\n\nGoogle Meet: " + ev.meet : "")) + (ev.meet ? "&location=" + encodeURIComponent(ev.meet) : "") + "&ctz=Asia/Kolkata";
             return {
               title: ev.title + (ev.time ? " · " + ev.time.slice(0, 5) : ""), tag: ev.tag, tagClass: "tag-" + ev.tag,
-              isClub: ev.tag === "club" || ev.tag === "task", id: ev.id, desc: ev.desc || "", gcalUrl,
+              isClub: ev.tag === "club" || ev.tag === "task", id: ev.id, desc: ev.desc || "", meet: ev.meet || "", gcalUrl,
               onDelete: ev.id && (EVENT_ADMINS.some(a => a.toLowerCase() === me.toLowerCase()) || (ev.createdBy || "").toLowerCase() === me.toLowerCase()) ? () => { if (confirm("Delete " + (ev.tag === "task" ? "task" : "event") + " \"" + (ev.title || "") + "\"?")) this.db.deleteEvent(ev.id).then(() => this.pull()); } : null
             };
           })
         };
       })(),
       toggleEvForm: () => this.setState({ evForm: !st.evForm, evType: "event", evErr: "" }),
-      evForm: !!st.evForm, evTitle: st.evTitle, evDesc: st.evDesc, evDate: st.evDate, evTime: st.evTime,
+      evForm: !!st.evForm, evTitle: st.evTitle, evDesc: st.evDesc, evMeet: st.evMeet || "", evDate: st.evDate, evTime: st.evTime,
       evAllMembers: !!st.evAllMembers, evPickMembers: !st.evAllMembers, evErr: st.evErr || "",
       setEvTypeEvent: () => this.setState({ evType: "event", evAllMembers: true, evParticipants: [] }),
       setEvTypeTask: () => this.setState({ evType: "task", evAllMembers: false }),
@@ -1303,9 +1314,23 @@ class Component extends DCLogic {
       submitBtnText: st.evType === "task" ? "Set task" : "Set event",
       onEvTitle: e => this.setState({ evTitle: e.target.value }),
       onEvDesc: e => this.setState({ evDesc: e.target.value }),
+      onEvMeet: e => this.setState({ evMeet: e.target.value }),
+      genMeetText: st.evMeetBusy ? "Creating…" : "Generate",
+      genMeet: async () => {
+        if (st.evMeetBusy) return;
+        if (!st.evTitle.trim() || !st.evDate || !st.evTime) return this.setState({ evErr: "Fill title, date and time first" });
+        this.setState({ evMeetBusy: true, evErr: "" });
+        try {
+          const link = await this.db.createMeet({ title: st.evTitle.trim(), date: st.evDate, time: st.evTime, description: st.evDesc.trim() });
+          this.setState({ evMeet: link, evMeetBusy: false });
+        } catch (e) { this.setState({ evErr: e.message, evMeetBusy: false }); }
+      },
       onEvDate: e => this.setState({ evDate: e.target.value }),
       onEvTime: e => this.setState({ evTime: e.target.value }),
       onEvAll: e => this.setState({ evAllMembers: e.target.checked, evParticipants: e.target.checked ? [] : st.evParticipants }),
+      // selects everyone on that team (incl. 'Core + Tech'); tweak individuals in the list below
+      evPickCore: () => this.setState({ evAllMembers: false, evParticipants: ROSTER.filter(r => /core/i.test(r[3] || "Core")).map(r => r[0]) }),
+      evPickTech: () => this.setState({ evAllMembers: false, evParticipants: ROSTER.filter(r => /tech/i.test(r[3] || "")).map(r => r[0]) }),
       evMemberList: ROSTER.map(r => {
         const name = r[0], sel = (st.evParticipants || []).includes(name);
         return {
@@ -1320,13 +1345,15 @@ class Component extends DCLogic {
         if (!st.evTitle.trim()) return this.setState({ evErr: "Title is required" });
         if (!st.evDate) return this.setState({ evErr: "Date is required" });
         if (!st.evTime) return this.setState({ evErr: "Time is required" });
+        const meet = (st.evMeet || "").trim();
+        if (meet && !/^https:\/\/meet\.google\.com\/[\w-]+$/.test(meet)) return this.setState({ evErr: "Meet link must look like https://meet.google.com/abc-defg-hij" });
         const email = st.account?.email || st.loginEmail || "";
         const participants = st.evAllMembers ? [] : (st.evParticipants || []);
         try {
           const evPayload = {
             title: st.evTitle.trim(), description: st.evDesc.trim(),
             event_date: st.evDate, event_time: st.evTime,
-            event_type: st.evType || "event",
+            event_type: st.evType || "event", meet_link: meet || null,
             created_by: email, all_members: !!st.evAllMembers,
             participants: participants.map(p => { const r = ROSTER.find(r => r[0] === p); return r ? (r[7] || p) : p; })
           };
@@ -1334,7 +1361,7 @@ class Component extends DCLogic {
           fetch(new URL("./api/notify-new-event", window.location.href), {
             method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(evPayload)
           }).catch(() => {});
-          this.setState({ evForm: false, evType: "event", evTitle: "", evDesc: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], evErr: "" });
+          this.setState({ evForm: false, evType: "event", evTitle: "", evDesc: "", evMeet: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], evErr: "" });
           await this.pull();
         } catch (e) { this.setState({ evErr: e.message || "Failed to create event" }); }
       },

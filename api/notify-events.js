@@ -51,7 +51,8 @@ module.exports = async (req, res) => {
     if (!recipients.length) continue;
 
     const leadName = (ev.created_by && members ? (members.find(m => m.email && m.email.toLowerCase() === ev.created_by.toLowerCase()) || {}).name : null) || ev.created_by || "—";
-    const timeStr = ev.event_time ? ev.event_time.slice(0, 5) : "";
+    const meet = /^https:\/\/meet\.google\.com\/[\w-]+$/.test(ev.meet_link || "") ? ev.meet_link : "";
+    const timeStr = ev.event_time ?ev.event_time.slice(0, 5) : "";
     const dateObj = new Date(ev.event_date + "T00:00");
     const dateFmt = dateObj.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
@@ -67,10 +68,10 @@ module.exports = async (req, res) => {
     } else {
       gcalDates = gcalDate + "/" + gcalDate;
     }
-    const gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(ev.title) + "&dates=" + gcalDates + "&details=" + encodeURIComponent(ev.description || "") + "&ctz=Asia/Kolkata";
+    const gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(ev.title) + "&dates=" + gcalDates + "&details=" + encodeURIComponent((ev.description || "") + (meet ? "\n\nGoogle Meet: " + meet : "")) + (meet ? "&location=" + encodeURIComponent(meet) : "") + "&ctz=Asia/Kolkata";
 
     const subject = `Music Club: "${ev.title}" is ${label}`;
-    const text = `${ev.title}\n\n${ev.description || "(no description)"}\n\nLead: ${leadName}\nWhen: ${dateFmt} at ${timeStr}\nWho: ${ev.all_members ? "All members" : (ev.participants || []).join(", ")}\n\nThis event is ${label}!\n\nAdd to Google Calendar: ${gcalUrl}`;
+    const text = `${ev.title}\n\n${ev.description || "(no description)"}\n\nLead: ${leadName}\nWhen: ${dateFmt} at ${timeStr}\nWho: ${ev.all_members ? "All members" : (ev.participants || []).join(", ")}\n\nThis event is ${label}!${meet ? "\nGoogle Meet: " + meet : ""}\n\nAdd to Google Calendar: ${gcalUrl}`;
     const html = `
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -103,6 +104,7 @@ module.exports = async (req, res) => {
     <div style="margin:20px 0 0;padding:14px;background:rgba(209,104,46,.15);border-radius:8px;text-align:center;font-weight:600;font-size:15px;color:#d1682e">
       This event is ${label}!
     </div>
+    ${meet ? `<div style="margin:20px 0 0;text-align:center"><a href="${meet}" target="_blank" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:999px">Join Google Meet</a></div>` : ""}
     <div style="margin:20px 0 0;text-align:center">
       <a href="${gcalUrl}" target="_blank" style="display:inline-block;padding:12px 28px;background:#d1682e;color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:999px">Add to Google Calendar</a>
     </div>

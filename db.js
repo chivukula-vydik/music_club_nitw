@@ -232,6 +232,21 @@ export async function addEvent(ev) {
   if (error) throw error;
 }
 
+// asks the server to create a Google Meet on the club calendar; returns the link
+export async function createMeet({ title, date, time, description }) {
+  if (!serverMode) throw new Error("Meet links need the server");
+  const c = await client();
+  const { data } = await c.auth.getSession();
+  const res = await fetch(new URL("./api/create-event", window.location.href), {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + (data.session?.access_token || "") },
+    body: JSON.stringify({ title, date, time, description })
+  });
+  const out = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(out.error || "Failed to create Meet link");
+  return out.meet_link;
+}
+
 export async function deleteEvent(id) {
   if (!serverMode) return;
   const c = await client();
