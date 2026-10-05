@@ -128,7 +128,7 @@ module.exports = async (req, res) => {
     } catch (e) { console.error("Notify error:", ev.id, e.message); }
   }
 
-  // jam slot reminders: email the booker + players once, when their slot is < 2h away
+  // jam slot reminders: email the booker + players once, when their slot is <= 1h away
   const DAY_IDX = { Monday: 0, Tuesday: 1, Wednesday: 2, Thursday: 3, Friday: 4, Saturday: 5, Sunday: 6 };
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const lastWeek = new Date(now.getTime() - 8 * 864e5);
@@ -143,7 +143,7 @@ module.exports = async (req, res) => {
     const w = String(b.week);
     const start = new Date(Date.UTC(+w.slice(0, 4), +w.slice(4, 6) - 1, +w.slice(6, 8) + DAY_IDX[b.day], hour) - 330 * 60000);
     const mins = Math.round((start - now) / 60000);
-    if (!(mins > 0 && mins <= 120)) continue;
+    if (!(mins > 0 && mins <= 60)) continue;
 
     const names = [b.booked_by, ...(b.players || [])];
     const recipients = names.map(n => memberEmails[n]).filter(Boolean);
