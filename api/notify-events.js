@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
 
   let sent = 0;
   for (const ev of events || []) {
-    const evDateTime = new Date(`${ev.event_date}T${ev.event_time}`);
+    const evDateTime = new Date(`${ev.event_date}T${ev.event_time}+05:30`); // stored as IST; server runs UTC
     const diffMs = evDateTime - now;
     const diffMin = diffMs / 60000;
     const diffHrs = diffMs / 3600000;
@@ -128,6 +128,72 @@ module.exports = async (req, res) => {
     } catch (e) { console.error("Notify error:", ev.id, e.message); }
   }
 
+  // jam slot reminders: email the booker + players once, when their slot is < 2h away
+  const DAY_IDX = { Monday: 0, Tuesday: 1, Wednesday: 2, Thursday: 3, Friday: 4, Saturday: 5, Sunday: 6 };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const lastWeek = new Date(now.getTime() - 8 * 864e5);
+  const minWeek = lastWeek.getUTCFullYear() * 10000 + (lastWeek.getUTCMonth() + 1) * 100 + lastWeek.getUTCDate();
+  let slotsSent = 0;
+  const { data: slots, error: slotErr } = await sb.from("bookings").select("week,day,slot,song,booked_by,players").eq("notified", false).gte("week", minWeek);
+  if (slotErr) console.error("Slot query error:", slotErr.message);
+  for (const b of slots || []) {
+    // slot "6-7" → 18:00, "9-10*" → 21:00, "12-1*" → 24:00 (midnight); times are IST
+    const h0 = parseInt(b.slot, 10);
+    const hour = b.slot.endsWith("*") ? h0 + 12 : h0 < 9 ? h0 + 12 : h0;
+    const w = String(b.week);
+    const start = new Date(Date.UTC(+w.slice(0, 4), +w.slice(4, 6) - 1, +w.slice(6, 8) + DAY_IDX[b.day], hour) - 330 * 60000);
+    const mins = Math.round((start - now) / 60000);
+    if (!(mins > 0 && mins <= 120)) continue;
+
+    const names = [b.booked_by, ...(b.players || [])];
+    const recipients = names.map(n => memberEmails[n]).filter(Boolean);
+    if (!recipients.length) continue;
+
+    const timeFmt = start.toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" });
+    const when = `${b.day}, ${timeFmt} (in ${mins} min)`;
+    const subject = `Music Club: your jam slot starts at ${timeFmt}`;
+    const text = `Your jam room slot is coming up.\n\nSong: ${b.song}\nWhen: ${when}\nWho: ${names.join(", ")}\n\nSee you there!`;
+    const html = `
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#121211;font-family:'Segoe UI',Helvetica,Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#121211;padding:40px 20px">
+<tr><td align="center">
+<table width="420" cellpadding="0" cellspacing="0" style="background:#1a1a19;border-radius:16px;overflow:hidden;border:1px solid rgba(243,241,236,.1)">
+  <tr><td style="background:linear-gradient(135deg,#3d8dbd 0%,#2a6a94 100%);padding:32px 36px;text-align:center">
+    <img src="cid:mclogo" alt="Music Club NITW" width="64" height="64" style="width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,255,255,.25);margin-bottom:12px;display:block;margin-left:auto;margin-right:auto">
+    <h1 style="margin:0;font-size:22px;font-weight:700;color:#fff;letter-spacing:-.02em">Music Club NITW</h1>
+    <p style="margin:6px 0 0;font-size:12px;color:rgba(255,255,255,.7);letter-spacing:.08em;text-transform:uppercase">Jam Slot Reminder</p>
+  </td></tr>
+  <tr><td style="padding:36px">
+    <h2 style="margin:0 0 20px;font-size:20px;color:#f3f1ec;font-weight:700">${esc(b.song)}</h2>
+    <table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#f3f1ec">
+      <tr><td style="padding:8px 12px 8px 0;color:rgba(243,241,236,.5);white-space:nowrap;vertical-align:top">When</td><td style="padding:8px 0;font-weight:600">${esc(when)}</td></tr>
+      <tr><td style="padding:8px 12px 8px 0;color:rgba(243,241,236,.5);white-space:nowrap;vertical-align:top">Who</td><td style="padding:8px 0">${esc(names.join(", "))}</td></tr>
+    </table>
+    <div style="margin:20px 0 0;padding:14px;background:rgba(61,141,189,.15);border-radius:8px;text-align:center;font-weight:600;font-size:15px;color:#7cb8db">
+      Your jam slot starts in ${mins} minutes!
+    </div>
+  </td></tr>
+  <tr><td style="padding:0 36px 28px">
+    <hr style="border:none;border-top:1px solid rgba(243,241,236,.08);margin:0 0 18px">
+    <p style="margin:0;font-size:11px;color:rgba(243,241,236,.25);text-align:center">Music Club &middot; NIT Warangal &middot; musicclub.nitw@gmail.com</p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>`;
+
+    try {
+      await transporter.sendMail({
+        from: MAIL_FROM, bcc: recipients, subject, text, html,
+        attachments: [{ filename: "logo.png", path: path.join(__dirname, "..", "assets", "logo.png"), cid: "mclogo" }]
+      });
+      await sb.from("bookings").update({ notified: true }).match({ week: b.week, day: b.day, slot: b.slot });
+      slotsSent++;
+    } catch (e) { console.error("Slot notify error:", b.week, b.day, b.slot, e.message); }
+  }
+
   // permanently delete minutes older than 4 months
   const cutoff = new Date();
   cutoff.setMonth(cutoff.getMonth() - 4);
@@ -138,5 +204,5 @@ module.exports = async (req, res) => {
     purged = (data || []).length;
   } catch (e) { console.error("Minutes purge error:", e.message); }
 
-  res.status(200).json({ checked: (events || []).length, sent, purged });
+  res.status(200).json({ checked: (events || []).length, sent, slotsSent, purged });
 };

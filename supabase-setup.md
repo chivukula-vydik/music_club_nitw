@@ -165,6 +165,14 @@ live updates between devices.
 - **Backups** → Supabase keeps daily backups on the free tier. Worth exporting the
   members table to the club Drive once a semester.
 
+## Jam slot reminder emails
+
+Run once in the SQL Editor (tracks which slots already got their reminder):
+
+```sql
+alter table bookings add column if not exists notified boolean not null default false;
+```
+
 ## Google Meet links on events
 
 Run once in the SQL Editor:
