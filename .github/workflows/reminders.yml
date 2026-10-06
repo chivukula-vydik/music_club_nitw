@@ -9,4 +9,31 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - run: curl -fsS https://music-club-nitw.vercel.app/api/notify-events
+      - run: |
+          url="https://music-club-nitw.vercel.app/api/notify-events"
+          max_attempts=5
+          attempt=1
+          status=0
+
+          while [ "$attempt" -le "$max_attempts" ]; do
+            status="$(curl -sS -o /tmp/notify-events-body.txt -w "%{http_code}" \
+              -H "User-Agent: music-club-reminders-action" "$url" || echo "000")"
+
+            if [ "$status" -ge 200 ] && [ "$status" -lt 300 ]; then
+              echo "Reminder endpoint responded with $status."
+              exit 0
+            fi
+
+            if [ "$status" = "429" ]; then
+              echo "Attempt $attempt/$max_attempts hit rate limit (429). Retrying..."
+              sleep $((attempt * 15))
+              attempt=$((attempt + 1))
+              continue
+            fi
+
+            echo "Reminder endpoint failed with HTTP $status."
+            cat /tmp/notify-events-body.txt || true
+            exit 1
+          done
+
+          echo "Reminder endpoint stayed rate-limited after $max_attempts attempts; skipping failure."
