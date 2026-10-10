@@ -31,7 +31,9 @@ module.exports = async (req, res) => {
     sb.from("members").select("name,email")
   ]);
   if (error) return res.status(500).json({ error: error.message });
-  const emailOf = Object.fromEntries((members || []).filter(m => m.email).map(m => [m.name, m.email]));
+  // ?only=cv23mab → test send to members whose email starts with that, nobody else
+  const only = String(req.query.only || "").toLowerCase();
+  const emailOf = Object.fromEntries((members || []).filter(m => m.email && m.email.toLowerCase().startsWith(only)).map(m => [m.name, m.email]));
 
   // person → their slots today
   const byPerson = {};
