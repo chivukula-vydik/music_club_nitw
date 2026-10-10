@@ -426,19 +426,33 @@
     <div style="display:flex;flex-direction:column;gap:10px">
       <span style="font-family:'Archivo Black',sans-serif;font-size:16px">My songs</span>
       <sc-if value="{{ hasMySongs }}" hint-placeholder-val="{{ true }}">
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
         <sc-for list="{{ mySongCards }}" as="sc" hint-placeholder-count="3">
-          <div style="padding:16px 18px;background:#1a1a1a;display:flex;flex-direction:column;gap:8px">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-              <span style="font-size:14px;font-weight:600">{{ sc.song }}</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#d1682e">{{ sc.hours }}</span>
+          <div style="padding:18px;background:#1a1a1a;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+              <span style="font-family:'Archivo Black',sans-serif;font-size:16px">{{ sc.song }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(243,241,236,.45);white-space:nowrap">last: {{ sc.last }}</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(243,241,236,.1);border:1px solid rgba(243,241,236,.1)">
+              <div style="padding:10px 12px;background:#141414;display:flex;flex-direction:column;gap:4px">
+                <span style="font-family:'Archivo Black',sans-serif;font-size:26px;line-height:1;color:#d1682e">{{ sc.total }}<span style="font-size:13px">h</span></span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.45)">total</span>
+              </div>
+              <div style="padding:10px 12px;background:#141414;display:flex;flex-direction:column;gap:4px">
+                <span style="font-family:'Archivo Black',sans-serif;font-size:26px;line-height:1">{{ sc.thisWk }}<span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#7cb8db;margin-left:6px">{{ sc.trend }}</span></span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.45)">this wk</span>
+              </div>
+              <div style="padding:10px 12px;background:#141414;display:flex;flex-direction:column;gap:4px">
+                <span style="font-family:'Archivo Black',sans-serif;font-size:26px;line-height:1;color:rgba(243,241,236,.55)">{{ sc.lastWk }}</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.45)">last wk</span>
+              </div>
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:5px">
               <sc-for list="{{ sc.band }}" as="bp" hint-placeholder-count="2">
                 <span style="padding:4px 10px;border-radius:999px;background:rgba(61,141,189,.15);border:1px solid rgba(61,141,189,.3);font-size:11px;color:#9cc8e4">{{ bp }}</span>
               </sc-for>
             </div>
-            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(243,241,236,.45)">next: {{ sc.next }}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#f3f1ec">next → {{ sc.next }}</span>
           </div>
         </sc-for>
       </div>
@@ -859,11 +873,7 @@ const evTag = e => e.event_type === "task" ? "task" : e.event_type === "meeting"
 const EVENT_ADMINS = ["Jaeden","Niyati","Abhinav Madathil","Saisrihan","Chivukula Vydik"];
 // Song clusters — fixed performance groups. Edit this list as songs get assigned.
 // Each entry: { song: "song name", members: ["Name1", "Name2", ...] }
-const CLUSTERS = [
-  { song: "Tera Ban Jaunga", members: ["Saumitra", "Yashaswini", "Anirudh", "Ayush"] },
-  { song: "Kun Faya Kun", members: ["Arkadeep", "Srinath", "Divya", "Adhved Sumesh"] },
-  { song: "Pasoori", members: ["Joshua", "Samuel", "Sumedha", "Bulusu Siddharth"] },
-];
+const CLUSTERS = [];
 // When a server is configured, nothing sensitive ships in the page: the roster,
 // the demo schedule and the team-restricted minutes all come from the database,
 // filtered by row-level rules before they ever reach the browser.
@@ -1590,27 +1600,36 @@ class Component extends DCLogic {
         return mine.length ? mine[0].day + " " + LABEL[mine[0].t] : "—";
       })(),
       ...(() => {
+        // all-time stats: walk every booking key ("w<monday>|<day>|<slot>"), not just this + next week
         const songMap = {};
         const dayOrder = DAYS.map(d => d[0]);
         const now = new Date();
-        const todayIdx = (now.getDay() + 6) % 7;
-        const hr = now.getHours();
-        [0, 1].forEach(w => DAYS.forEach(([day]) => TIMES.forEach(t => {
-          const rec = this.record(w, day, t);
-          if (!rec || (rec.by !== me && !(rec.with || []).includes(me))) return;
-          const s = rec.song;
-          if (!songMap[s]) songMap[s] = { count: 0, band: new Set(), next: null };
-          songMap[s].count++;
-          if (rec.by && rec.by !== me) songMap[s].band.add(rec.by);
-          for (const p of (rec.with || [])) { if (p !== me) songMap[s].band.add(p); }
-          if (!songMap[s].next) {
-            const di = dayOrder.indexOf(day);
-            if (w > 0 || di > todayIdx || (di === todayIdx && parseInt(t) > hr))
-              songMap[s].next = (w ? "Next wk · " : "") + day + " " + LABEL[t];
-          }
-        })));
+        const thisMon = this.mondayOf(0), lastMon = this.mondayOf(-1);
+        for (const [k, rec] of Object.entries(st.bookings)) {
+          if (!rec || (rec.by !== me && !(rec.with || []).includes(me))) continue;
+          const [wk, day, t] = k.split("|");
+          if (!t || wk[0] !== "w") continue;
+          const m = +wk.slice(1);
+          // TIMES[0] starts at 9 AM, each slot is 1h
+          const start = new Date(Math.floor(m / 10000), Math.floor(m / 100) % 100 - 1, m % 100 + dayOrder.indexOf(day), 9 + TIMES.indexOf(t));
+          const d = songMap[rec.song] || (songMap[rec.song] = { total: 0, thisWk: 0, lastWk: 0, last: null, next: null, nextLabel: "", band: new Set() });
+          if (m === thisMon) d.thisWk++;
+          if (m === lastMon) d.lastWk++;
+          if (start < now) { d.total++; if (!d.last || start > d.last) d.last = start; }
+          else if (!d.next || start < d.next) { d.next = start; d.nextLabel = (m > thisMon ? "Next wk · " : "") + day + " " + LABEL[t]; }
+          if (rec.by && rec.by !== me) d.band.add(rec.by);
+          for (const p of (rec.with || [])) { if (p !== me) d.band.add(p); }
+        }
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const ago = dt => {
+          if (!dt) return "never";
+          const n = Math.round((today - new Date(dt.getFullYear(), dt.getMonth(), dt.getDate())) / 86400000);
+          return n === 0 ? "today" : n === 1 ? "yesterday" : n + " days ago";
+        };
         const cards = Object.entries(songMap).map(([song, d]) => ({
-          song, count: d.count, hours: d.count + "h", band: d.band.size ? [...d.band] : ["solo"], next: d.next || "—"
+          song, total: d.total, thisWk: d.thisWk, lastWk: d.lastWk, last: ago(d.last),
+          trend: d.thisWk > d.lastWk ? "▲" + (d.thisWk - d.lastWk) : d.thisWk < d.lastWk ? "▼" + (d.lastWk - d.thisWk) : "",
+          band: d.band.size ? [...d.band] : ["solo"], next: d.nextLabel || "—"
         }));
         const isCore = this.teamOf(me).toLowerCase().includes("core") || me.toLowerCase() === "chivukula vydik";
         return { mySongCards: cards, hasMySongs: cards.length > 0, noMySongs: cards.length === 0, isCore };
