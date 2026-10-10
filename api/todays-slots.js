@@ -31,9 +31,7 @@ module.exports = async (req, res) => {
     sb.from("members").select("name,email")
   ]);
   if (error) return res.status(500).json({ error: error.message });
-  // ?only=cv23mab → test send to members whose email starts with that, nobody else
-  const only = String(req.query.only || "").toLowerCase();
-  const emailOf = Object.fromEntries((members || []).filter(m => m.email && m.email.toLowerCase().startsWith(only)).map(m => [m.name, m.email]));
+  const emailOf = Object.fromEntries((members || []).filter(m => m.email).map(m => [m.name, m.email]));
 
   // person → their slots today
   const byPerson = {};
@@ -55,14 +53,14 @@ module.exports = async (req, res) => {
     const first = name.split(" ")[0];
     const count = mine.length === 1 ? "1 slot" : `${mine.length} slots`;
     const text = mine.length
-      ? `Hi ${first},\n\nYou have ${count} in the jam room today (${dateFmt}):\n\n` +
+      ? `Good morning, ${first}!\n\nYou have ${count} in the jam room today (${dateFmt}):\n\n` +
         mine.map(s => `${ampm(s.hour)}–${ampm(s.hour + 1)}  ${s.song}  (${s.others.length ? "with " + s.others.join(", ") : "solo"})`).join("\n") +
         `\n\nSee you there!`
-      : `Hi ${first},\n\nYou don't have any jam slots today (${dateFmt}).\n\nWant to play? Book one on the portal.`;
+      : `Good morning, ${first}!\n\nYou don't have any jam slots today (${dateFmt}).\n\nWant to play? Book one on the portal.`;
     const rows = !mine.length ? `
       <tr><td style="padding:14px;background:rgba(243,241,236,.05);border-radius:8px;text-align:center;color:rgba(243,241,236,.6)">You don't have any slots today. Want to play? Book one on the portal.</td></tr>` : mine.map(s => `
       <tr>
-        <td style="padding:12px 14px 12px 0;border-top:1px solid rgba(243,241,236,.08);white-space:nowrap;vertical-align:top;font-weight:700;color:#7cb8db">${ampm(s.hour)}</td>
+        <td style="padding:12px 14px 12px 0;border-top:1px solid rgba(243,241,236,.08);white-space:nowrap;vertical-align:top;font-weight:700;color:#f5c542">${ampm(s.hour)}</td>
         <td style="padding:12px 0;border-top:1px solid rgba(243,241,236,.08)">
           <div style="font-weight:600;color:#f3f1ec">${esc(s.song)}</div>
           <div style="margin-top:3px;font-size:12px;color:rgba(243,241,236,.5)">${s.others.length ? "with " + esc(s.others.join(", ")) : "solo"}</div>
@@ -75,13 +73,13 @@ module.exports = async (req, res) => {
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#121211;padding:40px 20px">
 <tr><td align="center">
 <table width="420" cellpadding="0" cellspacing="0" style="background:#1a1a19;border-radius:16px;overflow:hidden;border:1px solid rgba(243,241,236,.1)">
-  <tr><td style="background:linear-gradient(135deg,#3d8dbd 0%,#2a6a94 100%);padding:32px 36px;text-align:center">
-    <img src="cid:mclogo" alt="Music Club NITW" width="64" height="64" style="width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,255,255,.25);margin-bottom:12px;display:block;margin-left:auto;margin-right:auto">
-    <h1 style="margin:0;font-size:22px;font-weight:700;color:#fff;letter-spacing:-.02em">Music Club NITW</h1>
-    <p style="margin:6px 0 0;font-size:12px;color:rgba(255,255,255,.7);letter-spacing:.08em;text-transform:uppercase">Today's Slots</p>
+  <tr><td style="background:linear-gradient(135deg,#f5c542 0%,#e8a317 100%);padding:32px 36px;text-align:center">
+    <img src="cid:mclogo" alt="Music Club NITW" width="64" height="64" style="width:64px;height:64px;border-radius:50%;border:2px solid rgba(26,26,25,.2);margin-bottom:12px;display:block;margin-left:auto;margin-right:auto">
+    <h1 style="margin:0;font-size:22px;font-weight:700;color:#1a1a19;letter-spacing:-.02em">Music Club NITW</h1>
+    <p style="margin:6px 0 0;font-size:12px;color:rgba(26,26,25,.65);letter-spacing:.08em;text-transform:uppercase">Today's Slots</p>
   </td></tr>
   <tr><td style="padding:36px">
-    <h2 style="margin:0 0 6px;font-size:20px;color:#f3f1ec;font-weight:700">Hi ${esc(first)}, ${mine.length ? `you have ${count} today` : "no slots today"}</h2>
+    <h2 style="margin:0 0 6px;font-size:20px;color:#f3f1ec;font-weight:700">Good morning, ${esc(first)}!<br>${mine.length ? `You have ${count} today` : "No slots today"}</h2>
     <p style="margin:0 0 20px;font-size:13px;color:rgba(243,241,236,.5)">${dateFmt}</p>
     <table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#f3f1ec">${rows}
     </table>
