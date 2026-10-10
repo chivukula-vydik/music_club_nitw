@@ -1,4 +1,4 @@
-// Morning digest: each member with jam slots today gets one personal email listing them.
+// Morning digest: every member gets one personal email listing today's jam slots (or saying they have none).
 // Triggered once a day by the Vercel cron in vercel.json (Vercel sends "Authorization: Bearer $CRON_SECRET").
 const nodemailer = require("nodemailer");
 const path = require("path");
@@ -47,16 +47,18 @@ module.exports = async (req, res) => {
   const dateFmt = ist.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
 
   let sent = 0;
-  for (const [name, mine] of Object.entries(byPerson)) {
-    const to = emailOf[name];
-    if (!to) continue;
-    mine.sort((a, b) => a.hour - b.hour);
+  // every member gets one: their slots, or a "nothing today" note
+  for (const [name, to] of Object.entries(emailOf)) {
+    const mine = (byPerson[name] || []).sort((a, b) => a.hour - b.hour);
     const first = name.split(" ")[0];
     const count = mine.length === 1 ? "1 slot" : `${mine.length} slots`;
-    const text = `Hi ${first},\n\nYou have ${count} in the jam room today (${dateFmt}):\n\n` +
-      mine.map(s => `${ampm(s.hour)}–${ampm(s.hour + 1)}  ${s.song}  (${s.others.length ? "with " + s.others.join(", ") : "solo"})`).join("\n") +
-      `\n\nSee you there!`;
-    const rows = mine.map(s => `
+    const text = mine.length
+      ? `Hi ${first},\n\nYou have ${count} in the jam room today (${dateFmt}):\n\n` +
+        mine.map(s => `${ampm(s.hour)}–${ampm(s.hour + 1)}  ${s.song}  (${s.others.length ? "with " + s.others.join(", ") : "solo"})`).join("\n") +
+        `\n\nSee you there!`
+      : `Hi ${first},\n\nYou don't have any jam slots today (${dateFmt}).\n\nWant to play? Book one on the portal.`;
+    const rows = !mine.length ? `
+      <tr><td style="padding:14px;background:rgba(243,241,236,.05);border-radius:8px;text-align:center;color:rgba(243,241,236,.6)">You don't have any slots today. Want to play? Book one on the portal.</td></tr>` : mine.map(s => `
       <tr>
         <td style="padding:12px 14px 12px 0;border-top:1px solid rgba(243,241,236,.08);white-space:nowrap;vertical-align:top;font-weight:700;color:#7cb8db">${ampm(s.hour)}</td>
         <td style="padding:12px 0;border-top:1px solid rgba(243,241,236,.08)">
@@ -77,7 +79,7 @@ module.exports = async (req, res) => {
     <p style="margin:6px 0 0;font-size:12px;color:rgba(255,255,255,.7);letter-spacing:.08em;text-transform:uppercase">Today's Slots</p>
   </td></tr>
   <tr><td style="padding:36px">
-    <h2 style="margin:0 0 6px;font-size:20px;color:#f3f1ec;font-weight:700">Hi ${esc(first)}, you have ${count} today</h2>
+    <h2 style="margin:0 0 6px;font-size:20px;color:#f3f1ec;font-weight:700">Hi ${esc(first)}, ${mine.length ? `you have ${count} today` : "no slots today"}</h2>
     <p style="margin:0 0 20px;font-size:13px;color:rgba(243,241,236,.5)">${dateFmt}</p>
     <table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#f3f1ec">${rows}
     </table>
@@ -94,12 +96,12 @@ module.exports = async (req, res) => {
     try {
       await transporter.sendMail({
         from: process.env.MAIL_FROM || process.env.SMTP_USER, to,
-        subject: `Music Club: your ${count} today`, text, html,
+        subject: mine.length ? `Music Club: your ${count} today` : "Music Club: no slots for you today", text, html,
         attachments: [{ filename: "logo.png", path: path.join(__dirname, "..", "assets", "logo.png"), cid: "mclogo" }]
       });
       sent++;
     } catch (e) { console.error("Digest error:", name, e.message); }
   }
 
-  res.status(200).json({ day, week, people: Object.keys(byPerson).length, sent });
+  res.status(200).json({ day, week, withSlots: Object.keys(byPerson).length, sent });
 };
