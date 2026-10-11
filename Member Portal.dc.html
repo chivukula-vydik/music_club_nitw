@@ -422,7 +422,6 @@
       </div>
     </div>
 
-    <sc-if value="{{ isCore }}" hint-placeholder-val="{{ true }}">
     <div style="display:flex;flex-direction:column;gap:10px">
       <span style="font-family:'Archivo Black',sans-serif;font-size:16px">My songs</span>
       <sc-if value="{{ hasMySongs }}" hint-placeholder-val="{{ true }}">
@@ -461,7 +460,6 @@
         <div style="padding:20px;border:1px solid rgba(243,241,236,.12);background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.4)">no songs yet — book a slot to get started</div>
       </sc-if>
     </div>
-    </sc-if>
 
     <div style=”height:1px;background:rgba(243,241,236,.1);margin:8px 0”></div>
 
@@ -1631,8 +1629,7 @@ class Component extends DCLogic {
           trend: d.thisWk > d.lastWk ? "▲" + (d.thisWk - d.lastWk) : d.thisWk < d.lastWk ? "▼" + (d.lastWk - d.thisWk) : "",
           band: d.band.size ? [...d.band] : ["solo"], next: d.nextLabel || "—"
         }));
-        const isCore = this.teamOf(me).toLowerCase().includes("core") || me.toLowerCase() === "chivukula vydik";
-        return { mySongCards: cards, hasMySongs: cards.length > 0, noMySongs: cards.length === 0, isCore };
+        return { mySongCards: cards, hasMySongs: cards.length > 0, noMySongs: cards.length === 0 };
       })(),
       ...(() => {
         const mgDay = DAYS.find(d => d[1] === me);
