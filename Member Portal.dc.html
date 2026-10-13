@@ -893,6 +893,8 @@ const evTag = e => e.event_type === "task" ? "task" : e.event_type === "meeting"
 const EVENT_ADMINS = ["Jaeden","Niyati","Abhinav Madathil","Saisrihan","Chivukula Vydik"];
 // Song names are free text, so "Hotel California" and "hotel california " are the same song.
 const songKey = s => (s || "").trim().toLowerCase().replace(/\s+/g, " ");
+// "practice", "personal slot", "solo session"… are slots, not songs: they never get a song id
+const notSong = s => /^((practice|personal|session|slot|solo|self|individual)( |$))+$/.test(songKey(s));
 // When a server is configured, nothing sensitive ships in the page: the roster,
 // the demo schedule and the team-restricted minutes all come from the database,
 // filtered by row-level rules before they ever reach the browser.
@@ -1077,7 +1079,7 @@ class Component extends DCLogic {
       if (!rec || !rec.song) continue;
       const ident = this.songIdent(rec);
       const sk = ident.key;
-      if (!sk || sk === "practice session") continue;
+      if (!sk || notSong(ident.name)) continue;
       const w = +((k.split("|")[0] || "").slice(1)) || 0;
       const c = map[sk] || (map[sk] = { names: {}, members: new Set(), last: 0, id: ident.id });
       c.names[ident.name] = (c.names[ident.name] || 0) + 1;
@@ -1638,7 +1640,7 @@ class Component extends DCLogic {
               : { bookingSong: x.name, bookingSongId: x.id });
           } }));
         return { songSuggestions: list, hasSongSuggestions: list.length > 0,
-          songIsNew: !!(q && q !== "practice session" && st.songs.length && !st.bookingSongId && !st.songs.some(x => songKey(x.name) === q)) };
+          songIsNew: !!(q && !notSong(q) && st.songs.length && !st.bookingSongId && !st.songs.some(x => songKey(x.name) === q)) };
       })(),
       onBookingSong: e => {
         const v = e.target.value;
@@ -1657,7 +1659,7 @@ class Component extends DCLogic {
         const owner = (b.existing && b.owner) || me;
         let song = st.bookingSong.trim().replace(/\s+/g, " ") || "practice session";
         let songId = st.bookingSongId;
-        if (!songId && songKey(song) !== "practice session") {
+        if (!songId && !notSong(song)) {
           const known = st.songs.find(x => songKey(x.name) === songKey(song));
           if (known) songId = known.id;
           else if (this.db && this.db.serverMode) {
