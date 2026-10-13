@@ -514,7 +514,7 @@
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
       <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Booked</span><span style="font-family:'Archivo Black',sans-serif;font-size:22px;color:#d1682e">{{ dayBooked }}</span></div>
       <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Free hours</span><span style="font-family:'Archivo Black',sans-serif;font-size:22px">{{ dayFree }}</span></div>
-      <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Next up</span><span style="font-size:13px;font-weight:500;color:#7cb8db">{{ dayNext }}</span></div>
+      <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Back-to-back</span><span style="font-size:13px;font-weight:500;color:#7cb8db">{{ dayStreaks }}</span></div>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
@@ -1876,7 +1876,7 @@ class Component extends DCLogic {
         if (!mgDay) return { managedDay: null };
         const day = mgDay[0], w = st.dayWeek || 0;
         const now = new Date(), todayIdx = (now.getDay() + 6) % 7, dayIdx = DAYS.indexOf(mgDay);
-        let nextUp = "";
+        const at = {}; // name -> hour indexes they play
         let booked = 0;
         const rows = TIMES.map(t => {
           const rec = this.record(w, day, t), k = this.key(w, day, t);
@@ -1886,7 +1886,7 @@ class Component extends DCLogic {
           if (!rec) return { ...base, booked: false, free: true,
             onBook: () => this.setState({ booking: { week: w, day, t, label: "Request", existing: false }, bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: "" }) };
           booked++;
-          if (!past && !nextUp) nextUp = LABEL[t] + " · " + rec.song;
+          for (const n of [rec.by].concat(rec.with || [])) if (n) (at[n] = at[n] || []).push(TIMES.indexOf(t));
           return { ...base, booked: true, free: false, song: rec.song,
             people: (rec.by || "unclaimed") + ((rec.with || []).length ? " + " + rec.with.join(", ") : " · solo"),
             canMessage: [rec.by].concat(rec.with || []).some(n => n && n !== me),
@@ -1899,7 +1899,16 @@ class Component extends DCLogic {
         });
         return { managedDay: day, dayRows: rows, dayRange: this.weekLabel(w),
           dayBooked: booked + " / " + TIMES.length, dayFree: TIMES.length - booked,
-          dayNext: nextUp || (w === 0 ? "nothing left this week" : "nothing booked"),
+          dayStreaks: (() => {
+            // longest run of consecutive hours per person, 2h or more
+            const out = [];
+            for (const [n, idx] of Object.entries(at)) {
+              let best = 1, run = 1;
+              for (let i = 1; i < idx.length; i++) { run = idx[i] === idx[i - 1] + 1 ? run + 1 : 1; if (run > best) best = run; }
+              if (best >= 2) out.push([n, best]);
+            }
+            return out.sort((a, b) => b[1] - a[1]).map(([n, h]) => n + " " + h + "h").join(" · ") || "none";
+          })(),
           dayWeeks: [0, 1].map(x => ({ label: x ? "Next week" : "This week", onClick: () => this.setState({ dayWeek: x }),
             class: w === x ? "week-active" : "week-inactive" })) };
       })()
