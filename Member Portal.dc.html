@@ -1876,7 +1876,7 @@ class Component extends DCLogic {
         if (!mgDay) return { managedDay: null };
         const day = mgDay[0], w = st.dayWeek || 0;
         const now = new Date(), todayIdx = (now.getDay() + 6) % 7, dayIdx = DAYS.indexOf(mgDay);
-        const at = {}; // name -> hour indexes they play
+        const at = {}; // song -> { name, hour indexes it is booked }
         let booked = 0;
         const rows = TIMES.map(t => {
           const rec = this.record(w, day, t), k = this.key(w, day, t);
@@ -1886,7 +1886,7 @@ class Component extends DCLogic {
           if (!rec) return { ...base, booked: false, free: true,
             onBook: () => this.setState({ booking: { week: w, day, t, label: "Request", existing: false }, bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: "" }) };
           booked++;
-          for (const n of [rec.by].concat(rec.with || [])) if (n) (at[n] = at[n] || []).push(TIMES.indexOf(t));
+          if (!notSong(rec.song)) (at[songKey(rec.song)] = at[songKey(rec.song)] || { name: rec.song, idx: [] }).idx.push(TIMES.indexOf(t));
           return { ...base, booked: true, free: false, song: rec.song,
             people: (rec.by || "unclaimed") + ((rec.with || []).length ? " + " + rec.with.join(", ") : " · solo"),
             canMessage: [rec.by].concat(rec.with || []).some(n => n && n !== me),
@@ -1900,9 +1900,9 @@ class Component extends DCLogic {
         return { managedDay: day, dayRows: rows, dayRange: this.weekLabel(w),
           dayBooked: booked + " / " + TIMES.length, dayFree: TIMES.length - booked,
           dayStreaks: (() => {
-            // longest run of consecutive hours per person, 2h or more
+            // songs booked in 2+ hours in a row, longest run per song
             const out = [];
-            for (const [n, idx] of Object.entries(at)) {
+            for (const { name: n, idx } of Object.values(at)) {
               let best = 1, run = 1;
               for (let i = 1; i < idx.length; i++) { run = idx[i] === idx[i - 1] + 1 ? run + 1 : 1; if (run > best) best = run; }
               if (best >= 2) out.push([n, best]);
