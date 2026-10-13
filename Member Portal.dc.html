@@ -639,7 +639,7 @@
             <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#d1682e">{{ bookingWithCount }}</span>
           </div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;padding:11px;border:1px solid rgba(243,241,236,.14);background:#171716;min-height:44px;align-items:center">
-            <span style="padding:5px 11px;border-radius:999px;background:rgba(209,104,46,.24);border:1px solid rgba(209,104,46,.5);font-size:12px;color:#f3d5c2">{{ bookingOwner }} · you</span>
+            <span style="padding:5px 11px;border-radius:999px;background:rgba(209,104,46,.24);border:1px solid rgba(209,104,46,.5);font-size:12px;color:#f3d5c2">{{ bookingOwner }}</span>
             <sc-for list="{{ bookingWith }}" as="p" hint-placeholder-count="0">
               <button onClick="{{ p.onRemove }}" style="display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;background:rgba(61,141,189,.18);border:1px solid rgba(61,141,189,.45);font-size:12px;color:#cfe4f0;cursor:pointer;font-family:inherit">
                 <span>{{ p.name }}</span><span style="opacity:.6">×</span>
@@ -1014,6 +1014,8 @@ class Component extends DCLogic {
 
   key(week, day, t) { return "w" + this.mondayOf(week) + "|" + day + "|" + t; }
 
+  managesDay(day) { const d = DAYS.find(x => x[0] === day); return !!(d && this.state.user && d[1] === this.state.user); }
+
   // Song clusters built from bookings: every song anyone booked, with everyone who played it.
   // Shared by all members of the slot, not just the person who booked it.
   songClusters() {
@@ -1078,13 +1080,14 @@ class Component extends DCLogic {
         const roll = rec ? [rec.by || "unclaimed"].concat(withList).join(", ") : "";
         const key = this.key(st.week, day, t);
         const isPast = st.week < 0;
+        const mgr = this.managesDay(day);
         return {
           song: rec ? rec.song : "",
           by: rec && withList.length ? (rec.by || "unclaimed") + " +" + withList.length : roll,
-          class: (mine || inTeam) ? "cell-yours" : rec ? "cell-booked" : "cell-free",
+          class: (mine || inTeam || (rec && mgr)) ? "cell-yours" : rec ? "cell-booked" : "cell-free",
           title: (rec ? rec.song + " — " + roll : "free") + " · " + day + " " + LABEL[t],
-          onClick: isPast ? null : (mine || inTeam) ? () => this.setState({
-            booking: { week: st.week, day, t, label: day + " " + LABEL[t], existing: true, origin: key },
+          onClick: isPast ? null : (rec && (mine || inTeam || mgr)) ? () => this.setState({
+            booking: { week: st.week, day, t, label: day + " " + LABEL[t], existing: true, origin: key, owner: rec.by },
             bookingSong: rec.song, bookingWith: (rec.with || []).slice(), pickQuery: ""
           }) : (!rec && me) ? () => this.setState({
             booking: { week: st.week, day, t, label: "Request", existing: false },
@@ -1452,7 +1455,9 @@ class Component extends DCLogic {
           this.db.addMinutes(entry).then(() => this.pull()).catch(e => this.setState({ dbErr: String(e.message || e) }));
         }
       },
-      jamNote: st.week < 0 ? "past week · read-only" : "read-only view · slots go through your day's manager",
+      jamNote: st.week < 0 ? "past week · read-only"
+        : DAYS.some(d => d[1] === me) ? "you manage " + DAYS.filter(d => d[1] === me).map(d => d[0]).join(", ") + " · tap any slot there to edit"
+        : "read-only view · slots go through your day's manager",
       days: DAYS.map(([name, manager]) => ({ name, manager })),
       bookingDays: (() => {
         const todayIdx = (new Date().getDay() + 6) % 7;
@@ -1497,9 +1502,14 @@ class Component extends DCLogic {
       weekNextClass: st.week >= 1 ? "week-disabled" : "",
       bookingExisting: !!(st.booking && st.booking.existing),
       bookingIsRequest: !!(st.booking && !st.booking.existing),
-      bookingHeading: st.booking && st.booking.existing ? "Your slot" : "Request a slot",
+      bookingHeading: st.booking && st.booking.existing
+        ? (st.booking.owner && st.booking.owner !== me && !st.bookingWith.includes(me) ? st.booking.owner + "'s slot" : "Your slot")
+        : "Request a slot",
       bookingConfirm: st.booking && st.booking.existing ? "Save changes" : "Send request",
-      bookingOwner: me || "",
+      bookingOwner: (() => {
+        const o = (st.booking && st.booking.existing && st.booking.owner) || me || "";
+        return o === me ? o + " · you" : o + " · booked";
+      })(),
       bookingWith: st.bookingWith.map(name => ({ name, onRemove: () => this.setState({ bookingWith: st.bookingWith.filter(x => x !== name) }) })),
       bookingWithCount: st.bookingWith.length ? st.bookingWith.length + 1 + " playing" : "just you so far",
       pickQuery: st.pickQuery,
@@ -1541,7 +1551,8 @@ class Component extends DCLogic {
         const k = this.key(b.week || 0, b.day, b.t);
         if (!b.t || !this.freeFor(b.week || 0, b.day, b.origin).includes(b.t)) return;
         const next = { ...st.bookings };
-        const rec = { song: st.bookingSong.trim() || "practice session", by: me, with: st.bookingWith };
+        const owner = (b.existing && b.owner) || me;
+        const rec = { song: st.bookingSong.trim() || "practice session", by: owner, with: st.bookingWith.filter(p => p !== owner) };
         if (b.existing && b.origin && b.origin !== k) {
           next[b.origin] = null;
           this.writeBooking(b.origin, null, next);
@@ -1586,7 +1597,7 @@ class Component extends DCLogic {
         const when = (week ? "Next week · " : "") + day + " · " + LABEL[t];
         return { song: rec.song, when: when + ((rec.with && rec.with.length) ? " · with " + rec.with.join(", ") : " · solo"),
           onEdit: () => this.setState({
-            booking: { week, day, t, label: when, existing: true, origin: key },
+            booking: { week, day, t, label: when, existing: true, origin: key, owner: rec.by },
             bookingSong: rec.song, bookingWith: (rec.with || []).slice(), pickQuery: ""
           }),
           onDrop: () => { if (confirm("Delete this slot?")) this.writeBooking(key, null, { ...st.bookings, [key]: null }); } };
