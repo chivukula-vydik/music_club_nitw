@@ -515,7 +515,7 @@
       <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Booked</span><span style="font-family:'Archivo Black',sans-serif;font-size:22px;color:#d1682e">{{ dayBooked }}</span></div>
       <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Free hours</span><span style="font-family:'Archivo Black',sans-serif;font-size:22px">{{ dayFree }}</span></div>
       <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">People playing</span><span style="font-family:'Archivo Black',sans-serif;font-size:22px">{{ dayPeople }}</span></div>
-      <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Most hours</span><span style="font-size:13px;font-weight:500;color:#7cb8db">{{ dayTop }}</span></div>
+      <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Next up</span><span style="font-size:13px;font-weight:500;color:#7cb8db">{{ dayNext }}</span></div>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
@@ -1877,7 +1877,8 @@ class Component extends DCLogic {
         if (!mgDay) return { managedDay: null };
         const day = mgDay[0], w = st.dayWeek || 0;
         const now = new Date(), todayIdx = (now.getDay() + 6) % 7, dayIdx = DAYS.indexOf(mgDay);
-        const hours = {}, people = new Set();
+        const people = new Set();
+        let nextUp = "";
         let booked = 0;
         const rows = TIMES.map(t => {
           const rec = this.record(w, day, t), k = this.key(w, day, t);
@@ -1887,7 +1888,8 @@ class Component extends DCLogic {
           if (!rec) return { ...base, booked: false, free: true,
             onBook: () => this.setState({ booking: { week: w, day, t, label: "Request", existing: false }, bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: "" }) };
           booked++;
-          for (const n of [rec.by].concat(rec.with || [])) { if (n) { people.add(n); hours[n] = (hours[n] || 0) + 1; } }
+          for (const n of [rec.by].concat(rec.with || [])) { if (n) people.add(n); }
+          if (!past && !nextUp) nextUp = LABEL[t] + " · " + rec.song;
           return { ...base, booked: true, free: false, song: rec.song,
             people: (rec.by || "unclaimed") + ((rec.with || []).length ? " + " + rec.with.join(", ") : " · solo"),
             canMessage: [rec.by].concat(rec.with || []).some(n => n && n !== me),
@@ -1898,10 +1900,9 @@ class Component extends DCLogic {
             onMove: () => this.setState({ tab: "jam", week: w, moveFrom: { week: w, day, t, key: k } }),
             onDrop: () => { if (confirm("Delete " + (rec.by || "this") + "'s slot (" + rec.song + ")?")) this.writeBooking(k, null, { ...st.bookings, [k]: null }); } };
         });
-        const top = Object.entries(hours).sort((a, b) => b[1] - a[1])[0];
         return { managedDay: day, dayRows: rows, dayRange: this.weekLabel(w),
           dayBooked: booked + " / " + TIMES.length, dayFree: TIMES.length - booked, dayPeople: people.size,
-          dayTop: top ? top[0] + " · " + top[1] + "h" : "—",
+          dayNext: nextUp || (w === 0 ? "nothing left this week" : "nothing booked"),
           dayWeeks: [0, 1].map(x => ({ label: x ? "Next week" : "This week", onClick: () => this.setState({ dayWeek: x }),
             class: w === x ? "week-active" : "week-inactive" })) };
       })()
