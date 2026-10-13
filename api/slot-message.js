@@ -29,7 +29,7 @@ function emailHtml({ manager, day, song, when, who, message }) {
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#121211;padding:40px 20px">
 <tr><td align="center">
 <table width="420" cellpadding="0" cellspacing="0" style="background:#1a1a19;border-radius:16px;overflow:hidden;border:1px solid rgba(243,241,236,.1)">
-  <tr><td style="background:linear-gradient(135deg,#3d8dbd 0%,#2a6a94 100%);padding:32px 36px;text-align:center">
+  <tr><td style="background:linear-gradient(135deg,#c8372d 0%,#992820 100%);padding:32px 36px;text-align:center">
     <img src="cid:mclogo" alt="Music Club NITW" width="64" height="64" style="width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,255,255,.25);margin-bottom:12px;display:block;margin-left:auto;margin-right:auto">
     <h1 style="margin:0;font-size:22px;font-weight:700;color:#fff;letter-spacing:-.02em">Music Club NITW</h1>
     <p style="margin:6px 0 0;font-size:12px;color:rgba(255,255,255,.7);letter-spacing:.08em;text-transform:uppercase">Message from your slot manager</p>
@@ -41,7 +41,7 @@ function emailHtml({ manager, day, song, when, who, message }) {
       <tr><td style="padding:8px 12px 8px 0;color:rgba(243,241,236,.5);white-space:nowrap;vertical-align:top">Who</td><td style="padding:8px 0">${esc(who)}</td></tr>
       <tr><td style="padding:8px 12px 8px 0;color:rgba(243,241,236,.5);white-space:nowrap;vertical-align:top">From</td><td style="padding:8px 0">${esc(manager)} · ${esc(day)} manager</td></tr>
     </table>
-    <div style="margin:20px 0 0;padding:16px 18px;background:rgba(61,141,189,.15);border-radius:8px;font-size:15px;line-height:1.55;color:#f3f1ec;white-space:pre-wrap">${esc(message)}</div>
+    <div style="margin:20px 0 0;padding:16px 18px;background:rgba(200,55,45,.14);border-radius:8px;font-size:15px;line-height:1.55;color:#f3f1ec;white-space:pre-wrap">${esc(message)}</div>
     <p style="margin:18px 0 0;font-size:12.5px;color:rgba(243,241,236,.5);text-align:center">Reply to this email to reach ${esc(manager)}.</p>
   </td></tr>
   <tr><td style="padding:0 36px 28px">
