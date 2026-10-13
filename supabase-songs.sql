@@ -21,7 +21,7 @@ from (
          count(*) over (partition by lower(regexp_replace(btrim(song), '\s+', ' ', 'g')), btrim(song)) as n
   from bookings
   -- "practice", "personal slot", "solo session"… are slots, not songs
-  where btrim(song) <> '' and lower(regexp_replace(btrim(song), '\s+', ' ', 'g')) !~ '(^| )(practice|personal|session|slot|solo|self|individual|recording|record|shooting|shoot|reel|reels|video)( |$)'
+  where btrim(song) <> '' and lower(regexp_replace(btrim(song), '\s+', ' ', 'g')) !~ '(^| )(practice|personal|session|slot|solo|self|individual|recording|record|shooting|shoot|reel|reels|video|meet|meeting|meetup)( |$)'
 ) v
 order by k, n desc
 on conflict (name_key) do nothing;
@@ -51,4 +51,4 @@ exception when duplicate_object then null; end $$;
 
 -- Cleanup (safe to re-run): drop "songs" that are really practice/personal slots.
 -- Their bookings keep their text and just lose the song id.
-delete from songs where name_key ~ '(^| )(practice|personal|session|slot|solo|self|individual|recording|record|shooting|shoot|reel|reels|video)( |$)';
+delete from songs where name_key ~ '(^| )(practice|personal|session|slot|solo|self|individual|recording|record|shooting|shoot|reel|reels|video|meet|meeting|meetup)( |$)';

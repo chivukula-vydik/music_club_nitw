@@ -903,8 +903,8 @@ const nearKey = (a, b) => {
   for (let i = 1; i <= a.length; i++) { const c = [i]; for (let j = 1; j <= b.length; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; }
   return p[b.length] <= Math.max(1, Math.floor(Math.min(a.length, b.length) / 6));
 };
-// any name containing practice, reel shoot, recording… is a slot, not a song: it never gets a song id
-const notSong = s => /(^| )(practice|personal|session|slot|solo|self|individual|recording|record|shooting|shoot|reel|reels|video)( |$)/.test(songWords(s));
+// any name containing practice, reel shoot, recording, meet… is a slot, not a song: it never gets a song id
+const notSong = s => /(^| )(practice|personal|session|slot|solo|self|individual|recording|record|shooting|shoot|reel|reels|video|meet|meeting|meetup)( |$)/.test(songWords(s));
 // When a server is configured, nothing sensitive ships in the page: the roster,
 // the demo schedule and the team-restricted minutes all come from the database,
 // filtered by row-level rules before they ever reach the browser.
