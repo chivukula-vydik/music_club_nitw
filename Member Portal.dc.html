@@ -222,6 +222,7 @@
     <div class="mc-ptabs" style="display:flex;gap:4px;padding:0 28px">
       <button onClick="{{ goMine }}" class="tab {{ mineTabClass }}">My slots</button>
       <button onClick="{{ goSongs }}" class="tab {{ songsTabClass }}">My songs</button>
+      <sc-if value="{{ managedDay }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goDay }}" class="tab {{ dayTabClass }}">My day</button></sc-if>
       <button onClick="{{ goJam }}" class="tab {{ jamTabClass }}">Jam room</button>
       <button onClick="{{ goSkills }}" class="tab {{ skillsTabClass }}">Members &amp; skills</button>
       <button onClick="{{ goMinutes }}" class="tab {{ minutesTabClass }}">Minutes</button>
@@ -444,34 +445,10 @@
           </div>
         </sc-for>
         <sc-if value="{{ noMySlots }}" hint-placeholder-val="{{ true }}">
-          <div style="padding:20px;background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.4)">nothing booked yet — hit “Request a slot"</div>
+          <div style="padding:20px;background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.4)">nothing booked yet — hit “Request a slot”</div>
         </sc-if>
       </div>
     </div>
-
-    <sc-if value="{{ managedDay }}" hint-placeholder-val="{{ false }}">
-    <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-family:'Archivo Black',sans-serif;font-size:18px">{{ managedDay }}</span>
-        <span style="padding:4px 10px;border-radius:999px;background:rgba(61,141,189,.18);color:#7cb8db;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase">you manage</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45)">{{ managedCount }}</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
-        <sc-for list="{{ managedSlots }}" as="ms" hint-placeholder-count="2">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 20px;background:#1a1a1a">
-            <div style="display:flex;flex-direction:column;gap:3px">
-              <span style="font-size:14px;font-weight:600">{{ ms.song }}</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.5)">{{ ms.time }} · {{ ms.by }}<sc-if value="{{ ms.players }}" hint-placeholder-val="{{ false }}"> + {{ ms.players }}</sc-if></span>
-            </div>
-            <button onClick="{{ ms.onDelete }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.5);font-size:11px;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Delete</button>
-          </div>
-        </sc-for>
-        <sc-if value="{{ noManagedSlots }}" hint-placeholder-val="{{ false }}">
-          <div style="padding:18px 20px;background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.4)">nothing booked yet</div>
-        </sc-if>
-      </div>
-    </div>
-    </sc-if>
 
   </section>
   </sc-if>
@@ -517,6 +494,55 @@
       <sc-if value="{{ noMySongs }}" hint-placeholder-val="{{ false }}">
         <div style="padding:20px;border:1px solid rgba(243,241,236,.12);background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.4)">no songs yet — book a slot to get started</div>
       </sc-if>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ onDay }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:32px 28px 56px;display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">{{ managedDay }}</h2>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">you manage this day · {{ dayRange }}</span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <sc-for list="{{ dayWeeks }}" as="w" hint-placeholder-count="2">
+          <button onClick="{{ w.onClick }}" class="{{ w.class }}" style="padding:9px 15px;border-radius:999px;font-size:12.5px;cursor:pointer">{{ w.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+      <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Booked</span><span style="font-family:'Archivo Black',sans-serif;font-size:22px;color:#d1682e">{{ dayBooked }}</span></div>
+      <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Free hours</span><span style="font-family:'Archivo Black',sans-serif;font-size:22px">{{ dayFree }}</span></div>
+      <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">People playing</span><span style="font-family:'Archivo Black',sans-serif;font-size:22px">{{ dayPeople }}</span></div>
+      <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.4)">Most hours</span><span style="font-size:13px;font-weight:500;color:#7cb8db">{{ dayTop }}</span></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+      <sc-for list="{{ dayRows }}" as="r" hint-placeholder-count="6">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:12px 18px;background:#1a1a1a;opacity:{{ r.opacity }}">
+          <span style="width:86px;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.55)">{{ r.time }}</span>
+          <sc-if value="{{ r.booked }}" hint-placeholder-val="{{ true }}">
+            <div style="flex:1;min-width:170px;display:flex;flex-direction:column;gap:3px">
+              <span style="font-size:14px;font-weight:600">{{ r.song }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.5)">{{ r.people }}</span>
+            </div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap">
+              <sc-if value="{{ r.mail }}" hint-placeholder-val="{{ false }}"><a href="{{ r.mail }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.7);font-size:11.5px;cursor:pointer;text-decoration:none;font-family:inherit" style-hover="border-color:#3d8dbd;color:#f3f1ec">Email</a></sc-if>
+              <sc-if value="{{ r.canAct }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ r.onEdit }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.7);font-size:11.5px;cursor:pointer;text-decoration:none;font-family:inherit" style-hover="border-color:#3d8dbd;color:#f3f1ec">Edit</button>
+                <button onClick="{{ r.onMove }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.7);font-size:11.5px;cursor:pointer;text-decoration:none;font-family:inherit" style-hover="border-color:#3d8dbd;color:#f3f1ec">Move</button>
+                <button onClick="{{ r.onDrop }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.7);font-size:11.5px;cursor:pointer;text-decoration:none;font-family:inherit" style-hover="border-color:#d1682e;color:#d1682e">Drop</button>
+              </sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{ r.free }}" hint-placeholder-val="{{ false }}">
+            <span style="flex:1;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.3)">free</span>
+            <sc-if value="{{ r.canAct }}" hint-placeholder-val="{{ true }}"><button onClick="{{ r.onBook }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.7);font-size:11.5px;cursor:pointer;text-decoration:none;font-family:inherit" style-hover="border-color:#d1682e;color:#d1682e">Book</button></sc-if>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
   </section>
   </sc-if>
 
@@ -1364,13 +1390,14 @@ class Component extends DCLogic {
         if (this.db && this.db.serverMode) this.db.signOut();
         this.persist({ user: null, account: null, loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false });
       },
-      onMine: st.tab === "mine", onSongs: st.tab === "songs", onJam: st.tab === "jam", onSkills: st.tab === "skills", onProfile: st.tab === "profile", onMinutes: st.tab === "minutes", onEvents: st.tab === "events",
-      goMine: () => this.setState({ tab: "mine" }), goSongs: () => this.setState({ tab: "songs" }), goJam: () => this.setState({ tab: "jam" }), goSkills: () => this.setState({ tab: "skills" }),
+      onMine: st.tab === "mine", onSongs: st.tab === "songs", onDay: st.tab === "day", onJam: st.tab === "jam", onSkills: st.tab === "skills", onProfile: st.tab === "profile", onMinutes: st.tab === "minutes", onEvents: st.tab === "events",
+      goMine: () => this.setState({ tab: "mine" }), goSongs: () => this.setState({ tab: "songs" }), goDay: () => this.setState({ tab: "day" }), goJam: () => this.setState({ tab: "jam" }), goSkills: () => this.setState({ tab: "skills" }),
       goMinutes: () => this.setState({ tab: "minutes" }),
       goEvents: () => this.setState({ tab: "events" }),
       goProfile: () => { this.setState({ tab: "profile", saveNote: "", saveStatus: "", pwNote: "", pwStatus: "" }); this.loadProfile(me); },
       mineTabClass: st.tab === "mine" ? "tab-active" : "tab-inactive",
       songsTabClass: st.tab === "songs" ? "tab-active" : "tab-inactive",
+      dayTabClass: st.tab === "day" ? "tab-active" : "tab-inactive",
       jamTabClass: st.tab === "jam" ? "tab-active" : "tab-inactive",
       skillsTabClass: st.tab === "skills" ? "tab-active" : "tab-inactive",
       minutesTabClass: st.tab === "minutes" ? "tab-active" : "tab-inactive",
@@ -1804,14 +1831,34 @@ class Component extends DCLogic {
       ...(() => {
         const mgDay = DAYS.find(d => d[1] === me);
         if (!mgDay) return { managedDay: null };
-        const dayName = mgDay[0];
-        const slots = [];
-        [0, 1].forEach(w => TIMES.forEach(t => {
-          const rec = this.record(w, dayName, t);
-          const k = this.key(w, dayName, t);
-          if (rec) slots.push({ time: (w ? "Next wk · " : "") + LABEL[t], song: rec.song, by: rec.by, players: (rec.with || []).length ? rec.with.join(", ") : "", onDelete: () => { if (confirm("Delete " + rec.by + "'s slot (" + rec.song + ")?")) this.writeBooking(k, null, { ...st.bookings, [k]: null }); } });
-        }));
-        return { managedDay: dayName, managedSlots: slots, managedCount: slots.length + " booked", noManagedSlots: slots.length === 0 };
+        const day = mgDay[0], w = st.dayWeek || 0;
+        const now = new Date(), todayIdx = (now.getDay() + 6) % 7, dayIdx = DAYS.indexOf(mgDay);
+        const hours = {}, people = new Set();
+        let booked = 0;
+        const rows = TIMES.map(t => {
+          const rec = this.record(w, day, t), k = this.key(w, day, t);
+          // TIMES[0] starts at 9 AM, each slot is 1h
+          const past = w === 0 && (dayIdx < todayIdx || (dayIdx === todayIdx && 9 + TIMES.indexOf(t) + 1 <= now.getHours()));
+          const base = { time: LABEL[t], opacity: past ? ".45" : "1", canAct: !past };
+          if (!rec) return { ...base, booked: false, free: true,
+            onBook: () => this.setState({ booking: { week: w, day, t, label: "Request", existing: false }, bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: "" }) };
+          booked++;
+          for (const n of [rec.by].concat(rec.with || [])) { if (n) { people.add(n); hours[n] = (hours[n] || 0) + 1; } }
+          const email = (ROSTER.find(r => r[0] === rec.by) || [])[7];
+          return { ...base, booked: true, free: false, song: rec.song,
+            people: (rec.by || "unclaimed") + ((rec.with || []).length ? " + " + rec.with.join(", ") : " · solo"),
+            mail: email ? "mailto:" + email + "?subject=" + encodeURIComponent("Jam slot · " + day + " " + LABEL[t]) : "",
+            onEdit: () => this.setState({ booking: { week: w, day, t, label: day + " " + LABEL[t], existing: true, origin: k, owner: rec.by },
+              bookingSong: rec.song, bookingSongId: rec.songId || null, bookingWith: (rec.with || []).slice(), pickQuery: "" }),
+            onMove: () => this.setState({ tab: "jam", week: w, moveFrom: { week: w, day, t, key: k } }),
+            onDrop: () => { if (confirm("Delete " + (rec.by || "this") + "'s slot (" + rec.song + ")?")) this.writeBooking(k, null, { ...st.bookings, [k]: null }); } };
+        });
+        const top = Object.entries(hours).sort((a, b) => b[1] - a[1])[0];
+        return { managedDay: day, dayRows: rows, dayRange: this.weekLabel(w),
+          dayBooked: booked + " / " + TIMES.length, dayFree: TIMES.length - booked, dayPeople: people.size,
+          dayTop: top ? top[0] + " · " + top[1] + "h" : "—",
+          dayWeeks: [0, 1].map(x => ({ label: x ? "Next week" : "This week", onClick: () => this.setState({ dayWeek: x }),
+            class: w === x ? "week-active" : "week-inactive" })) };
       })()
     };
   }
