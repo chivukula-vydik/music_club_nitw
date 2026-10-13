@@ -629,6 +629,16 @@
           <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">What are you working on</span>
           <input value="{{ bookingSong }}" onChange="{{ onBookingSong }}" placeholder="song, or 'practice session'" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
         </label>
+        <sc-if value="{{ hasSongSuggestions }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:-8px">
+            <sc-for list="{{ songSuggestions }}" as="sg" hint-placeholder-count="3">
+              <button onClick="{{ sg.onPick }}" style="padding:6px 11px;border-radius:999px;border:1px solid rgba(61,141,189,.45);background:rgba(61,141,189,.12);color:#cfe4f0;font-size:12.5px;cursor:pointer;font-family:inherit">{{ sg.name }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ songIsNew }}" hint-placeholder-val="{{ false }}">
+          <span style="margin-top:-8px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#e8ac86">new song · will be added to the club list. pick a match above if it's a typo</span>
+        </sc-if>
         <sc-if value="{{ hasClusters }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;flex-direction:column;gap:8px">
             <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Your clusters</span>
@@ -924,7 +934,7 @@ const KEY = "mc-portal-v1";
 const split = s => (s || "").split(",").map(x => x.trim()).filter(Boolean);
 
 class Component extends DCLogic {
-  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "", calMonth: new Date().getFullYear() * 12 + new Date().getMonth(), calSelectedDay: null, dbEvents: [], evForm: false, evType: "event", evTitle: "", evDesc: "", evMeet: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], notifsOpen: false, moveFrom: null };
+  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "", calMonth: new Date().getFullYear() * 12 + new Date().getMonth(), calSelectedDay: null, dbEvents: [], evForm: false, evType: "event", evTitle: "", evDesc: "", evMeet: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], notifsOpen: false, moveFrom: null, songs: [] };
 
   async componentDidMount() {
     if (!SERVER) try {
@@ -966,7 +976,7 @@ class Component extends DCLogic {
       ROSTER.length = 0; ROSTER.push(...d.members);
       const name = (d.members.find(r => (r[7] || "").toLowerCase() === account.email.toLowerCase()) || [])[0] || account.name;
       this.setState({
-        account, user: name, bookings: d.bookings, profiles: d.profiles, moms: d.minutes, dbEvents, dbErr: ""
+        account, user: name, bookings: d.bookings, profiles: d.profiles, moms: d.minutes, songs: d.songs || [], dbEvents, dbErr: ""
       }, () => this.loadProfile(name));
     } catch (e) {
       this.setState({ dbErr: String(e.message || e) });
@@ -1051,22 +1061,32 @@ class Component extends DCLogic {
 
   // Song clusters built from bookings: every song anyone booked, with everyone who played it.
   // Shared by all members of the slot, not just the person who booked it.
+  // A booking's song: by id once the songs table exists, by normalized name before that.
+  songIdent(rec) {
+    if (rec.songId) {
+      const s = this.state.songs.find(x => x.id === rec.songId);
+      return { key: "id:" + rec.songId, id: rec.songId, name: s ? s.name : (rec.song || "").trim() };
+    }
+    return { key: songKey(rec.song), id: null, name: (rec.song || "").trim() };
+  }
+
   songClusters() {
     const map = {};
     for (const [k, rec] of Object.entries(this.state.bookings)) {
       if (!rec || !rec.song) continue;
-      const sk = songKey(rec.song);
+      const ident = this.songIdent(rec);
+      const sk = ident.key;
       if (!sk || sk === "practice session") continue;
       const w = +((k.split("|")[0] || "").slice(1)) || 0;
-      const c = map[sk] || (map[sk] = { names: {}, members: new Set(), last: 0 });
-      c.names[rec.song.trim()] = (c.names[rec.song.trim()] || 0) + 1;
+      const c = map[sk] || (map[sk] = { names: {}, members: new Set(), last: 0, id: ident.id });
+      c.names[ident.name] = (c.names[ident.name] || 0) + 1;
       if (rec.by) c.members.add(rec.by);
       for (const p of (rec.with || [])) c.members.add(p);
       if (w > c.last) c.last = w;
     }
     return Object.entries(map)
       .map(([key, c]) => ({
-        key,
+        key, id: c.id,
         song: Object.entries(c.names).sort((a, b) => b[1] - a[1])[0][0],
         members: [...c.members],
         last: c.last
@@ -1145,10 +1165,10 @@ class Component extends DCLogic {
           : st.moveFrom ? (moving ? () => this.setState({ moveFrom: null }) : target ? () => this.moveSlot(st.moveFrom, here) : null)
           : (rec && (mine || inTeam || mgr)) ? () => this.setState({
             booking: { week: st.week, day, t, label: day + " " + LABEL[t], existing: true, origin: key, owner: rec.by },
-            bookingSong: rec.song, bookingWith: (rec.with || []).slice(), pickQuery: ""
+            bookingSong: rec.song, bookingSongId: rec.songId || null, bookingWith: (rec.with || []).slice(), pickQuery: ""
           }) : (!rec && me) ? () => this.setState({
             booking: { week: st.week, day, t, label: "Request", existing: false },
-            bookingSong: "", bookingWith: [], pickQuery: ""
+            bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: ""
           }) : null
         };
       })
@@ -1547,7 +1567,7 @@ class Component extends DCLogic {
         const day = st.week === 0 ? DAYS[Math.max(todayIdx, 0)][0] : DAYS[0][0];
         this.setState({
           booking: { week: st.week, day, t: this.freeFor(st.week, day)[0], label: "Request", existing: false },
-          bookingSong: "", bookingWith: [], pickQuery: ""
+          bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: ""
         });
       },
       week: st.week,
@@ -1561,7 +1581,7 @@ class Component extends DCLogic {
       bookingCanMove: !!(st.booking && st.booking.existing && this.managesDay(st.booking.day)),
       startMove: () => {
         const b = st.booking; if (!b) return;
-        this.setState({ booking: null, bookingSong: "", bookingWith: [], pickQuery: "", tab: "jam", week: b.week || 0,
+        this.setState({ booking: null, bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: "", tab: "jam", week: b.week || 0,
           moveFrom: { week: b.week || 0, day: b.day, t: b.t, key: b.origin || this.key(b.week || 0, b.day, b.t) } });
       },
       isMoving: !!st.moveFrom,
@@ -1600,41 +1620,66 @@ class Component extends DCLogic {
       myClusters: this.songClusters().filter(c => c.members.includes(me)).map(c => ({
         song: c.song,
         roster: c.members.filter(m => m !== me).join(", "),
-        onPick: () => this.setState({ bookingSong: c.song, bookingWith: c.members.filter(m => m !== me) })
+        onPick: () => this.setState({ bookingSong: c.song, bookingSongId: c.id || null, bookingWith: c.members.filter(m => m !== me) })
       })),
       hasClusters: this.songClusters().some(c => c.members.includes(me)),
+      ...(() => {
+        const q = songKey(st.bookingSong);
+        const list = (!q || st.bookingSongId) ? [] : st.songs
+          .filter(x => songKey(x.name).includes(q) && songKey(x.name) !== q)
+          .slice(0, 6)
+          .map(x => ({ name: x.name, onPick: () => {
+            const c = this.songClusters().find(c => c.id === x.id && c.members.includes(me));
+            this.setState(c
+              ? { bookingSong: x.name, bookingSongId: x.id, bookingWith: c.members.filter(m => m !== me) }
+              : { bookingSong: x.name, bookingSongId: x.id });
+          } }));
+        return { songSuggestions: list, hasSongSuggestions: list.length > 0,
+          songIsNew: !!(q && q !== "practice session" && st.songs.length && !st.bookingSongId && !st.songs.some(x => songKey(x.name) === q)) };
+      })(),
       onBookingSong: e => {
         const v = e.target.value;
-        const match = this.songClusters().find(c => c.key === songKey(v) && c.members.includes(me));
+        const known = st.songs.find(x => songKey(x.name) === songKey(v));
+        const match = this.songClusters().find(c => (known ? c.id === known.id : c.key === songKey(v)) && c.members.includes(me));
         if (match) {
-          this.setState({ bookingSong: v, bookingWith: match.members.filter(m => m !== me) });
+          this.setState({ bookingSong: v, bookingSongId: known ? known.id : null, bookingWith: match.members.filter(m => m !== me) });
         } else {
-          this.setState({ bookingSong: v });
+          this.setState({ bookingSong: v, bookingSongId: known ? known.id : null });
         }
       },
-      confirmBooking: () => {
+      confirmBooking: async () => {
         const b = st.booking; if (!b) return;
         const k = this.key(b.week || 0, b.day, b.t);
         if (!b.t || !this.freeFor(b.week || 0, b.day, b.origin).includes(b.t)) return;
-        const next = { ...st.bookings };
         const owner = (b.existing && b.owner) || me;
-        const rec = { song: st.bookingSong.trim() || "practice session", by: owner, with: st.bookingWith.filter(p => p !== owner) };
+        let song = st.bookingSong.trim().replace(/\s+/g, " ") || "practice session";
+        let songId = st.bookingSongId;
+        if (!songId && songKey(song) !== "practice session") {
+          const known = st.songs.find(x => songKey(x.name) === songKey(song));
+          if (known) songId = known.id;
+          else if (this.db && this.db.serverMode) {
+            try { songId = await this.db.ensureSong(song, me); } catch (e) { this.setState({ dbErr: String(e.message || e) }); return; }
+          }
+        }
+        if (songId) { const s = this.state.songs.find(x => x.id === songId); if (s) song = s.name; }
+        const next = { ...this.state.bookings };
+        const rec = { song, songId: songId || null, by: owner, with: st.bookingWith.filter(p => p !== owner) };
         if (b.existing && b.origin && b.origin !== k) {
           next[b.origin] = null;
           this.writeBooking(b.origin, null, next);
         }
         next[k] = rec;
         this.writeBooking(k, rec, next);
-        this.setState({ booking: null, bookingSong: "", bookingWith: [], pickQuery: "" });
+        this.setState({ booking: null, bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: "" });
       },
       dropBooking: () => {
         const b = st.booking; if (!b) return;
         if (!confirm("Delete this slot? This can't be undone.")) return;
         const k = b.origin || this.key(b.week || 0, b.day, b.t);
         this.writeBooking(k, null, { ...st.bookings, [k]: null });
-        this.setState({ booking: null, bookingSong: "", bookingWith: [], pickQuery: "" });
+        this.setState({ booking: null, bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: "" });
       },
-      cancelBooking: () => this.setState({ booking: null, bookingSong: "", bookingWith: [], pickQuery: "" }),
+      cancelBooking: () => this.setState({ booking: null, bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: "" }),
       query: st.query, onQuery: e => this.setState({ query: e.target.value }),
       teamFilters: ["All", "Core", "Tech"].map(label => {
         const on = st.team === label;
@@ -1664,7 +1709,7 @@ class Component extends DCLogic {
         return { song: rec.song, when: when + ((rec.with && rec.with.length) ? " · with " + rec.with.join(", ") : " · solo"),
           onEdit: () => this.setState({
             booking: { week, day, t, label: when, existing: true, origin: key, owner: rec.by },
-            bookingSong: rec.song, bookingWith: (rec.with || []).slice(), pickQuery: ""
+            bookingSong: rec.song, bookingSongId: rec.songId || null, bookingWith: (rec.with || []).slice(), pickQuery: ""
           }),
           onDrop: () => { if (confirm("Delete this slot?")) this.writeBooking(key, null, { ...st.bookings, [key]: null }); } };
       }),
@@ -1711,9 +1756,9 @@ class Component extends DCLogic {
           const m = +wk.slice(1);
           // TIMES[0] starts at 9 AM, each slot is 1h
           const start = new Date(Math.floor(m / 10000), Math.floor(m / 100) % 100 - 1, m % 100 + dayOrder.indexOf(day), 9 + TIMES.indexOf(t));
-          const sk = songKey(rec.song);
-          const d = songMap[sk] || (songMap[sk] = { names: {}, total: 0, thisWk: 0, lastWk: 0, last: null, next: null, nextLabel: "", band: new Set() });
-          d.names[rec.song.trim()] = (d.names[rec.song.trim()] || 0) + 1;
+          const ident = this.songIdent(rec);
+          const d = songMap[ident.key] || (songMap[ident.key] = { names: {}, total: 0, thisWk: 0, lastWk: 0, last: null, next: null, nextLabel: "", band: new Set() });
+          d.names[ident.name] = (d.names[ident.name] || 0) + 1;
           if (m === thisMon) d.thisWk++;
           if (m === lastMon) d.lastWk++;
           if (start < now) { d.total++; if (!d.last || start > d.last) d.last = start; }

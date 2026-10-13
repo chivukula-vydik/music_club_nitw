@@ -103,7 +103,11 @@ function minutesCutoff() {
   return d.toISOString().slice(0, 10);
 }
 
-// Returns { members, bookings, profiles, minutes } in the shape the portal uses.
+// True once the songs table exists (supabase-songs.sql has been run). Until then
+// bookings keep working on song names alone.
+export let songsEnabled = false;
+
+// Returns { members, bookings, profiles, minutes, songs } in the shape the portal uses.
 export async function load() {
   if (!serverMode) {
     const s = localState();
@@ -114,18 +118,21 @@ export async function load() {
       members: null, // portal falls back to its built-in roster
       bookings: s.bookings || {},
       profiles: s.profiles || {},
-      minutes: kept
+      minutes: kept,
+      songs: []
     };
   }
 
   const c = await client();
   const cut = minutesCutoff();
-  const [members, bookings, profiles, minutes] = await Promise.all([
+  const [members, bookings, profiles, minutes, songs] = await Promise.all([
     c.from("members").select("name,branch,year,team,major_skill,minor_skill,vibe,email").order("name"),
-    c.from("bookings").select("week,day,slot,song,booked_by,players,created_at"),
+    c.from("bookings").select("*"),
     c.from("profiles").select("member_name,major_skill,minor_skill,vibe"),
-    c.from("minutes").select("id,meeting_date,title,audience,author,body").gte("meeting_date", cut).order("meeting_date", { ascending: false })
+    c.from("minutes").select("id,meeting_date,title,audience,author,body").gte("meeting_date", cut).order("meeting_date", { ascending: false }),
+    c.from("songs").select("id,name").order("name")
   ]);
+  songsEnabled = !songs.error;
 
   const err = [members, bookings, profiles, minutes].find(r => r.error);
   if (err) throw err.error;
@@ -140,7 +147,7 @@ export async function load() {
       w = mon.getFullYear() * 10000 + (mon.getMonth() + 1) * 100 + mon.getDate();
     }
     const key = (w ? "w" + w + "|" : "") + b.day + "|" + b.slot;
-    bookingMap[key] = { song: b.song, by: b.booked_by, with: b.players || [] };
+    bookingMap[key] = { song: b.song, songId: b.song_id || null, by: b.booked_by, with: b.players || [] };
   }
 
   const profileMap = {};
@@ -152,7 +159,8 @@ export async function load() {
     members: members.data.map(m => [m.name, m.branch, String(m.year), m.team, m.major_skill || "", m.minor_skill || "", m.vibe || "", m.email || ""]),
     bookings: bookingMap,
     profiles: profileMap,
-    minutes: minutes.data.map(m => ({ id: String(m.id), date: m.meeting_date, title: m.title, audience: m.audience, author: m.author, body: m.body }))
+    minutes: minutes.data.map(m => ({ id: String(m.id), date: m.meeting_date, title: m.title, audience: m.audience, author: m.author, body: m.body })),
+    songs: songsEnabled ? songs.data : []
   };
 }
 
@@ -179,12 +187,32 @@ export async function saveBooking(key, rec) {
     const { error } = await c.from("bookings").delete().match({ week, day, slot });
     if (error) throw error;
   } else {
+    // notified resets so a moved or swapped slot gets its 1-hour reminder at the new time
+    const row = { week, day, slot, song: rec.song, booked_by: rec.by, players: rec.with || [], notified: false };
+    if (songsEnabled) row.song_id = rec.songId || null;
     const { error } = await c.from("bookings")
-      // notified resets so a moved or swapped slot gets its 1-hour reminder at the new time
-      .upsert({ week, day, slot, song: rec.song, booked_by: rec.by, players: rec.with || [], notified: false },
+      .upsert(row,
               { onConflict: "week,day,slot" });
     if (error) throw error;
   }
+}
+
+// Returns the id of the song with this name, creating it if it's new.
+export async function ensureSong(name, by) {
+  if (!serverMode || !songsEnabled) return null;
+  const c = await client();
+  const key = name.trim().toLowerCase().replace(/\s+/g, " ");
+  const found = await c.from("songs").select("id").eq("name_key", key).maybeSingle();
+  if (found.error) throw found.error;
+  if (found.data) return found.data.id;
+  const made = await c.from("songs").insert({ name: name.trim().replace(/\s+/g, " "), created_by: by }).select("id").single();
+  if (made.error) {
+    // someone else created it a moment ago
+    const again = await c.from("songs").select("id").eq("name_key", key).maybeSingle();
+    if (again.data) return again.data.id;
+    throw made.error;
+  }
+  return made.data.id;
 }
 
 export async function saveProfile(name, p) {
@@ -264,6 +292,7 @@ export async function subscribe(onChange) {
     .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, onChange)
     .on("postgres_changes", { event: "*", schema: "public", table: "minutes" }, onChange)
     .on("postgres_changes", { event: "*", schema: "public", table: "events" }, onChange)
+    .on("postgres_changes", { event: "*", schema: "public", table: "songs" }, onChange)
     .subscribe();
   return () => c.removeChannel(ch);
 }
