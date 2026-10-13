@@ -10,6 +10,13 @@ const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 const MAIL_FROM = process.env.MAIL_FROM || SMTP_USER;
 
+// email colour by event type: meeting green, task purple, everything else orange
+const TYPE_COLORS = {
+  meeting: { a: "#2e9e5b", b: "#227a46", tint: "rgba(46,158,91,.15)", fg: "#5cc98a", label: "Meeting" },
+  task: { a: "#8a4fd1", b: "#6a38a8", tint: "rgba(138,79,209,.15)", fg: "#b48ae8", label: "Task" },
+  event: { a: "#d1682e", b: "#b8522a", tint: "rgba(209,104,46,.15)", fg: "#d1682e", label: "Event" }
+};
+
 module.exports = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", process.env.ALLOWED_ORIGIN || "");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -72,6 +79,7 @@ module.exports = async (req, res) => {
 
     const subject = `Music Club: "${ev.title}" is ${label}`;
     const text = `${ev.title}\n\n${ev.description || "(no description)"}\n\nLead: ${leadName}\nWhen: ${dateFmt} at ${timeStr}\nWho: ${ev.all_members ? "All members" : (ev.participants || []).join(", ")}\n\nThis event is ${label}!${meet ? "\nGoogle Meet: " + meet : ""}\n\nAdd to Google Calendar: ${gcalUrl}`;
+    const c = TYPE_COLORS[ev.event_type] || TYPE_COLORS.event;
     const html = `
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -79,10 +87,10 @@ module.exports = async (req, res) => {
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#121211;padding:40px 20px">
 <tr><td align="center">
 <table width="420" cellpadding="0" cellspacing="0" style="background:#1a1a19;border-radius:16px;overflow:hidden;border:1px solid rgba(243,241,236,.1)">
-  <tr><td style="background:linear-gradient(135deg,#d1682e 0%,#b8522a 100%);padding:32px 36px;text-align:center">
+  <tr><td style="background:linear-gradient(135deg,${c.a} 0%,${c.b} 100%);padding:32px 36px;text-align:center">
     <img src="cid:mclogo" alt="Music Club NITW" width="64" height="64" style="width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,255,255,.25);margin-bottom:12px;display:block;margin-left:auto;margin-right:auto">
     <h1 style="margin:0;font-size:22px;font-weight:700;color:#fff;letter-spacing:-.02em">Music Club NITW</h1>
-    <p style="margin:6px 0 0;font-size:12px;color:rgba(255,255,255,.7);letter-spacing:.08em;text-transform:uppercase">Event Reminder</p>
+    <p style="margin:6px 0 0;font-size:12px;color:rgba(255,255,255,.7);letter-spacing:.08em;text-transform:uppercase">${c.label} Reminder</p>
   </td></tr>
   <tr><td style="padding:36px">
     <h2 style="margin:0 0 6px;font-size:20px;color:#f3f1ec;font-weight:700">${ev.title}</h2>
@@ -101,12 +109,12 @@ module.exports = async (req, res) => {
         <td style="padding:8px 0">${whoList}</td>
       </tr>
     </table>
-    <div style="margin:20px 0 0;padding:14px;background:rgba(209,104,46,.15);border-radius:8px;text-align:center;font-weight:600;font-size:15px;color:#d1682e">
+    <div style="margin:20px 0 0;padding:14px;background:${c.tint};border-radius:8px;text-align:center;font-weight:600;font-size:15px;color:${c.fg}">
       This event is ${label}!
     </div>
     ${meet ? `<div style="margin:20px 0 0;text-align:center"><a href="${meet}" target="_blank" style="display:inline-block;padding:12px 28px;background:#1a73e8;color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:999px">Join Google Meet</a></div>` : ""}
     <div style="margin:20px 0 0;text-align:center">
-      <a href="${gcalUrl}" target="_blank" style="display:inline-block;padding:12px 28px;background:#d1682e;color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:999px">Add to Google Calendar</a>
+      <a href="${gcalUrl}" target="_blank" style="display:inline-block;padding:12px 28px;background:${c.a};color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:999px">Add to Google Calendar</a>
     </div>
   </td></tr>
   <tr><td style="padding:0 36px 28px">
