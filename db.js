@@ -180,7 +180,8 @@ export async function saveBooking(key, rec) {
     if (error) throw error;
   } else {
     const { error } = await c.from("bookings")
-      .upsert({ week, day, slot, song: rec.song, booked_by: rec.by, players: rec.with || [] },
+      // notified resets so a moved or swapped slot gets its 1-hour reminder at the new time
+      .upsert({ week, day, slot, song: rec.song, booked_by: rec.by, players: rec.with || [], notified: false },
               { onConflict: "week,day,slot" });
     if (error) throw error;
   }
