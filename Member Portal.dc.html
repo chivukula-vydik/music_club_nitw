@@ -221,6 +221,7 @@
   <div class="mc-ptabs-wrap" style="position:relative;border-bottom:1px solid rgba(243,241,236,.1);background:#1a1a1a">
     <div class="mc-ptabs" style="display:flex;gap:4px;padding:0 28px">
       <button onClick="{{ goMine }}" class="tab {{ mineTabClass }}">My slots</button>
+      <button onClick="{{ goSongs }}" class="tab {{ songsTabClass }}">My songs</button>
       <button onClick="{{ goJam }}" class="tab {{ jamTabClass }}">Jam room</button>
       <button onClick="{{ goSkills }}" class="tab {{ skillsTabClass }}">Members &amp; skills</button>
       <button onClick="{{ goMinutes }}" class="tab {{ minutesTabClass }}">Minutes</button>
@@ -425,8 +426,62 @@
       </div>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <span style="font-family:'Archivo Black',sans-serif;font-size:16px">My songs</span>
+    <div style="height:1px;background:rgba(243,241,236,.1);margin:8px 0"></div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <span style="font-family:'Archivo Black',sans-serif;font-size:16px">Booked slots</span>
+      <div style="display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+        <sc-for list="{{ mySlots }}" as="s" hint-placeholder-count="1">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;padding:16px 20px;background:#1a1a1a">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:14.5px;font-weight:600">{{ s.song }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.5)">{{ s.when }}</span>
+            </div>
+            <div style="display:flex;gap:9px">
+              <button onClick="{{ s.onEdit }}" style="padding:8px 15px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.75);font-size:12.5px;cursor:pointer" style-hover="border-color:#3d8dbd;color:#f3f1ec">Edit / add people</button>
+              <button onClick="{{ s.onDrop }}" style="padding:8px 15px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.6);font-size:12.5px;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Drop</button>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ noMySlots }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:20px;background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.4)">nothing booked yet — hit “Request a slot"</div>
+        </sc-if>
+      </div>
+    </div>
+
+    <sc-if value="{{ managedDay }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:'Archivo Black',sans-serif;font-size:18px">{{ managedDay }}</span>
+        <span style="padding:4px 10px;border-radius:999px;background:rgba(61,141,189,.18);color:#7cb8db;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase">you manage</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45)">{{ managedCount }}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
+        <sc-for list="{{ managedSlots }}" as="ms" hint-placeholder-count="2">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 20px;background:#1a1a1a">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <span style="font-size:14px;font-weight:600">{{ ms.song }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.5)">{{ ms.time }} · {{ ms.by }}<sc-if value="{{ ms.players }}" hint-placeholder-val="{{ false }}"> + {{ ms.players }}</sc-if></span>
+            </div>
+            <button onClick="{{ ms.onDelete }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.5);font-size:11px;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Delete</button>
+          </div>
+        </sc-for>
+        <sc-if value="{{ noManagedSlots }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:18px 20px;background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.4)">nothing booked yet</div>
+        </sc-if>
+      </div>
+    </div>
+    </sc-if>
+
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ onSongs }}" hint-placeholder-val="{{ false }}">
+  <section style="padding:32px 28px 56px;display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <h2 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:30px;letter-spacing:-.015em">My songs</h2>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">{{ mySongsCount }} · hours, trend and band for every song you've played</span>
+    </div>
       <sc-if value="{{ hasMySongs }}" hint-placeholder-val="{{ true }}">
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
         <sc-for list="{{ mySongCards }}" as="sc" hint-placeholder-count="3">
@@ -462,55 +517,6 @@
       <sc-if value="{{ noMySongs }}" hint-placeholder-val="{{ false }}">
         <div style="padding:20px;border:1px solid rgba(243,241,236,.12);background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.4)">no songs yet — book a slot to get started</div>
       </sc-if>
-    </div>
-
-    <div style=”height:1px;background:rgba(243,241,236,.1);margin:8px 0”></div>
-
-    <div style=”display:flex;flex-direction:column;gap:12px”>
-      <span style=”font-family:'Archivo Black',sans-serif;font-size:16px”>Booked slots</span>
-      <div style=”display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)”>
-        <sc-for list=”{{ mySlots }}” as=”s” hint-placeholder-count=”1”>
-          <div style=”display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;padding:16px 20px;background:#1a1a1a”>
-            <div style=”display:flex;flex-direction:column;gap:4px”>
-              <span style=”font-size:14.5px;font-weight:600”>{{ s.song }}</span>
-              <span style=”font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.5)”>{{ s.when }}</span>
-            </div>
-            <div style=”display:flex;gap:9px”>
-              <button onClick=”{{ s.onEdit }}” style=”padding:8px 15px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.75);font-size:12.5px;cursor:pointer” style-hover=”border-color:#3d8dbd;color:#f3f1ec”>Edit / add people</button>
-              <button onClick=”{{ s.onDrop }}” style=”padding:8px 15px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.6);font-size:12.5px;cursor:pointer” style-hover=”border-color:#d1682e;color:#d1682e”>Drop</button>
-            </div>
-          </div>
-        </sc-for>
-        <sc-if value=”{{ noMySlots }}” hint-placeholder-val=”{{ true }}”>
-          <div style=”padding:20px;background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.4)”>nothing booked yet — hit “Request a slot”</div>
-        </sc-if>
-      </div>
-    </div>
-
-    <sc-if value="{{ managedDay }}" hint-placeholder-val="{{ false }}">
-    <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-family:'Archivo Black',sans-serif;font-size:18px">{{ managedDay }}</span>
-        <span style="padding:4px 10px;border-radius:999px;background:rgba(61,141,189,.18);color:#7cb8db;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase">you manage</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45)">{{ managedCount }}</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
-        <sc-for list="{{ managedSlots }}" as="ms" hint-placeholder-count="2">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 20px;background:#1a1a1a">
-            <div style="display:flex;flex-direction:column;gap:3px">
-              <span style="font-size:14px;font-weight:600">{{ ms.song }}</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.5)">{{ ms.time }} · {{ ms.by }}<sc-if value="{{ ms.players }}" hint-placeholder-val="{{ false }}"> + {{ ms.players }}</sc-if></span>
-            </div>
-            <button onClick="{{ ms.onDelete }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.5);font-size:11px;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Delete</button>
-          </div>
-        </sc-for>
-        <sc-if value="{{ noManagedSlots }}" hint-placeholder-val="{{ false }}">
-          <div style="padding:18px 20px;background:#1a1a1a;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(243,241,236,.4)">nothing booked yet</div>
-        </sc-if>
-      </div>
-    </div>
-    </sc-if>
-
   </section>
   </sc-if>
 
@@ -1358,12 +1364,13 @@ class Component extends DCLogic {
         if (this.db && this.db.serverMode) this.db.signOut();
         this.persist({ user: null, account: null, loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false });
       },
-      onMine: st.tab === "mine", onJam: st.tab === "jam", onSkills: st.tab === "skills", onProfile: st.tab === "profile", onMinutes: st.tab === "minutes", onEvents: st.tab === "events",
-      goMine: () => this.setState({ tab: "mine" }), goJam: () => this.setState({ tab: "jam" }), goSkills: () => this.setState({ tab: "skills" }),
+      onMine: st.tab === "mine", onSongs: st.tab === "songs", onJam: st.tab === "jam", onSkills: st.tab === "skills", onProfile: st.tab === "profile", onMinutes: st.tab === "minutes", onEvents: st.tab === "events",
+      goMine: () => this.setState({ tab: "mine" }), goSongs: () => this.setState({ tab: "songs" }), goJam: () => this.setState({ tab: "jam" }), goSkills: () => this.setState({ tab: "skills" }),
       goMinutes: () => this.setState({ tab: "minutes" }),
       goEvents: () => this.setState({ tab: "events" }),
       goProfile: () => { this.setState({ tab: "profile", saveNote: "", saveStatus: "", pwNote: "", pwStatus: "" }); this.loadProfile(me); },
       mineTabClass: st.tab === "mine" ? "tab-active" : "tab-inactive",
+      songsTabClass: st.tab === "songs" ? "tab-active" : "tab-inactive",
       jamTabClass: st.tab === "jam" ? "tab-active" : "tab-inactive",
       skillsTabClass: st.tab === "skills" ? "tab-active" : "tab-inactive",
       minutesTabClass: st.tab === "minutes" ? "tab-active" : "tab-inactive",
@@ -1792,7 +1799,7 @@ class Component extends DCLogic {
           trend: d.thisWk > d.lastWk ? "▲" + (d.thisWk - d.lastWk) : d.thisWk < d.lastWk ? "▼" + (d.lastWk - d.thisWk) : "",
           band: d.band.size ? [...d.band] : ["solo"], next: d.nextLabel || "—"
         }));
-        return { mySongCards: cards, hasMySongs: cards.length > 0, noMySongs: cards.length === 0 };
+        return { mySongCards: cards, hasMySongs: cards.length > 0, noMySongs: cards.length === 0, mySongsCount: cards.length + (cards.length === 1 ? " song" : " songs") };
       })(),
       ...(() => {
         const mgDay = DAYS.find(d => d[1] === me);
