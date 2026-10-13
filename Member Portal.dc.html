@@ -894,8 +894,8 @@ const EVENT_ADMINS = ["Jaeden","Niyati","Abhinav Madathil","Saisrihan","Chivukul
 // Song names are free text, so "Hotel California" and "hotel california " are the same song.
 // spaces, punctuation and emoji don't count: "tilak 💥" = "Tilak!" = "tilak". Same list as song_key() in supabase-song-key.sql
 const songKey = s => (s || "").toLowerCase().replace(/[\s!-\/:-@\[\\\]^_`{-~☀-➿️‍\u{1F000}-\u{1FAFF}]+/gu, " ").trim();
-// "practice", "personal slot", "solo session"… are slots, not songs: they never get a song id
-const notSong = s => /^((practice|personal|session|slot|solo|self|individual)( |$))+$/.test(songKey(s));
+// "practice", "personal slot", "reel shoot", "recording"… are slots, not songs: they never get a song id
+const notSong = s => /^((practice|personal|session|slot|solo|self|individual|recording|record|shooting|shoot|reel|reels|video)( |$))+$/.test(songKey(s));
 // When a server is configured, nothing sensitive ships in the page: the roster,
 // the demo schedule and the team-restricted minutes all come from the database,
 // filtered by row-level rules before they ever reach the browser.
