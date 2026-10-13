@@ -296,18 +296,6 @@ export async function enablePush(memberName) {
   return "on";
 }
 
-// sends a test notification to my own phone(s); returns how many got it
-export async function testPush() {
-  const c = await client();
-  const { data } = await c.auth.getSession();
-  const res = await fetch(new URL("./api/test-push", window.location.href), {
-    method: "POST", headers: { Authorization: "Bearer " + (data.session?.access_token || "") }
-  });
-  const out = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(out.error || "Test failed");
-  return out.sent;
-}
-
 // a day manager emails everyone on a slot from the club address; returns how many got it
 export async function sendSlotMessage(key, message) {
   if (!serverMode) throw new Error("Messages need the server");
