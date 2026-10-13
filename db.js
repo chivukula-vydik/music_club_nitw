@@ -201,7 +201,8 @@ export async function saveBooking(key, rec) {
 export async function ensureSong(name, by) {
   if (!serverMode || !songsEnabled) return null;
   const c = await client();
-  const key = name.trim().toLowerCase().replace(/\s+/g, " ");
+  // same rule as song_key() in supabase-song-key.sql
+  const key = name.toLowerCase().replace(/[\s!-\/:-@\[\\\]^_`{-~☀-➿️‍\u{1F000}-\u{1FAFF}]+/gu, " ").trim();
   const found = await c.from("songs").select("id").eq("name_key", key).maybeSingle();
   if (found.error) throw found.error;
   if (found.data) return found.data.id;
@@ -210,6 +211,8 @@ export async function ensureSong(name, by) {
     // someone else created it a moment ago
     const again = await c.from("songs").select("id").eq("name_key", key).maybeSingle();
     if (again.data) return again.data.id;
+    // key rules out of sync (SQL not run yet): save the booking without an id rather than block it
+    if (made.error.code === "23505") return null;
     throw made.error;
   }
   return made.data.id;
