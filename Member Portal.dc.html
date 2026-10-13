@@ -893,9 +893,18 @@ const evTag = e => e.event_type === "task" ? "task" : e.event_type === "meeting"
 const EVENT_ADMINS = ["Jaeden","Niyati","Abhinav Madathil","Saisrihan","Chivukula Vydik"];
 // Song names are free text, so "Hotel California" and "hotel california " are the same song.
 // spaces, punctuation and emoji don't count: "tilak 💥" = "Tilak!" = "tilak". Same list as song_key() in supabase-song-key.sql
-const songKey = s => (s || "").toLowerCase().replace(/[\s!-\/:-@\[\\\]^_`{-~☀-➿️‍\u{1F000}-\u{1FAFF}]+/gu, " ").trim();
+const songWords = s => (s || "").toLowerCase().replace(/[\s!-\/:-@\[\\\]^_`{-~☀-➿️‍\u{1F000}-\u{1FAFF}]+/gu, " ").trim();
+// one song if only spaces or doubled letters differ: "NainaMorey" = "Naina Morey", "kannulo" = "kanulo". Same rule as song_key() in supabase-song-dedupe.sql
+const songKey = s => songWords(s).replace(/ /g, "").replace(/(.)\1+/gu, "$1");
+// close spellings ("ilayaraja" / "ilaiyaraja"): edit distance on keys, about 1 typo per 6 letters
+const nearKey = (a, b) => {
+  if (Math.min(a.length, b.length) < 5 || Math.abs(a.length - b.length) > 2) return false;
+  let p = [...Array(b.length + 1).keys()];
+  for (let i = 1; i <= a.length; i++) { const c = [i]; for (let j = 1; j <= b.length; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; }
+  return p[b.length] <= Math.max(1, Math.floor(Math.min(a.length, b.length) / 6));
+};
 // any name containing practice, reel shoot, recording… is a slot, not a song: it never gets a song id
-const notSong = s => /(^| )(practice|personal|session|slot|solo|self|individual|recording|record|shooting|shoot|reel|reels|video)( |$)/.test(songKey(s));
+const notSong = s => /(^| )(practice|personal|session|slot|solo|self|individual|recording|record|shooting|shoot|reel|reels|video)( |$)/.test(songWords(s));
 // When a server is configured, nothing sensitive ships in the page: the roster,
 // the demo schedule and the team-restricted minutes all come from the database,
 // filtered by row-level rules before they ever reach the browser.
@@ -1633,7 +1642,7 @@ class Component extends DCLogic {
         const q = songKey(st.bookingSong);
         const list = (!q || st.bookingSongId) ? [] : st.songs
           // either way round, so "Besabriyan" still suggests an existing "Besabriya"
-          .filter(x => { const n = songKey(x.name); return n !== q && (n.includes(q) || (n.length > 3 && q.includes(n))); })
+          .filter(x => { const n = songKey(x.name); return n !== q && (n.includes(q) || (n.length > 3 && q.includes(n)) || nearKey(n, q)); })
           .slice(0, 6)
           .map(x => ({ name: x.name, onPick: () => {
             const c = this.songClusters().find(c => c.id === x.id && c.members.includes(me));
@@ -1642,7 +1651,7 @@ class Component extends DCLogic {
               : { bookingSong: x.name, bookingSongId: x.id });
           } }));
         return { songSuggestions: list, hasSongSuggestions: list.length > 0,
-          songIsNew: !!(q && !notSong(q) && st.songs.length && !st.bookingSongId && !st.songs.some(x => songKey(x.name) === q)) };
+          songIsNew: !!(q && !notSong(st.bookingSong) && st.songs.length && !st.bookingSongId && !st.songs.some(x => songKey(x.name) === q)) };
       })(),
       onBookingSong: e => {
         const v = e.target.value;

@@ -201,8 +201,8 @@ export async function saveBooking(key, rec) {
 export async function ensureSong(name, by) {
   if (!serverMode || !songsEnabled) return null;
   const c = await client();
-  // same rule as song_key() in supabase-song-key.sql
-  const key = name.toLowerCase().replace(/[\s!-\/:-@\[\\\]^_`{-~☀-➿️‍\u{1F000}-\u{1FAFF}]+/gu, " ").trim();
+  // same rule as songKey() in the portal and song_key() in supabase-song-dedupe.sql
+  const key = name.toLowerCase().replace(/[\s!-\/:-@\[\\\]^_`{-~☀-➿️‍\u{1F000}-\u{1FAFF}]+/gu, "").replace(/(.)\1+/gu, "$1");
   const found = await c.from("songs").select("id").eq("name_key", key).maybeSingle();
   if (found.error) throw found.error;
   if (found.data) return found.data.id;
