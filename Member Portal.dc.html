@@ -869,9 +869,8 @@ const ROSTER = [];
 const CHIPS = ["Vocals","Guitar","Keyboard","Drums","Bass","Tabla","Flute","Violin","Beatbox","Cajon","Hosting","Photography","Graphic design","Video editing","Stage Design","Videography","Ukulele","Clarinet","Piano"];
 const evTag = e => e.event_type === "task" ? "task" : e.event_type === "meeting" ? "meeting" : "club";
 const EVENT_ADMINS = ["Jaeden","Niyati","Abhinav Madathil","Saisrihan","Chivukula Vydik"];
-// Song clusters — fixed performance groups. Edit this list as songs get assigned.
-// Each entry: { song: "song name", members: ["Name1", "Name2", ...] }
-const CLUSTERS = [];
+// Song names are free text, so "Hotel California" and "hotel california " are the same song.
+const songKey = s => (s || "").trim().toLowerCase().replace(/\s+/g, " ");
 // When a server is configured, nothing sensitive ships in the page: the roster,
 // the demo schedule and the team-restricted minutes all come from the database,
 // filtered by row-level rules before they ever reach the browser.
@@ -1014,6 +1013,31 @@ class Component extends DCLogic {
   }
 
   key(week, day, t) { return "w" + this.mondayOf(week) + "|" + day + "|" + t; }
+
+  // Song clusters built from bookings: every song anyone booked, with everyone who played it.
+  // Shared by all members of the slot, not just the person who booked it.
+  songClusters() {
+    const map = {};
+    for (const [k, rec] of Object.entries(this.state.bookings)) {
+      if (!rec || !rec.song) continue;
+      const sk = songKey(rec.song);
+      if (!sk || sk === "practice session") continue;
+      const w = +((k.split("|")[0] || "").slice(1)) || 0;
+      const c = map[sk] || (map[sk] = { names: {}, members: new Set(), last: 0 });
+      c.names[rec.song.trim()] = (c.names[rec.song.trim()] || 0) + 1;
+      if (rec.by) c.members.add(rec.by);
+      for (const p of (rec.with || [])) c.members.add(p);
+      if (w > c.last) c.last = w;
+    }
+    return Object.entries(map)
+      .map(([key, c]) => ({
+        key,
+        song: Object.entries(c.names).sort((a, b) => b[1] - a[1])[0][0],
+        members: [...c.members],
+        last: c.last
+      }))
+      .sort((a, b) => b.last - a.last);
+  }
 
   record(week, day, t) {
     const st = this.state, k = this.key(week, day, t);
@@ -1497,17 +1521,17 @@ class Component extends DCLogic {
           onAdd: () => this.setState({ bookingWith: st.bookingWith.concat([r[0]]), pickQuery: "" })
         }));
       })(),
-      myClusters: CLUSTERS.filter(c => c.members.includes(me)).map(c => ({
+      myClusters: this.songClusters().filter(c => c.members.includes(me)).map(c => ({
         song: c.song,
         roster: c.members.filter(m => m !== me).join(", "),
         onPick: () => this.setState({ bookingSong: c.song, bookingWith: c.members.filter(m => m !== me) })
       })),
-      hasClusters: CLUSTERS.some(c => c.members.includes(me)),
+      hasClusters: this.songClusters().some(c => c.members.includes(me)),
       onBookingSong: e => {
         const v = e.target.value;
-        const match = CLUSTERS.find(c => c.song.toLowerCase() === v.trim().toLowerCase());
+        const match = this.songClusters().find(c => c.key === songKey(v) && c.members.includes(me));
         if (match) {
-          this.setState({ bookingSong: v, bookingWith: match.members.filter(m => m !== st.user) });
+          this.setState({ bookingSong: v, bookingWith: match.members.filter(m => m !== me) });
         } else {
           this.setState({ bookingSong: v });
         }
@@ -1610,7 +1634,9 @@ class Component extends DCLogic {
           const m = +wk.slice(1);
           // TIMES[0] starts at 9 AM, each slot is 1h
           const start = new Date(Math.floor(m / 10000), Math.floor(m / 100) % 100 - 1, m % 100 + dayOrder.indexOf(day), 9 + TIMES.indexOf(t));
-          const d = songMap[rec.song] || (songMap[rec.song] = { total: 0, thisWk: 0, lastWk: 0, last: null, next: null, nextLabel: "", band: new Set() });
+          const sk = songKey(rec.song);
+          const d = songMap[sk] || (songMap[sk] = { names: {}, total: 0, thisWk: 0, lastWk: 0, last: null, next: null, nextLabel: "", band: new Set() });
+          d.names[rec.song.trim()] = (d.names[rec.song.trim()] || 0) + 1;
           if (m === thisMon) d.thisWk++;
           if (m === lastMon) d.lastWk++;
           if (start < now) { d.total++; if (!d.last || start > d.last) d.last = start; }
@@ -1624,8 +1650,8 @@ class Component extends DCLogic {
           const n = Math.round((today - new Date(dt.getFullYear(), dt.getMonth(), dt.getDate())) / 86400000);
           return n === 0 ? "today" : n === 1 ? "yesterday" : n + " days ago";
         };
-        const cards = Object.entries(songMap).map(([song, d]) => ({
-          song, total: d.total, thisWk: d.thisWk, lastWk: d.lastWk, last: ago(d.last),
+        const cards = Object.values(songMap).map(d => ({
+          song: Object.entries(d.names).sort((a, b) => b[1] - a[1])[0][0], total: d.total, thisWk: d.thisWk, lastWk: d.lastWk, last: ago(d.last),
           trend: d.thisWk > d.lastWk ? "▲" + (d.thisWk - d.lastWk) : d.thisWk < d.lastWk ? "▼" + (d.lastWk - d.thisWk) : "",
           band: d.band.size ? [...d.band] : ["solo"], next: d.nextLabel || "—"
         }));
