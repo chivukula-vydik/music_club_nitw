@@ -420,6 +420,13 @@
       </sc-if>
     </div>
     </sc-if>
+    <sc-if value="{{ pushOn }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.5)">
+      <span>phone notifications on</span>
+      <button onClick="{{ onTestPush }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(61,141,189,.45);background:transparent;color:#7cb8db;font-size:11.5px;cursor:pointer;font-family:inherit" style-hover="border-color:#7cb8db;color:#cfe4f0">{{ pushTestLabel }}</button>
+      <span>{{ pushTestNote }}</span>
+    </div>
+    </sc-if>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:rgba(243,241,236,.12);border:1px solid rgba(243,241,236,.12)">
       <div style="padding:18px 20px;background:#201f1e;display:flex;flex-direction:column;gap:6px">
@@ -1830,6 +1837,15 @@ class Component extends DCLogic {
       pushText: st.pushState === "ios-install" ? "On iPhone: tap Share → Add to Home Screen, open the portal from there, then turn them on"
         : st.pushState === "blocked" ? "Notifications are blocked for this site. Allow them in your browser or phone settings"
         : st.pushErr || "slot reminders, today's slots, events and messages from your manager. Emails keep coming too",
+      pushOn: st.pushState === "on",
+      pushTestLabel: st.pushTesting ? "Sending…" : "Send me a test",
+      pushTestNote: st.pushTestNote || "",
+      onTestPush: async () => {
+        if (st.pushTesting) return;
+        this.setState({ pushTesting: true, pushTestNote: "" });
+        try { const n = await this.db.testPush(); this.setState({ pushTesting: false, pushTestNote: "sent to " + n + (n === 1 ? " device" : " devices") + ", check your phone" }); }
+        catch (e) { this.setState({ pushTesting: false, pushTestNote: String(e.message || e) }); }
+      },
       pushButton: st.pushBusy ? "Turning on…" : "Turn on",
       onEnablePush: async () => {
         if (st.pushBusy) return;
