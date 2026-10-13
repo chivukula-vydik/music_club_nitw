@@ -1046,6 +1046,8 @@ class Component extends DCLogic {
   state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "", calMonth: new Date().getFullYear() * 12 + new Date().getMonth(), calSelectedDay: null, dbEvents: [], evForm: false, evType: "event", evTitle: "", evDesc: "", evMeet: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], notifsOpen: false, moveFrom: null, songs: [] };
 
   async componentDidMount() {
+    // closed bell items stay closed across reloads and re-logins (kept in this browser)
+    if (SERVER) try { this.setState({ dismissedNotifs: JSON.parse(localStorage.getItem(KEY) || "{}").dismissedNotifs || [] }); } catch (e) {}
     if (!SERVER) try {
       const s = JSON.parse(localStorage.getItem(KEY) || "{}");
       let creds = {};
