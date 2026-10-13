@@ -20,7 +20,7 @@ from (
          lower(regexp_replace(btrim(song), '\s+', ' ', 'g')) as k,
          count(*) over (partition by lower(regexp_replace(btrim(song), '\s+', ' ', 'g')), btrim(song)) as n
   from bookings
-  where btrim(song) <> '' and lower(btrim(song)) <> 'practice session'
+  where btrim(song) <> '' and lower(regexp_replace(btrim(song), '\s+', ' ', 'g')) <> 'practice session'
 ) v
 order by k, n desc
 on conflict (name_key) do nothing;

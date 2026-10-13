@@ -994,8 +994,9 @@ class Component extends DCLogic {
   async writeBooking(key, rec, nextBookings) {
     this.persist({ bookings: nextBookings });
     if (this.db && this.db.serverMode) {
-      try { await this.db.saveBooking(key, rec); } catch (e) { this.setState({ dbErr: String(e.message || e) }); this.pull(); }
+      try { await this.db.saveBooking(key, rec); } catch (e) { this.setState({ dbErr: String(e.message || e) }); this.pull(); return false; }
     }
+    return true;
   }
   async hash(name, pw) {
     const data = new TextEncoder().encode("mcnitw:" + name.toLowerCase() + ":" + pw);
@@ -1054,8 +1055,7 @@ class Component extends DCLogic {
     if (!confirm(msg)) return;
     const next = { ...st.bookings, [to.key]: rec, [from.key]: other || null };
     // write the destination first so a failure never loses a booking
-    await this.writeBooking(to.key, rec, next);
-    if (this.state.dbErr) return;
+    if (!(await this.writeBooking(to.key, rec, next))) return;
     await this.writeBooking(from.key, other || null, next);
   }
 
@@ -1063,10 +1063,11 @@ class Component extends DCLogic {
   // Shared by all members of the slot, not just the person who booked it.
   // A booking's song: by id once the songs table exists, by normalized name before that.
   songIdent(rec) {
-    if (rec.songId) {
-      const s = this.state.songs.find(x => x.id === rec.songId);
-      return { key: "id:" + rec.songId, id: rec.songId, name: s ? s.name : (rec.song || "").trim() };
-    }
+    const songs = this.state.songs;
+    // a booking saved without an id still joins its song if the name is on the list
+    const s = rec.songId ? songs.find(x => x.id === rec.songId) : songs.find(x => songKey(x.name) === songKey(rec.song));
+    const id = rec.songId || (s && s.id);
+    if (id) return { key: "id:" + id, id, name: s ? s.name : (rec.song || "").trim() };
     return { key: songKey(rec.song), id: null, name: (rec.song || "").trim() };
   }
 
@@ -1154,11 +1155,13 @@ class Component extends DCLogic {
             else { this._dragTo = null; this._dropEl = null; }
           },
           onDragOver: e => { if (this._drag && mgr && !isPast && this._drag.key !== key) e.preventDefault(); },
-          onDragEnd: () => {
+          onDragEnd: e => {
             const from = this._drag, to = this._dragTo;
             if (this._dropEl) this._dropEl.classList.remove("cell-dropover");
             this._drag = this._dragTo = this._dropEl = null;
-            if (from && to) this.moveSlot(from, to);
+            // dropEffect is "none" when released outside a valid cell or cancelled with Esc
+            const dropped = !e.dataTransfer || e.dataTransfer.dropEffect !== "none";
+            if (from && to && dropped) this.moveSlot(from, to);
           },
           title: (rec ? rec.song + " — " + roll : "free") + " · " + day + " " + LABEL[t],
           onClick: isPast ? null
@@ -1664,13 +1667,12 @@ class Component extends DCLogic {
         if (songId) { const s = this.state.songs.find(x => x.id === songId); if (s) song = s.name; }
         const next = { ...this.state.bookings };
         const rec = { song, songId: songId || null, by: owner, with: st.bookingWith.filter(p => p !== owner) };
-        if (b.existing && b.origin && b.origin !== k) {
-          next[b.origin] = null;
-          this.writeBooking(b.origin, null, next);
-        }
+        const moved = b.existing && b.origin && b.origin !== k;
+        if (moved) next[b.origin] = null;
         next[k] = rec;
-        this.writeBooking(k, rec, next);
         this.setState({ booking: null, bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: "" });
+        // new slot first, then clear the old one, so a failed save never loses the booking
+        if ((await this.writeBooking(k, rec, next)) && moved) this.writeBooking(b.origin, null, next);
       },
       dropBooking: () => {
         const b = st.booking; if (!b) return;
