@@ -41,7 +41,7 @@
   .cell-booked{background:rgba(61,141,189,.14);color:#cfe4f0}
   .cell-yours{background:rgba(209,104,46,.28);color:#f3d5c2}
   .cell-moving{background:rgba(209,104,46,.28);color:#f3d5c2;outline:2px solid #d1682e;outline-offset:-2px}
-  .cell-target{background:rgba(209,104,46,.06);outline:1px dashed rgba(209,104,46,.6);outline-offset:-3px}
+  .cell-target{outline:1px dashed rgba(209,104,46,.7);outline-offset:-3px}
   .cell-dropover{outline:2px solid #d1682e!important;outline-offset:-2px}
   .week-active{border:1px solid #d1682e;background:rgba(209,104,46,.2);color:#f3f1ec}
   .week-inactive{border:1px solid rgba(243,241,236,.18);background:transparent;color:rgba(243,241,236,.55)}
@@ -1028,20 +1028,25 @@ class Component extends DCLogic {
 
   managesDay(day) { const d = DAYS.find(x => x[0] === day); return !!(d && this.state.user && d[1] === this.state.user); }
 
-  // Manager moves a booking to a free slot on a day they manage. Asks first.
+  // Manager moves a booking to another slot on a day they manage; if that slot is booked, the two swap. Asks first.
   async moveSlot(from, to) {
     const st = this.state;
     const rec = st.bookings[from.key];
     this.setState({ moveFrom: null, dbErr: "" });
     if (!rec || from.key === to.key) return;
-    if (st.bookings[to.key] || !this.managesDay(to.day) || !this.managesDay(from.day)) return;
-    const msg = "Move \"" + rec.song + "\" (" + (rec.by || "unclaimed") + ")\nfrom " + from.day + " " + LABEL[from.t] + "\nto " + to.day + " " + LABEL[to.t] + "?";
+    if (!this.managesDay(to.day) || !this.managesDay(from.day)) return;
+    const other = st.bookings[to.key];
+    const tag = r => "\"" + r.song + "\" (" + (r.by || "unclaimed") + ")";
+    const msg = other
+      ? "Swap these slots?\n" + tag(rec) + ": " + from.day + " " + LABEL[from.t] + " → " + to.day + " " + LABEL[to.t] +
+        "\n" + tag(other) + ": " + to.day + " " + LABEL[to.t] + " → " + from.day + " " + LABEL[from.t]
+      : "Move " + tag(rec) + "\nfrom " + from.day + " " + LABEL[from.t] + "\nto " + to.day + " " + LABEL[to.t] + "?";
     if (!confirm(msg)) return;
-    const next = { ...st.bookings, [to.key]: rec, [from.key]: null };
-    // write the new slot first so a failure never loses the booking
+    const next = { ...st.bookings, [to.key]: rec, [from.key]: other || null };
+    // write the destination first so a failure never loses a booking
     await this.writeBooking(to.key, rec, next);
     if (this.state.dbErr) return;
-    await this.writeBooking(from.key, null, next);
+    await this.writeBooking(from.key, other || null, next);
   }
 
   // Song clusters built from bookings: every song anyone booked, with everyone who played it.
@@ -1111,11 +1116,11 @@ class Component extends DCLogic {
         const mgr = this.managesDay(day);
         const here = { week: st.week, day, t, key };
         const moving = st.moveFrom && st.moveFrom.key === key;
-        const target = !!(st.moveFrom && !rec && mgr && !isPast);
+        const target = !!(st.moveFrom && !moving && mgr && !isPast);
         return {
           song: rec ? rec.song : "",
           by: rec && withList.length ? (rec.by || "unclaimed") + " +" + withList.length : roll,
-          class: moving ? "cell-moving" : target ? "cell-target" : (mine || inTeam || (rec && mgr)) ? "cell-yours" : rec ? "cell-booked" : "cell-free",
+          class: moving ? "cell-moving" : ((mine || inTeam || (rec && mgr)) ? "cell-yours" : rec ? "cell-booked" : "cell-free") + (target ? " cell-target" : ""),
           draggable: (rec && mgr && !isPast) ? "true" : "false",
           onDragStart: e => {
             if (!(rec && mgr && !isPast)) return;
@@ -1125,10 +1130,10 @@ class Component extends DCLogic {
           onDragEnter: e => {
             if (!this._drag) return;
             if (this._dropEl) this._dropEl.classList.remove("cell-dropover");
-            if (!rec && mgr && !isPast) { this._dragTo = here; this._dropEl = e.currentTarget; e.currentTarget.classList.add("cell-dropover"); }
+            if (mgr && !isPast && this._drag.key !== key) { this._dragTo = here; this._dropEl = e.currentTarget; e.currentTarget.classList.add("cell-dropover"); }
             else { this._dragTo = null; this._dropEl = null; }
           },
-          onDragOver: e => { if (this._drag && !rec && mgr && !isPast) e.preventDefault(); },
+          onDragOver: e => { if (this._drag && mgr && !isPast && this._drag.key !== key) e.preventDefault(); },
           onDragEnd: () => {
             const from = this._drag, to = this._dragTo;
             if (this._dropEl) this._dropEl.classList.remove("cell-dropover");
@@ -1508,7 +1513,7 @@ class Component extends DCLogic {
         }
       },
       jamNote: st.week < 0 ? "past week · read-only"
-        : DAYS.some(d => d[1] === me) ? "you manage " + DAYS.filter(d => d[1] === me).map(d => d[0]).join(", ") + " · tap a slot to edit, drag it to move"
+        : DAYS.some(d => d[1] === me) ? "you manage " + DAYS.filter(d => d[1] === me).map(d => d[0]).join(", ") + " · tap a slot to edit, drag it to move or swap"
         : "read-only view · slots go through your day's manager",
       days: DAYS.map(([name, manager]) => ({ name, manager })),
       bookingDays: (() => {
@@ -1560,7 +1565,7 @@ class Component extends DCLogic {
           moveFrom: { week: b.week || 0, day: b.day, t: b.t, key: b.origin || this.key(b.week || 0, b.day, b.t) } });
       },
       isMoving: !!st.moveFrom,
-      moveNote: st.moveFrom ? "Moving " + ((st.bookings[st.moveFrom.key] || {}).song || "slot") + " · tap a dashed free slot to drop it there" : "",
+      moveNote: st.moveFrom ? "Moving " + ((st.bookings[st.moveFrom.key] || {}).song || "slot") + " · tap a dashed slot to drop it there (a booked one swaps)" : "",
       cancelMove: () => this.setState({ moveFrom: null }),
       bookingIsRequest: !!(st.booking && !st.booking.existing),
       bookingHeading: st.booking && st.booking.existing
