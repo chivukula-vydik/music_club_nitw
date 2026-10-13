@@ -6,6 +6,7 @@
 const nodemailer = require("nodemailer");
 const path = require("path");
 const { createClient } = require("@supabase/supabase-js");
+const { pushTo } = require("./_push");
 
 const DAY_IDX = { Monday: 0, Tuesday: 1, Wednesday: 2, Thursday: 3, Friday: 4, Saturday: 5, Sunday: 6 };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -110,6 +111,7 @@ module.exports = async (req, res) => {
     console.error("Slot message error:", e.message);
     return res.status(502).json({ error: "Couldn't send the email. Try again in a minute." });
   }
+  await pushTo(sb, names, { title: `${me.name} · ${day} manager`, body: message.length > 140 ? message.slice(0, 139) + "…" : message, tag: `msg-${week}-${day}-${slot}` });
   res.status(200).json({ sent: recipients.length });
 };
 

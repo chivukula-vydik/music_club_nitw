@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 const path = require("path");
 const { createClient } = require("@supabase/supabase-js");
+const { pushTo } = require("./_push");
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -132,6 +133,9 @@ module.exports = async (req, res) => {
         attachments: [{ filename: "logo.png", path: path.join(__dirname, "..", "assets", "logo.png"), cid: "mclogo" }]
       });
       await sb.from("events").update({ [flagCol]: true }).eq("id", ev.id);
+      const pushNames = ev.all_members ? (members || []).map(m => m.name)
+        : (members || []).filter(m => m.email && (ev.participants || []).some(p => p.toLowerCase() === m.email.toLowerCase())).map(m => m.name);
+      await pushTo(sb, pushNames, { title: `${c.label} ${label}: ${ev.title}`, body: dateFmt + (timeStr ? " · " + timeStr : ""), tag: "event-" + ev.id });
       sent++;
     } catch (e) { console.error("Notify error:", ev.id, e.message); }
   }
@@ -199,6 +203,7 @@ module.exports = async (req, res) => {
         attachments: [{ filename: "logo.png", path: path.join(__dirname, "..", "assets", "logo.png"), cid: "mclogo" }]
       });
       await sb.from("bookings").update({ notified: true }).match({ week: b.week, day: b.day, slot: b.slot });
+      await pushTo(sb, names, { title: `Jam slot in ${mins} min`, body: `${b.song} · ${timeFmt}`, tag: `slot-${b.week}-${b.day}-${b.slot}` });
       slotsSent++;
     } catch (e) { console.error("Slot notify error:", b.week, b.day, b.slot, e.message); }
   }

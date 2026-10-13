@@ -3,6 +3,7 @@
 const nodemailer = require("nodemailer");
 const path = require("path");
 const { createClient } = require("@supabase/supabase-js");
+const { pushTo } = require("./_push");
 
 const SMTP_PORT = Number(process.env.SMTP_PORT) || 587;
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -102,6 +103,8 @@ module.exports = async (req, res) => {
       });
       sent++;
     } catch (e) { console.error("Digest error:", name, e.message); }
+    // phone ping only for people who actually play today
+    if (mine.length) await pushTo(sb, [name], { title: `Good morning, ${first}! ${count} today`, body: mine.map(s => `${ampm(s.hour)} ${s.song}`).join(" · "), tag: "today-" + week + "-" + day });
   }
 
   res.status(200).json({ day, week, withSlots: Object.keys(byPerson).length, sent });

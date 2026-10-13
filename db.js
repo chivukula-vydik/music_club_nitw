@@ -265,6 +265,37 @@ export async function addEvent(ev) {
   if (error) throw error;
 }
 
+/* ---------- phone notifications ---------- */
+
+// public half of the push key pair; the private half is VAPID_PRIVATE_KEY on Vercel
+const VAPID_PUBLIC = "BEHKeOH68XdH62ZIZCzKTMtbLM-Y5BEHg7rQxov1iQVuuwbKmwFkiNNr3xPY_tzUqPDJ4Fu-L-f2b5FZzPKa7g4";
+
+// "on" | "off" | "blocked" | "ios-install" (iPhone needs Add to Home Screen first) | "unsupported"
+export async function pushStatus() {
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const standalone = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
+  if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window))
+    return ios && !standalone ? "ios-install" : "unsupported";
+  if (!serverMode) return "unsupported";
+  if (Notification.permission === "denied") return "blocked";
+  const reg = await navigator.serviceWorker.getRegistration();
+  const sub = reg && await reg.pushManager.getSubscription();
+  return sub && Notification.permission === "granted" ? "on" : "off";
+}
+
+export async function enablePush(memberName) {
+  const perm = await Notification.requestPermission();
+  if (perm !== "granted") return perm === "denied" ? "blocked" : "off";
+  await navigator.serviceWorker.register("sw.js");
+  const reg = await navigator.serviceWorker.ready;
+  const key = Uint8Array.from(atob(VAPID_PUBLIC.replace(/-/g, "+").replace(/_/g, "/")), ch => ch.charCodeAt(0));
+  const sub = (await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+  const c = await client();
+  const { error } = await c.from("push_subs").upsert({ endpoint: sub.endpoint, member_name: memberName, sub: sub.toJSON() }, { onConflict: "endpoint" });
+  if (error) throw error;
+  return "on";
+}
+
 // a day manager emails everyone on a slot from the club address; returns how many got it
 export async function sendSlotMessage(key, message) {
   if (!serverMode) throw new Error("Messages need the server");

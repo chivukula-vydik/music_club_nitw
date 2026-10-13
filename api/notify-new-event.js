@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 const path = require("path");
 const { createClient } = require("@supabase/supabase-js");
+const { pushTo } = require("./_push");
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -38,6 +39,7 @@ module.exports = async (req, res) => {
 
   const recipients = all_members ? allEmails : (participants || []).filter(Boolean);
   if (!recipients.length) return res.status(200).json({ sent: 0 });
+  const pushNames = (members || []).filter(m => m.email && recipients.some(r => r.toLowerCase() === m.email.toLowerCase())).map(m => m.name);
 
   const leadName = (created_by && members
     ? (members.find(m => m.email && m.email.toLowerCase() === created_by.toLowerCase()) || {}).name
@@ -118,6 +120,7 @@ module.exports = async (req, res) => {
       from: MAIL_FROM, bcc: recipients, subject, text, html,
       attachments: [{ filename: "logo.png", path: path.join(__dirname, "..", "assets", "logo.png"), cid: "mclogo" }]
     });
+    await pushTo(sb, pushNames, { title: `New ${c.label}: ${title}`, body: dateFmt + (timeStr ? " · " + timeStr : "") });
     res.status(200).json({ sent: recipients.length });
   } catch (e) {
     console.error("Notify new event error:", e.message);
