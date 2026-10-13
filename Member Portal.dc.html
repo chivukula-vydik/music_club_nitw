@@ -40,6 +40,9 @@
   .cell-free{background:transparent;color:rgba(243,241,236,.25)}
   .cell-booked{background:rgba(61,141,189,.14);color:#cfe4f0}
   .cell-yours{background:rgba(209,104,46,.28);color:#f3d5c2}
+  .cell-moving{background:rgba(209,104,46,.28);color:#f3d5c2;outline:2px solid #d1682e;outline-offset:-2px}
+  .cell-target{background:rgba(209,104,46,.06);outline:1px dashed rgba(209,104,46,.6);outline-offset:-3px}
+  .cell-dropover{outline:2px solid #d1682e!important;outline-offset:-2px}
   .week-active{border:1px solid #d1682e;background:rgba(209,104,46,.2);color:#f3f1ec}
   .week-inactive{border:1px solid rgba(243,241,236,.18);background:transparent;color:rgba(243,241,236,.55)}
   .week-disabled{opacity:.25;pointer-events:none}
@@ -525,6 +528,12 @@
           <button onClick="{{ weekNext }}" class="{{ weekNextClass }}" style="width:32px;height:32px;border-radius:6px;border:1px solid rgba(243,241,236,.2);background:transparent;color:#f3f1ec;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="border-color:#d1682e;color:#d1682e">&#8250;</button>
         </div>
         <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(243,241,236,.45)">{{ jamNote }}</span>
+        <sc-if value="{{ isMoving }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 12px;border:1px solid #d1682e;background:rgba(209,104,46,.12);font-size:13px;color:#f3d5c2">
+            <span>{{ moveNote }}</span>
+            <button onClick="{{ cancelMove }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(243,241,236,.3);background:transparent;color:#f3f1ec;font-size:12px;cursor:pointer">Cancel</button>
+          </div>
+        </sc-if>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
         <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(243,241,236,.6)"><span style="width:11px;height:11px;border-radius:3px;background:rgba(61,141,189,.35);border:1px solid rgba(61,141,189,.6)"></span>booked</span>
@@ -557,7 +566,7 @@
           <div class="mc-jr" style="display:grid;grid-template-columns:78px repeat(7,1fr);border-bottom:1px solid rgba(243,241,236,.08)">
             <div style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.5);background:#201f1e">{{ row.time }}</div>
             <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="7">
-              <div onClick="{{ c.onClick }}" title="{{ c.title }}" class="{{ c.class }}" style="min-height:46px;padding:7px 9px;border-left:1px solid rgba(243,241,236,.08);display:flex;flex-direction:column;gap:2px;justify-content:center;cursor:pointer" style-hover="background:#252524">
+              <div onClick="{{ c.onClick }}" draggable="{{ c.draggable }}" onDragStart="{{ c.onDragStart }}" onDragEnter="{{ c.onDragEnter }}" onDragOver="{{ c.onDragOver }}" onDragEnd="{{ c.onDragEnd }}" title="{{ c.title }}" class="{{ c.class }}" style="min-height:46px;padding:7px 9px;border-left:1px solid rgba(243,241,236,.08);display:flex;flex-direction:column;gap:2px;justify-content:center;cursor:pointer" style-hover="background:#252524">
                 <span style="font-size:12px;font-weight:500;line-height:1.25">{{ c.song }}</span>
                 <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:rgba(243,241,236,.42)">{{ c.by }}</span>
               </div>
@@ -661,6 +670,9 @@
           <button onClick="{{ confirmBooking }}" style="flex:1;min-width:120px;padding:13px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:14.5px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">{{ bookingConfirm }}</button>
           <sc-if value="{{ bookingExisting }}" hint-placeholder-val="{{ false }}">
             <button onClick="{{ dropBooking }}" style="padding:13px 18px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:rgba(243,241,236,.7);font-size:14.5px;cursor:pointer" style-hover="border-color:#d1682e;color:#d1682e">Drop slot</button>
+          </sc-if>
+          <sc-if value="{{ bookingCanMove }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ startMove }}" style="padding:13px 18px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:rgba(243,241,236,.7);font-size:14.5px;cursor:pointer" style-hover="border-color:#3d8dbd;color:#3d8dbd">Move</button>
           </sc-if>
           <button onClick="{{ cancelBooking }}" style="padding:13px 18px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:rgba(243,241,236,.7);font-size:14.5px;cursor:pointer" style-hover="border-color:#f3f1ec;color:#f3f1ec">Cancel</button>
         </div>
@@ -912,7 +924,7 @@ const KEY = "mc-portal-v1";
 const split = s => (s || "").split(",").map(x => x.trim()).filter(Boolean);
 
 class Component extends DCLogic {
-  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "", calMonth: new Date().getFullYear() * 12 + new Date().getMonth(), calSelectedDay: null, dbEvents: [], evForm: false, evType: "event", evTitle: "", evDesc: "", evMeet: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], notifsOpen: false };
+  state = { user: null, tab: "mine", week: 0, bookings: {}, profiles: {}, creds: {}, moms: [], query: "", team: "All", chip: "", loginEmail: "", loginPass: "", otp: "", otpToken: "", otpSent: false, loginMode: "signin", loginErr: "", booking: null, bookingSong: "", bookingWith: [], pickQuery: "", saveNote: "", pMajor: "", pMinor: "", pVibe: "", pwOld: "", pwNew: "", pwNote: "", momOpen: null, momForm: false, momTitle: "", momAudience: "Combined", momBody: "", calMonth: new Date().getFullYear() * 12 + new Date().getMonth(), calSelectedDay: null, dbEvents: [], evForm: false, evType: "event", evTitle: "", evDesc: "", evMeet: "", evDate: "", evTime: "", evAllMembers: true, evParticipants: [], notifsOpen: false, moveFrom: null };
 
   async componentDidMount() {
     if (!SERVER) try {
@@ -1016,6 +1028,22 @@ class Component extends DCLogic {
 
   managesDay(day) { const d = DAYS.find(x => x[0] === day); return !!(d && this.state.user && d[1] === this.state.user); }
 
+  // Manager moves a booking to a free slot on a day they manage. Asks first.
+  async moveSlot(from, to) {
+    const st = this.state;
+    const rec = st.bookings[from.key];
+    this.setState({ moveFrom: null, dbErr: "" });
+    if (!rec || from.key === to.key) return;
+    if (st.bookings[to.key] || !this.managesDay(to.day) || !this.managesDay(from.day)) return;
+    const msg = "Move \"" + rec.song + "\" (" + (rec.by || "unclaimed") + ")\nfrom " + from.day + " " + LABEL[from.t] + "\nto " + to.day + " " + LABEL[to.t] + "?";
+    if (!confirm(msg)) return;
+    const next = { ...st.bookings, [to.key]: rec, [from.key]: null };
+    // write the new slot first so a failure never loses the booking
+    await this.writeBooking(to.key, rec, next);
+    if (this.state.dbErr) return;
+    await this.writeBooking(from.key, null, next);
+  }
+
   // Song clusters built from bookings: every song anyone booked, with everyone who played it.
   // Shared by all members of the slot, not just the person who booked it.
   songClusters() {
@@ -1081,12 +1109,36 @@ class Component extends DCLogic {
         const key = this.key(st.week, day, t);
         const isPast = st.week < 0;
         const mgr = this.managesDay(day);
+        const here = { week: st.week, day, t, key };
+        const moving = st.moveFrom && st.moveFrom.key === key;
+        const target = !!(st.moveFrom && !rec && mgr && !isPast);
         return {
           song: rec ? rec.song : "",
           by: rec && withList.length ? (rec.by || "unclaimed") + " +" + withList.length : roll,
-          class: (mine || inTeam || (rec && mgr)) ? "cell-yours" : rec ? "cell-booked" : "cell-free",
+          class: moving ? "cell-moving" : target ? "cell-target" : (mine || inTeam || (rec && mgr)) ? "cell-yours" : rec ? "cell-booked" : "cell-free",
+          draggable: (rec && mgr && !isPast) ? "true" : "false",
+          onDragStart: e => {
+            if (!(rec && mgr && !isPast)) return;
+            this._drag = here; this._dragTo = null;
+            try { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", key); } catch (_) {}
+          },
+          onDragEnter: e => {
+            if (!this._drag) return;
+            if (this._dropEl) this._dropEl.classList.remove("cell-dropover");
+            if (!rec && mgr && !isPast) { this._dragTo = here; this._dropEl = e.currentTarget; e.currentTarget.classList.add("cell-dropover"); }
+            else { this._dragTo = null; this._dropEl = null; }
+          },
+          onDragOver: e => { if (this._drag && !rec && mgr && !isPast) e.preventDefault(); },
+          onDragEnd: () => {
+            const from = this._drag, to = this._dragTo;
+            if (this._dropEl) this._dropEl.classList.remove("cell-dropover");
+            this._drag = this._dragTo = this._dropEl = null;
+            if (from && to) this.moveSlot(from, to);
+          },
           title: (rec ? rec.song + " — " + roll : "free") + " · " + day + " " + LABEL[t],
-          onClick: isPast ? null : (rec && (mine || inTeam || mgr)) ? () => this.setState({
+          onClick: isPast ? null
+          : st.moveFrom ? (moving ? () => this.setState({ moveFrom: null }) : target ? () => this.moveSlot(st.moveFrom, here) : null)
+          : (rec && (mine || inTeam || mgr)) ? () => this.setState({
             booking: { week: st.week, day, t, label: day + " " + LABEL[t], existing: true, origin: key, owner: rec.by },
             bookingSong: rec.song, bookingWith: (rec.with || []).slice(), pickQuery: ""
           }) : (!rec && me) ? () => this.setState({
@@ -1456,7 +1508,7 @@ class Component extends DCLogic {
         }
       },
       jamNote: st.week < 0 ? "past week · read-only"
-        : DAYS.some(d => d[1] === me) ? "you manage " + DAYS.filter(d => d[1] === me).map(d => d[0]).join(", ") + " · tap any slot there to edit"
+        : DAYS.some(d => d[1] === me) ? "you manage " + DAYS.filter(d => d[1] === me).map(d => d[0]).join(", ") + " · tap a slot to edit, drag it to move"
         : "read-only view · slots go through your day's manager",
       days: DAYS.map(([name, manager]) => ({ name, manager })),
       bookingDays: (() => {
@@ -1501,6 +1553,15 @@ class Component extends DCLogic {
       weekPrevClass: st.week <= -4 ? "week-disabled" : "",
       weekNextClass: st.week >= 1 ? "week-disabled" : "",
       bookingExisting: !!(st.booking && st.booking.existing),
+      bookingCanMove: !!(st.booking && st.booking.existing && this.managesDay(st.booking.day)),
+      startMove: () => {
+        const b = st.booking; if (!b) return;
+        this.setState({ booking: null, bookingSong: "", bookingWith: [], pickQuery: "", tab: "jam", week: b.week || 0,
+          moveFrom: { week: b.week || 0, day: b.day, t: b.t, key: b.origin || this.key(b.week || 0, b.day, b.t) } });
+      },
+      isMoving: !!st.moveFrom,
+      moveNote: st.moveFrom ? "Moving " + ((st.bookings[st.moveFrom.key] || {}).song || "slot") + " · tap a dashed free slot to drop it there" : "",
+      cancelMove: () => this.setState({ moveFrom: null }),
       bookingIsRequest: !!(st.booking && !st.booking.existing),
       bookingHeading: st.booking && st.booking.existing
         ? (st.booking.owner && st.booking.owner !== me && !st.bookingWith.includes(me) ? st.booking.owner + "'s slot" : "Your slot")

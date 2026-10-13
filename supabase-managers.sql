@@ -31,3 +31,8 @@ create policy "manager edits day" on bookings for update
 drop policy if exists "manager drops day" on bookings;
 create policy "manager drops day" on bookings for delete
   using ( exists (select 1 from day_managers dm where dm.day = bookings.day and dm.manager = (select name from me())) );
+
+-- moving a slot writes the booking into the new hour under the original booker's name
+drop policy if exists "manager books day" on bookings;
+create policy "manager books day" on bookings for insert
+  with check ( exists (select 1 from day_managers dm where dm.day = bookings.day and dm.manager = (select name from me())) );
