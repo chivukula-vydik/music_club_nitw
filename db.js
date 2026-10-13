@@ -147,7 +147,7 @@ export async function load() {
       w = mon.getFullYear() * 10000 + (mon.getMonth() + 1) * 100 + mon.getDate();
     }
     const key = (w ? "w" + w + "|" : "") + b.day + "|" + b.slot;
-    bookingMap[key] = { song: b.song, songId: b.song_id || null, by: b.booked_by, with: b.players || [] };
+    bookingMap[key] = { song: b.song, songId: b.song_id || null, by: b.booked_by, with: b.players || [], ...(b.hold ? { hold: true } : {}) };
   }
 
   const profileMap = {};
@@ -190,6 +190,7 @@ export async function saveBooking(key, rec) {
     // notified resets so a moved or swapped slot gets its 1-hour reminder at the new time
     const row = { week, day, slot, song: rec.song, booked_by: rec.by, players: rec.with || [], notified: false };
     if (songsEnabled) row.song_id = rec.songId || null;
+    if (rec.hold) row.hold = true; // needs supabase-holds.sql
     const { error } = await c.from("bookings")
       .upsert(row,
               { onConflict: "week,day,slot" });

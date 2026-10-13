@@ -142,9 +142,10 @@ module.exports = async (req, res) => {
   const lastWeek = new Date(now.getTime() - 8 * 864e5);
   const minWeek = lastWeek.getUTCFullYear() * 10000 + (lastWeek.getUTCMonth() + 1) * 100 + lastWeek.getUTCDate();
   let slotsSent = 0;
-  const { data: slots, error: slotErr } = await sb.from("bookings").select("week,day,slot,song,booked_by,players").eq("notified", false).gte("week", minWeek);
+  const { data: slots, error: slotErr } = await sb.from("bookings").select("*").eq("notified", false).gte("week", minWeek);
   if (slotErr) console.error("Slot query error:", slotErr.message);
   for (const b of slots || []) {
+    if (b.hold) continue; // a manager's hold, nobody to remind
     // slot "6-7" → 18:00, "9-10*" → 21:00, "12-1*" → 24:00 (midnight); times are IST
     const h0 = parseInt(b.slot, 10);
     const hour = b.slot.endsWith("*") ? h0 + 12 : h0 < 9 ? h0 + 12 : h0;

@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
   const day = DAYS[dayIdx];
 
   const [{ data: slots, error }, { data: members }] = await Promise.all([
-    sb.from("bookings").select("slot,song,booked_by,players").eq("week", week).eq("day", day),
+    sb.from("bookings").select("*").eq("week", week).eq("day", day),
     sb.from("members").select("name,email")
   ]);
   if (error) return res.status(500).json({ error: error.message });
@@ -36,6 +36,7 @@ module.exports = async (req, res) => {
   // person → their slots today
   const byPerson = {};
   for (const b of slots || []) {
+    if (b.hold) continue; // a manager's hold, not a jam
     const names = [b.booked_by, ...(b.players || [])].filter(Boolean);
     for (const n of new Set(names)) (byPerson[n] = byPerson[n] || []).push({ ...b, hour: slotHour(b.slot), others: names.filter(x => x !== n) });
   }
