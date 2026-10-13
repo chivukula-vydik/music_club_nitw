@@ -528,7 +528,7 @@
               <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(243,241,236,.5)">{{ r.people }}</span>
             </div>
             <div style="display:flex;gap:7px;flex-wrap:wrap">
-              <sc-if value="{{ r.mail }}" hint-placeholder-val="{{ false }}"><a href="{{ r.mail }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.7);font-size:11.5px;cursor:pointer;text-decoration:none;font-family:inherit" style-hover="border-color:#3d8dbd;color:#f3f1ec">Email</a></sc-if>
+              <sc-if value="{{ r.canMessage }}" hint-placeholder-val="{{ true }}"><button onClick="{{ r.onMessage }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.7);font-size:11.5px;cursor:pointer;text-decoration:none;font-family:inherit" style-hover="border-color:#3d8dbd;color:#f3f1ec">Message</button></sc-if>
               <sc-if value="{{ r.canAct }}" hint-placeholder-val="{{ true }}">
                 <button onClick="{{ r.onEdit }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.7);font-size:11.5px;cursor:pointer;text-decoration:none;font-family:inherit" style-hover="border-color:#3d8dbd;color:#f3f1ec">Edit</button>
                 <button onClick="{{ r.onMove }}" style="padding:6px 12px;border-radius:999px;border:1px solid rgba(243,241,236,.2);background:transparent;color:rgba(243,241,236,.7);font-size:11.5px;cursor:pointer;text-decoration:none;font-family:inherit" style-hover="border-color:#3d8dbd;color:#f3f1ec">Move</button>
@@ -717,6 +717,31 @@
             <button onClick="{{ startMove }}" style="padding:13px 18px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:rgba(243,241,236,.7);font-size:14.5px;cursor:pointer" style-hover="border-color:#3d8dbd;color:#3d8dbd">Move</button>
           </sc-if>
           <button onClick="{{ cancelBooking }}" style="padding:13px 18px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:rgba(243,241,236,.7);font-size:14.5px;cursor:pointer" style-hover="border-color:#f3f1ec;color:#f3f1ec">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ msgOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:60;background:rgba(12,12,12,.72);display:flex;align-items:center;justify-content:center;padding:24px">
+      <div style="width:100%;max-width:440px;max-height:88vh;overflow-y:auto;padding:26px;border:1px solid rgba(243,241,236,.16);background:#201f1e;display:flex;flex-direction:column;gap:16px;animation:mcin .18s ease both">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#3d8dbd">{{ msgWhen }}</span>
+          <span style="font-family:'Archivo Black',sans-serif;font-size:22px">Message {{ msgTo }}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.45)">sent from the club email in the usual club design · replies come to you</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ msgPresets }}" as="mp" hint-placeholder-count="3">
+            <button onClick="{{ mp.onPick }}" style="padding:6px 11px;border-radius:999px;border:1px solid rgba(61,141,189,.45);background:rgba(61,141,189,.12);color:#cfe4f0;font-size:12px;cursor:pointer;font-family:inherit">{{ mp.label }}</button>
+          </sc-for>
+        </div>
+        <textarea value="{{ msgText }}" onChange="{{ onMsgText }}" rows="5" placeholder="what do you need from them?" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px;line-height:1.55;resize:vertical"></textarea>
+        <sc-if value="{{ msgNote }}" hint-placeholder-val="{{ false }}">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:{{ msgNoteColor }}">{{ msgNote }}</span>
+        </sc-if>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button onClick="{{ sendMsg }}" style="flex:1;min-width:120px;padding:13px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:14.5px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">{{ msgSendLabel }}</button>
+          <button onClick="{{ closeMsg }}" style="padding:13px 18px;border-radius:999px;border:1px solid rgba(243,241,236,.22);background:transparent;color:rgba(243,241,236,.7);font-size:14.5px;cursor:pointer" style-hover="border-color:#f3f1ec;color:#f3f1ec">{{ msgCloseLabel }}</button>
         </div>
       </div>
     </div>
@@ -1728,6 +1753,25 @@ class Component extends DCLogic {
         this.writeBooking(k, null, { ...st.bookings, [k]: null });
         this.setState({ booking: null, bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: "" });
       },
+      msgOpen: !!st.msg, msgWhen: st.msg ? st.msg.when : "", msgTo: st.msg ? st.msg.to : "",
+      msgText: st.msgText || "", onMsgText: e => this.setState({ msgText: e.target.value, msgNote: "" }),
+      msgPresets: ["Can you move to another hour?", "Please confirm you're still coming", "This slot has to be cancelled, sorry"]
+        .map(label => ({ label, onPick: () => this.setState({ msgText: label, msgNote: "" }) })),
+      msgNote: st.msgNote || "", msgNoteColor: st.msgSent ? "#7cb8db" : "#e8ac86",
+      msgSendLabel: st.msgSending ? "Sending…" : "Send",
+      msgCloseLabel: st.msgSent ? "Close" : "Cancel",
+      closeMsg: () => this.setState({ msg: null, msgText: "", msgNote: "", msgSent: false }),
+      sendMsg: async () => {
+        const text = (st.msgText || "").trim();
+        if (!st.msg || st.msgSending) return;
+        if (!text) return this.setState({ msgNote: "Write a message first" });
+        if (!this.db || !this.db.serverMode) return this.setState({ msgNote: "Messages need the live site" });
+        this.setState({ msgSending: true, msgNote: "" });
+        try {
+          const n = await this.db.sendSlotMessage(st.msg.key, text);
+          this.setState({ msgSending: false, msgSent: true, msgText: "", msgNote: "Sent to " + n + (n === 1 ? " person" : " people") });
+        } catch (e) { this.setState({ msgSending: false, msgNote: String(e.message || e) }); }
+      },
       cancelBooking: () => this.setState({ booking: null, bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: "" }),
       query: st.query, onQuery: e => this.setState({ query: e.target.value }),
       teamFilters: ["All", "Core", "Tech"].map(label => {
@@ -1844,10 +1888,11 @@ class Component extends DCLogic {
             onBook: () => this.setState({ booking: { week: w, day, t, label: "Request", existing: false }, bookingSong: "", bookingSongId: null, bookingWith: [], pickQuery: "" }) };
           booked++;
           for (const n of [rec.by].concat(rec.with || [])) { if (n) { people.add(n); hours[n] = (hours[n] || 0) + 1; } }
-          const email = (ROSTER.find(r => r[0] === rec.by) || [])[7];
           return { ...base, booked: true, free: false, song: rec.song,
             people: (rec.by || "unclaimed") + ((rec.with || []).length ? " + " + rec.with.join(", ") : " · solo"),
-            mail: email ? "mailto:" + email + "?subject=" + encodeURIComponent("Jam slot · " + day + " " + LABEL[t]) : "",
+            canMessage: [rec.by].concat(rec.with || []).some(n => n && n !== me),
+            onMessage: () => this.setState({ msg: { key: k, when: day + " · " + LABEL[t] + " · " + rec.song,
+              to: [rec.by].concat(rec.with || []).filter(n => n && n !== me).join(", ") }, msgText: "", msgNote: "", msgSent: false }),
             onEdit: () => this.setState({ booking: { week: w, day, t, label: day + " " + LABEL[t], existing: true, origin: k, owner: rec.by },
               bookingSong: rec.song, bookingSongId: rec.songId || null, bookingWith: (rec.with || []).slice(), pickQuery: "" }),
             onMove: () => this.setState({ tab: "jam", week: w, moveFrom: { week: w, day, t, key: k } }),

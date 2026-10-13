@@ -264,6 +264,22 @@ export async function addEvent(ev) {
   if (error) throw error;
 }
 
+// a day manager emails everyone on a slot from the club address; returns how many got it
+export async function sendSlotMessage(key, message) {
+  if (!serverMode) throw new Error("Messages need the server");
+  const c = await client();
+  const { data } = await c.auth.getSession();
+  const { week, day, slot } = parseKey(key);
+  const res = await fetch(new URL("./api/slot-message", window.location.href), {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + (data.session?.access_token || "") },
+    body: JSON.stringify({ week, day, slot, message })
+  });
+  const out = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(out.error || "Couldn't send the message");
+  return out.sent;
+}
+
 // asks the server to create a Google Meet on the club calendar; returns the link
 export async function createMeet({ title, date, time, description }) {
   if (!serverMode) throw new Error("Meet links need the server");
