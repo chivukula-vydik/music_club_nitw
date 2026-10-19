@@ -225,12 +225,13 @@ document.addEventListener('click',function(e){
   btn.innerHTML='<svg id="mc-music-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e07832" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><svg id="mc-mute-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(243,241,236,.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
   if(window.innerWidth<=768){btn.style.width='36px';btn.style.height='36px';btn.style.bottom='16px';btn.style.right='16px';btn.querySelectorAll('svg').forEach(function(s){s.setAttribute('width','16');s.setAttribute('height','16')});}
   document.body.appendChild(btn);
+  updateBtn(false);
   var playing=false;
   function updateBtn(on){document.getElementById('mc-music-icon').style.display=on?'block':'none';document.getElementById('mc-mute-icon').style.display=on?'none':'block';btn.style.borderColor=on?'rgba(224,120,50,.6)':'rgba(224,120,50,.25)';}
   function play(){try{localStorage.removeItem('mc-beat-muted');}catch(e){}audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});}
   function pause(){audio.pause();playing=false;updateBtn(false);removeAutoStart();try{localStorage.setItem('mc-beat-muted','1');}catch(e){}}
   if(!muted)audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});
-  function autoStart(){if(playing)return;audio.play().then(function(){playing=true;updateBtn(true);removeAutoStart();}).catch(function(){});}
+  function autoStart(e){if(playing||btn.contains(e.target))return;audio.play().then(function(){playing=true;updateBtn(true);removeAutoStart();}).catch(function(){});}
   // ponytail: only user-activation events — scroll/wheel/touchmove don't unlock audio
   function removeAutoStart(){['click','touchstart','keydown','pointerdown'].forEach(function(e){document.removeEventListener(e,autoStart,true);});}
   if(!muted)['click','touchstart','keydown','pointerdown'].forEach(function(e){document.addEventListener(e,autoStart,true);});
