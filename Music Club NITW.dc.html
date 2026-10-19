@@ -653,7 +653,7 @@ if(location.hash){var _h=location.hash;var _t=setInterval(function(){var el=docu
 
 // ponytail: scroll-triggered sound prompt — appears after 150px scroll, any click unlocks audio
 (function(){
-  if(localStorage.getItem('mc-beat-unlocked'))return;
+  if(localStorage.getItem('mc-beat-unlocked')||localStorage.getItem('mc-beat-muted'))return;
   var s=document.createElement('style');
   s.textContent='@keyframes mcpulse{0%,100%{box-shadow:0 4px 20px rgba(224,120,50,.4)}50%{box-shadow:0 4px 30px rgba(224,120,50,.7)}}@keyframes mcslideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
   document.head.appendChild(s);
@@ -674,12 +674,14 @@ if(location.hash){var _h=location.hash;var _t=setInterval(function(){var el=docu
 })();
 // ponytail: rock beat — autoplay loop with mute toggle
 (function(){
+  // ponytail: mute sticks in localStorage until the user unmutes
+  var muted=false;try{muted=localStorage.getItem('mc-beat-muted')==='1';}catch(e){}
   var audio=document.createElement('audio');
   audio.src='assets/beat.mp3';
   audio.loop=true;
   audio.volume=0.35;
   audio.preload='auto';
-  audio.autoplay=true;
+  audio.autoplay=!muted;
 
   var btn=document.createElement('button');
   btn.id='mc-music-toggle';
@@ -695,11 +697,11 @@ if(location.hash){var _h=location.hash;var _t=setInterval(function(){var el=docu
     document.getElementById('mc-mute-icon').style.display=on?'none':'block';
     btn.style.borderColor=on?'rgba(224,120,50,.6)':'rgba(224,120,50,.25)';
   }
-  function play(){audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});}
-  function pause(){audio.pause();playing=false;updateBtn(false);}
+  function play(){try{localStorage.removeItem('mc-beat-muted');}catch(e){}audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});}
+  function pause(){audio.pause();playing=false;updateBtn(false);removeAutoStart();try{localStorage.setItem('mc-beat-muted','1');}catch(e){}}
 
   // try autoplay immediately
-  audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});
+  if(!muted)audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});
   // fallback: play on first interaction
   function autoStart(){
     if(playing)return;
@@ -707,15 +709,15 @@ if(location.hash){var _h=location.hash;var _t=setInterval(function(){var el=docu
   }
   // ponytail: only user-activation events — scroll/wheel/touchmove don't unlock audio
   function removeAutoStart(){['click','touchstart','keydown','pointerdown'].forEach(function(e){document.removeEventListener(e,autoStart,true);});}
-  ['click','touchstart','keydown','pointerdown'].forEach(function(e){document.addEventListener(e,autoStart,true);});
+  if(!muted)['click','touchstart','keydown','pointerdown'].forEach(function(e){document.addEventListener(e,autoStart,true);});
 
   btn.addEventListener('click',function(e){
     e.stopPropagation();
     if(playing)pause();else play();
   });
   // ponytail: persist play state across page navigations
-  try{var ss=sessionStorage.getItem('mc-beat');if(ss){var st=JSON.parse(ss);if(st.t)audio.currentTime=st.t;if(st.m){updateBtn(false);}}}catch(e){}
-  window.addEventListener('pagehide',function(){try{sessionStorage.setItem('mc-beat',JSON.stringify({p:playing,t:audio.currentTime,m:!playing}));}catch(e){}});
+  try{var ss=sessionStorage.getItem('mc-beat');if(ss){var st=JSON.parse(ss);if(st.t)audio.currentTime=st.t;}}catch(e){}
+  window.addEventListener('pagehide',function(){try{sessionStorage.setItem('mc-beat',JSON.stringify({p:playing,t:audio.currentTime}));}catch(e){}});
 })();
 </script>
 <script type="text/x-dc" data-dc-script data-props="{&quot;showPastEvents&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;},&quot;showSponsors&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;}}">
