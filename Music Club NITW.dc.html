@@ -722,10 +722,12 @@ document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
   function unlockPage(){ document.documentElement.classList.remove('film-on'); if(window.lenis) window.lenis.start(); }
   // the film plays once per visitor; after that the site opens straight on the hero
   let seen=false; try{ seen=localStorage.getItem('mc-film-seen')==='1'; }catch(err){}
-  if(reduce||seen){ film.remove(); wakeHero(); unlockPage();
+  const replay=new URLSearchParams(location.search).has('film');                // "Watch the teaser" asked for it: play even if seen / reduced motion
+  if(!replay&&(reduce||seen)){ film.remove(); wakeHero(); unlockPage();
     if(seen){ const rp=$('replay'); rp.hidden=false;
-      rp.onclick=()=>{ try{ localStorage.removeItem('mc-film-seen'); }catch(err){} location.href=location.pathname; }; }
+      rp.onclick=()=>{ location.href=location.pathname+'?film'; }; }
     return; }
+  if(replay) history.replaceState(null,'',location.pathname);
   window.__filmActive=true; document.documentElement.classList.add('film-on');
   // the film always hands over to the OBLIVION hero: ignore restored scroll positions and #section links
   if('scrollRestoration' in history) history.scrollRestoration='manual';
@@ -756,7 +758,7 @@ document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
   }
   (function watch(){ if(done||diving) return; if(v.currentTime>=EYE_T) dive(); else requestAnimationFrame(watch); })();
   v.addEventListener('ended',dive);
-  v.addEventListener('error',end,true);
+  v.querySelector('source:last-of-type').addEventListener('error',end);       // only when every source failed; a skipped phone source also fires error
   // the film waits behind the logo; the tap on the logo starts it with sound
   const gate=$('gate'); film.classList.add('gated'); gate.focus({preventScroll:true});
   gate.addEventListener('click',e=>{ e.stopPropagation(); if(gate.classList.contains('open')) return;
