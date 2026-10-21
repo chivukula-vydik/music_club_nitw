@@ -17,7 +17,7 @@
 <helmet data-dc-atomics>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Grenze+Gotisch:wght@800;900&family=Oswald:wght@400;500&family=Spectral:wght@400;500&display=swap" rel="stylesheet">
 <script src="./supabase-config.js"></script>
 <style>
   @view-transition{navigation:auto}
@@ -30,6 +30,31 @@
   a:hover{color:#3d8dbd}
   input,select,button,textarea{font-family:inherit}
   ::placeholder{color:rgba(243,241,236,.35)}
+  /* login screen only: Oblivion skin (the signed-in portal keeps its own look) */
+  .lg{background:radial-gradient(90% 60% at 50% 110%,rgba(143,20,14,.45),transparent 65%),linear-gradient(rgba(7,6,5,.84),rgba(7,6,5,.94)),url(oblivion/assets/world.webp) center/cover;color:#efe3d0}
+  .lg .h{margin:0;font-family:'Grenze Gotisch',Georgia,serif;font-weight:900;font-size:clamp(2.8rem,9vw,3.6rem);line-height:.9;letter-spacing:.01em;
+    color:transparent;background:linear-gradient(180deg,#fff6ea 0%,#f1dcc4 48%,#d99a80 100%);-webkit-background-clip:text;background-clip:text;
+    filter:drop-shadow(0 0 1px rgba(255,110,60,.9)) drop-shadow(1px 1px 0 #8f140e) drop-shadow(1px 1px 0 #6a0e09) drop-shadow(1px 2px 0 #470a06) drop-shadow(1px 2px 0 #2a0503)}
+  .lg .kick{display:flex;align-items:center;gap:14px;font-family:Oswald,sans-serif;font-size:.74rem;letter-spacing:.4em;text-transform:uppercase;color:#e05a35}
+  .lg .kick::before{content:"";width:34px;height:1px;background:#c2401f;box-shadow:0 0 8px #c2401f}
+  .lg .sub{margin:0;font-family:Spectral,Georgia,serif;font-size:1.05rem;line-height:1.6;color:#ddcdbd}
+  .lg .card{display:flex;flex-direction:column;gap:16px;padding:28px;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);
+    background:radial-gradient(120% 80% at 0% 0%,rgba(143,20,14,.22),transparent 55%),linear-gradient(170deg,#191615,#0b0908);box-shadow:inset 0 0 0 1px rgba(194,64,31,.35)}
+  .lg .lbl{font-family:Oswald,sans-serif;font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:#9a8f84}
+  .lg input{padding:13px 14px;border:0;border-radius:0;background:rgba(7,6,5,.7);color:#efe3d0;font-size:15px;box-shadow:inset 0 0 0 1px rgba(239,227,208,.22);transition:box-shadow .25s}
+  .lg input:focus{outline:none;box-shadow:inset 0 0 0 1px #e05a35,0 0 18px rgba(194,64,31,.35)}
+  .lg .go{width:100%;margin-top:4px;padding:15px;border:0;cursor:pointer;font-family:Oswald,sans-serif;font-weight:500;font-size:.85rem;letter-spacing:.3em;text-transform:uppercase;color:#efe3d0;
+    clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);background:linear-gradient(180deg,#a31a10,#5a0a06);transition:letter-spacing .3s,filter .3s}
+  .lg .go:hover{letter-spacing:.38em;filter:brightness(1.2)}
+  .lg .lnk{padding:0;border:0;background:transparent;cursor:pointer;font-family:Oswald,sans-serif;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:#9a8f84;transition:color .25s}
+  .lg .lnk:hover{color:#e05a35}
+  .lg .setup-t{font-family:'Grenze Gotisch',Georgia,serif;font-weight:800;font-size:1.3rem;color:#e05a35;letter-spacing:.03em}
+  .lg .note{font-family:Spectral,Georgia,serif;font-size:.9rem;line-height:1.5;color:#b8aa9c}
+  .lg .err{font-family:Spectral,Georgia,serif;font-size:.92rem;line-height:1.5;color:#f08a6a}
+  .lg .foot{font-family:Spectral,Georgia,serif;font-size:.88rem;line-height:1.6;color:#9a8f84}
+  .lg .foot a{color:#e05a35}
+  ::placeholder{color:rgba(243,241,236,.35)}
+  .lg .rough{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -2.2 1.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -2.2 1.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
   @keyframes mcin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
   .tab{padding:15px 18px 13px;border:none;background:transparent;font-size:13.5px;font-weight:600;cursor:pointer}
   .tab-active{color:#f3f1ec;border-bottom:2px solid #d1682e}
@@ -166,51 +191,52 @@
 </header>
 
 <sc-if value="{{ signedOut }}" hint-placeholder-val="{{ true }}">
-<main style="flex:1;display:flex;align-items:center;justify-content:center;padding:56px 24px;overflow-y:auto">
+<main class="lg" style="flex:1;display:flex;align-items:center;justify-content:center;padding:56px 24px;overflow-y:auto">
   <div style="width:100%;max-width:420px;flex-shrink:0;display:flex;flex-direction:column;gap:26px;animation:mcin .3s ease both">
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <h1 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:40px;line-height:.98;letter-spacing:-.02em;text-shadow:2px 0 rgba(194,85,31,.85),-2px 0 rgba(28,107,150,.85)">MEMBER<br><span style="color:#d1682e">LOGIN</span></h1>
-      <p style="margin:0;font-size:15px;line-height:1.6;color:rgba(243,241,236,.6)">Book jam-room slots and keep your skills up to date.</p>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <span class="kick">Members only</span>
+      <h1 class="h rough">Member login.</h1>
+      <p class="sub">Book jam-room slots and keep your skills up to date.</p>
     </div>
-    <div style="display:flex;flex-direction:column;gap:16px;padding:26px;border:1px solid rgba(243,241,236,.14);background:#201f1e">
+    <div class="card">
         <label style="display:flex;flex-direction:column;gap:8px">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Email</span>
-          <input type="email" value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" placeholder="you@student.nitw.ac.in" autoComplete="email" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+          <span class="lbl">Email</span>
+          <input type="email" value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" placeholder="you@student.nitw.ac.in" autoComplete="email">
         </label>
         <label style="display:flex;flex-direction:column;gap:8px">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">{{ passLabel }}</span>
-          <input type="password" value="{{ loginPass }}" onChange="{{ onLoginPass }}" placeholder="••••••••" autocomplete="current-password" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+          <span class="lbl">{{ passLabel }}</span>
+          <input type="password" value="{{ loginPass }}" onChange="{{ onLoginPass }}" placeholder="••••••••" autocomplete="current-password">
         </label>
         <sc-if value="{{ setupMode }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:4px">
-          <span style="font-family:'Archivo Black',sans-serif;font-size:16px;color:#d1682e;letter-spacing:.02em">{{ setupTitle }}</span>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.5;color:rgba(243,241,236,.5)">{{ setupDesc }}</span>
+          <span class="setup-t">{{ setupTitle }}</span>
+          <span class="note">{{ setupDesc }}</span>
         </div>
         <label style="display:flex;flex-direction:column;gap:8px">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,241,236,.45)">Email OTP</span>
-          <input inputmode="numeric" autocomplete="one-time-code" value="{{ otp }}" onChange="{{ onOtp }}" placeholder="enter OTP from email" style="padding:13px 14px;border-radius:8px;border:1px solid rgba(243,241,236,.2);background:#171716;color:#f3f1ec;font-size:15px">
+          <span class="lbl">Email OTP</span>
+          <input inputmode="numeric" autocomplete="one-time-code" value="{{ otp }}" onChange="{{ onOtp }}" placeholder="enter OTP from email">
         </label>
         </sc-if>
       <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}">
-        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.5;color:#e8886a">{{ loginErr }}</span>
+        <span class="err">{{ loginErr }}</span>
       </sc-if>
         <sc-if value="{{ signinMode }}" hint-placeholder-val="{{ true }}">
           <div style="display:flex;justify-content:flex-end;margin:-8px 0 -4px">
-            <button onClick="{{ goForgot }}" style="padding:0;border:none;background:transparent;color:rgba(243,241,236,.35);font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer" style-hover="color:#d1682e">Forgot password?</button>
+            <button class="lnk" onClick="{{ goForgot }}">Forgot password?</button>
           </div>
-          <button onClick="{{ signIn }}" style="width:100%;margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Sign in</button>
-          <button onClick="{{ goSetup }}" style="padding:0;border:none;background:transparent;color:rgba(243,241,236,.4);font-family:'JetBrains Mono',monospace;font-size:10.5px;cursor:pointer;text-align:center" style-hover="color:#d1682e">First time? Set up with OTP</button>
+          <button class="go" onClick="{{ signIn }}">Sign in</button>
+          <button class="lnk" onClick="{{ goSetup }}" style="text-align:center">First time? Set up with OTP</button>
         </sc-if>
         <sc-if value="{{ setupMode }}" hint-placeholder-val="{{ false }}">
           <sc-if value="{{ showSendOtp }}" hint-placeholder-val="{{ true }}">
-            <button onClick="{{ sendOtp }}" style="width:100%;margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">Send OTP to my email</button>
+            <button class="go" onClick="{{ sendOtp }}">Send OTP to my email</button>
           </sc-if>
           <sc-if value="{{ showVerifyOtp }}" hint-placeholder-val="{{ false }}">
-            <button onClick="{{ verifyOtp }}" style="width:100%;margin-top:4px;padding:14px;border-radius:999px;border:none;background:#d1682e;color:#1a1a1a;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3d8dbd">{{ forgotMode ? "Verify OTP & reset password" : "Verify OTP & set password" }}</button>
+            <button class="go" onClick="{{ verifyOtp }}">{{ forgotMode ? "Verify OTP & reset password" : "Verify OTP & set password" }}</button>
           </sc-if>
-          <button onClick="{{ goSignin }}" style="padding:0;border:none;background:transparent;color:rgba(243,241,236,.45);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;text-align:left" style-hover="color:#d1682e">← Back to sign in</button>
+          <button class="lnk" onClick="{{ goSignin }}" style="text-align:left">&larr; Back to sign in</button>
         </sc-if>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;line-height:1.6;color:rgba(243,241,236,.4)">use your @student.nitw.ac.in email. Not a member? <a href="mailto:mcevents26@gmail.com">mail the tech team</a></span>
+        <span class="foot">Use your @student.nitw.ac.in email. Not a member? <a href="mailto:mcevents26@gmail.com">Mail the tech team</a></span>
     </div>
   </div>
 </main>

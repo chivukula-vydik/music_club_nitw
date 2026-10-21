@@ -1,4 +1,4 @@
-const CACHE = "mc-v3";
+const CACHE = "mc-v4";   // bumped for the Oblivion launch: drops every visitor's old cached images
 const PRECACHE = [
   "assets/logo.png",
   "assets/photo-band-strip.png"

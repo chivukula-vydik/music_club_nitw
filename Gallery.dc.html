@@ -1,301 +1,63 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="icon" type="image/png" href="assets/logo.png">
-<meta name="theme-color" content="#1a1a1a">
-<script src="./support.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gallery · Music Club NITW</title>
+<link rel="icon" type="image/png" href="oblivion/assets/mc-icon-64.png">
+<link rel="apple-touch-icon" href="oblivion/assets/mc-icon-192.png">
+<meta name="theme-color" content="#070605">
+<link rel="manifest" href="manifest.json">
 <script defer src="/_vercel/insights/script.js"></script>
-<style>
-  @keyframes mcshimmer{to{background-position:-200% 0}}
-  #mc-skeleton{position:fixed;inset:0;z-index:9999;background:#1a1a1a;display:flex;flex-direction:column;transition:opacity .3s}
-  #mc-skeleton.mc-hide{opacity:0;pointer-events:none}
-  .mc-skel-bone{background:linear-gradient(90deg,#252423 25%,#2e2d2b 50%,#252423 75%);background-size:200% 100%;animation:mcshimmer 1.4s ease-in-out infinite;border-radius:10px}
-</style>
-</head>
-<body>
-<!-- Skeleton loader — outside x-dc so dc-runtime doesn't destroy it -->
-<div id="mc-skeleton">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 32px">
-    <div style="display:flex;align-items:center;gap:11px">
-      <div class="mc-skel-bone" style="width:36px;height:36px;border-radius:999px"></div>
-      <div class="mc-skel-bone" style="width:120px;height:14px"></div>
-    </div>
-    <div style="display:flex;gap:20px">
-      <div class="mc-skel-bone" style="width:50px;height:12px"></div>
-      <div class="mc-skel-bone" style="width:50px;height:12px"></div>
-      <div class="mc-skel-bone" style="width:50px;height:12px"></div>
-      <div class="mc-skel-bone" style="width:50px;height:12px"></div>
-    </div>
-  </div>
-  <div style="padding:56px 32px 24px;max-width:1212px;margin:0 auto;width:100%">
-    <div class="mc-skel-bone" style="width:100px;height:10px;margin-bottom:14px"></div>
-    <div class="mc-skel-bone" style="width:60px;height:10px;margin-bottom:14px"></div>
-    <div class="mc-skel-bone" style="width:260px;height:36px;margin-bottom:10px;border-radius:6px"></div>
-    <div class="mc-skel-bone" style="width:320px;height:10px"></div>
-  </div>
-  <div style="padding:0 32px;max-width:1212px;margin:0 auto;width:100%;flex:1">
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));grid-auto-rows:220px;gap:10px">
-      <div class="mc-skel-bone" style="grid-column:span 2;grid-row:span 2;border-radius:20px"></div>
-      <div class="mc-skel-bone" style="border-radius:20px"></div>
-      <div class="mc-skel-bone" style="border-radius:20px"></div>
-      <div class="mc-skel-bone" style="grid-row:span 2;border-radius:20px"></div>
-      <div class="mc-skel-bone" style="border-radius:20px"></div>
-      <div class="mc-skel-bone" style="grid-column:span 2;grid-row:span 2;border-radius:20px"></div>
-      <div class="mc-skel-bone" style="border-radius:20px"></div>
-      <div class="mc-skel-bone" style="border-radius:20px"></div>
-    </div>
-  </div>
-</div>
-<x-dc>
-<helmet data-dc-atomics>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="./image-slot.js"></script>
-<style>
-  @view-transition{navigation:auto}
-  ::view-transition-old(root){animation:mcfade .2s ease-out}
-  ::view-transition-new(root){animation:mcfade .2s ease-in reverse}
-  @keyframes mcfade{to{opacity:0}}
-  @keyframes mcshimmer{to{background-position:-200% 0}}
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:#1a1a1a;color:#f3f1ec;font-family:Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-  #mc-skeleton{position:fixed;inset:0;z-index:9999;background:#1a1a1a;display:flex;flex-direction:column;transition:opacity .3s}
-  #mc-skeleton.mc-hide{opacity:0;pointer-events:none}
-  .mc-skel-bone{background:linear-gradient(90deg,#252423 25%,#2e2d2b 50%,#252423 75%);background-size:200% 100%;animation:mcshimmer 1.4s ease-in-out infinite;border-radius:10px}
-  a{color:#e07832;text-decoration:none}
-  a:hover{color:#3d8dbd}
-  .mc-burger{display:none;background:none;border:none;cursor:pointer;padding:4px}
-  .mc-burger span{display:block;width:22px;height:2px;background:#f3f1ec;margin:5px 0;transition:transform .3s,opacity .3s}
-  .mc-desktop{display:block}
-  .mc-mobile{display:none}
-  .mc-mnav{display:none;flex-direction:column;align-items:stretch;gap:0;background:#1a1a1a;padding:12px 20px 20px;font-size:16px}
-  .mc-mnav.open{display:flex}
-  .mc-mnav a{padding:14px 0;border-bottom:1px solid rgba(243,241,236,.08)}
-  .mc-mnav a:last-child{border-bottom:none}
-  @media(max-width:768px){
-    .mc-desktop{display:none!important}
-    .mc-mobile{display:block!important}
-    .mc-burger{display:block}
-  }
-</style>
-</helmet>
+<link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@600;800;900&family=Oswald:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="oblivion/sub.css">
+</head>
+<body>
+<nav>
+  <a class="mark" href="Music%20Club%20NITW.dc.html"><img src="oblivion/assets/mc-logo-160.webp" alt="Music Club NITW" width="40" height="40"><span>MUSIC CLUB <em>NITW</em></span></a>
+  <button class="burger" id="burger" aria-expanded="false" aria-controls="menu">MENU</button>
+  <ul class="menu" id="menu">
+    <li><a href="Music%20Club%20NITW.dc.html#about">About</a></li>
+    <li><a href="Music%20Club%20NITW.dc.html#events">Events</a></li>
+    <li><a href="Gallery.dc.html" aria-current="page">Gallery</a></li>
+    <li><a href="Announcements.dc.html">Announcements</a></li>
+    <li><a href="Music%20Club%20NITW.dc.html#sponsors">Sponsors</a></li>
+    <li><a href="Member%20Portal.dc.html">Member login</a></li>
+    <li><a class="navcta" href="Music%20Club%20NITW.dc.html#contact">Get in touch</a></li>
+  </ul>
+</nav>
 
-<!-- Desktop -->
-<div class="mc-desktop" style="max-width:100%;overflow-x:hidden">
+<main class="sec">
+  <div class="wrap">
+    <a class="back" href="Music%20Club%20NITW.dc.html">&larr; Back to home</a>
+    <p class="kicker">Gallery</p>
+    <h1 class="big rough">On stage.</h1>
+    <p class="lead">Photos from TZ Flagship Event and Spring Spree Flagship Event.</p>
+    <div class="rule"></div>
 
-<header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:12px 32px;background:rgba(26,26,26,.85);backdrop-filter:blur(14px);">
-  <a href="Music%20Club%20NITW.dc.html" style="display:flex;align-items:center;gap:11px;color:#f3f1ec">
-    <img src="assets/logo.png" alt="Music Club NITW" style="width:36px;height:36px;border-radius:999px;display:block">
-    <span style="font-family:'Archivo Black',sans-serif;font-size:14px;letter-spacing:.02em">MUSIC CLUB <span style="color:rgba(243,241,236,.45)">NITW</span></span>
-  </a>
-  <nav style="display:flex;align-items:center;gap:26px;font-size:13px;font-weight:500;color:rgba(243,241,236,.62)">
-    <a href="Music%20Club%20NITW.dc.html#about" style="color:inherit" style-hover="color:#f3f1ec">About</a>
-    <a href="Music%20Club%20NITW.dc.html#events" style="color:inherit" style-hover="color:#f3f1ec">Events</a>
-    <a href="Gallery.dc.html" style="color:#f3f1ec">Gallery</a>
-    <a href="Announcements.dc.html" style="color:inherit" style-hover="color:#f3f1ec">Announcements</a>
-    <a href="Music%20Club%20NITW.dc.html#sponsors" style="color:inherit" style-hover="color:#f3f1ec">Sponsors</a>
-    <a href="Member%20Portal.dc.html" style="display:inline-flex;align-items:center;padding:9px 16px;border-radius:999px;border:1px solid rgba(61,141,189,.5);background:rgba(61,141,189,.15);color:#7cb8db;font-weight:600;font-size:13px" style-hover="background:rgba(61,141,189,.3);border-color:#3d8dbd">Member login</a>
-  </nav>
-</header>
-
-<section style="padding:56px 32px 24px;">
-  <div style="max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:14px">
-    <a href="Music%20Club%20NITW.dc.html" style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.45)">&larr; Back to home</a>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#3d8dbd">Gallery</div>
-    <span style="display:block;width:100%;max-width:210px;height:11px;background:repeating-linear-gradient(to bottom,rgba(243,241,236,.16) 0 1px,transparent 1px 3px)"></span>
-    <h1 style="margin:0;font-family:'Archivo Black',sans-serif;font-size:clamp(30px,4.2vw,50px);line-height:1.02;letter-spacing:-.02em">On stage.</h1>
-    <p style="margin:0;max-width:420px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.6;color:rgba(243,241,236,.45)">Photos from TZ Flagship Event and Spring Spree Flagship Event</p>
-  </div>
-</section>
-
-<section style="padding:0 32px 56px;">
-  <div style="max-width:1180px;margin:0 auto">
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));grid-auto-rows:220px;gap:10px">
-      <div style="grid-column:span 2;grid-row:span 2;position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
-        <img loading="lazy" src="assets/photo-nocturn-neon.png" alt="NOCTURN" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
-        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">TZ Flagship Event</span>
-      </div>
-      <div style="position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
-        <img loading="lazy" src="assets/photo-vocalist-blue.png" alt="Vocalist under blue stage lights" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
-        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">Spring Spree Flagship Event</span>
-      </div>
-      <div style="position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
-        <img loading="lazy" src="assets/photo-drummer.png" alt="Drummer mid-set" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
-        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">Drums</span>
-      </div>
-      <div style="grid-row:span 2;position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
-        <img loading="lazy" src="assets/photo-bass-keys.png" alt="Bass and keys on stage" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
-        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">Bass &amp; keys</span>
-      </div>
-      <div style="position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
-        <img loading="lazy" src="assets/photo-guitarist-green.png" alt="Guitarist in green light" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
-        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">Guitar</span>
-      </div>
-      <div style="grid-column:span 2;grid-row:span 2;position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
-        <img loading="lazy" src="assets/photo-mtv-mixtape.jpg" alt="MTV Mixtape" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
-        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">Spring Spree Flagship Event</span>
-      </div>
-      <div style="position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
-        <img loading="lazy" src="assets/photo-vocalist-bw.png" alt="Vocalist in a spotlight" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
-        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">Vocals in the smoke</span>
-      </div>
-      <div style="position:relative;border-radius:20px;overflow:hidden;background:#201f1e">
-        <img loading="lazy" src="assets/photo-bassist-green.png" alt="Bassist in smoke" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease" style-hover="transform:scale(1.05)">
-        <span style="position:absolute;left:14px;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 8px rgba(0,0,0,.8)">Soundcheck</span>
-      </div>
+    <div class="grid">
+      <figure class="shot w t"><img src="assets/photo-nocturn-neon.png" alt="NOCTURN neon sign on stage"><span>TZ Flagship Event</span></figure>
+      <figure class="shot"><img loading="lazy" src="assets/photo-vocalist-blue.png" alt="Vocalist under blue stage lights"><span>Spring Spree Flagship Event</span></figure>
+      <figure class="shot"><img loading="lazy" src="assets/photo-drummer.png" alt="Drummer mid-set"><span>Drums</span></figure>
+      <figure class="shot t"><img loading="lazy" src="assets/photo-bass-keys.png" alt="Bass and keys on stage"><span>Bass &amp; keys</span></figure>
+      <figure class="shot"><img loading="lazy" src="assets/photo-guitarist-green.png" alt="Guitarist in green light"><span>Guitar</span></figure>
+      <figure class="shot w t"><img loading="lazy" src="assets/photo-mtv-mixtape.jpg" alt="MTV Mixtape"><span>Spring Spree Flagship Event</span></figure>
+      <figure class="shot"><img loading="lazy" src="assets/photo-vocalist-bw.png" alt="Vocalist in a spotlight"><span>Vocals in the smoke</span></figure>
+      <figure class="shot"><img loading="lazy" src="assets/photo-bassist-green.png" alt="Bassist in smoke"><span>Soundcheck</span></figure>
     </div>
   </div>
-</section>
+</main>
 
-<footer style="padding:32px;border-top:1px solid rgba(243,241,236,.06)">
-  <div style="max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;align-items:center">
-    <a href="Music%20Club%20NITW.dc.html" style="display:flex;align-items:center;gap:11px;color:#f3f1ec">
-      <img src="assets/logo.png" alt="Music Club NITW" style="width:28px;height:28px;border-radius:999px;display:block">
-      <span style="font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:.02em">MUSIC CLUB <span style="color:rgba(243,241,236,.45)">NITW</span></span>
-    </a>
-    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(243,241,236,.35)">National Institute of Technology, Warangal, 506004</span>
+<footer>
+  <div class="wrap">
+    <div class="fm"><img src="oblivion/assets/mc-logo-160.webp" alt="" width="44" height="44"><div>MUSIC CLUB NITW<span>#highonmusic</span></div></div>
+    <small>National Institute of Technology, Warangal, 506004</small>
   </div>
 </footer>
 
-</div>
-
-<!-- Mobile -->
-<div class="mc-mobile">
-
-<header style="position:sticky;top:0;z-index:50;padding:10px 20px;background:rgba(26,26,26,.9);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:space-between">
-  <a href="Music%20Club%20NITW.dc.html" style="display:flex;align-items:center;gap:8px;color:#f3f1ec">
-    <img src="assets/logo.png" alt="Music Club NITW" style="width:30px;height:30px;border-radius:999px;display:block">
-    <span style="font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:.02em">MUSIC CLUB</span>
-  </a>
-  <button class="mc-burger mc-mburger" aria-label="Menu"><span></span><span></span><span></span></button>
-  <nav class="mc-mnav" style="position:absolute;top:100%;left:0;right:0">
-    <a href="Music%20Club%20NITW.dc.html" style="color:inherit">Home</a>
-    <a href="Music%20Club%20NITW.dc.html#m-about" style="color:inherit">About</a>
-    <a href="Music%20Club%20NITW.dc.html#m-events" style="color:inherit">Events</a>
-    <a href="Gallery.dc.html" style="color:#f3f1ec">Gallery</a>
-    <a href="Announcements.dc.html" style="color:inherit">Announcements</a>
-    <a href="Music%20Club%20NITW.dc.html#m-sponsors" style="color:inherit">Sponsors</a>
-    <a href="Member%20Portal.dc.html" style="color:#7cb8db">Member login</a>
-  </nav>
-</header>
-
-<section style="padding:32px 20px 16px;">
-  <a href="Music%20Club%20NITW.dc.html" style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,241,236,.45)">&larr; Back to home</a>
-  <div style="margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#3d8dbd">Gallery</div>
-  <h1 style="margin:8px 0 0;font-family:'Archivo Black',sans-serif;font-size:28px;line-height:1.05;letter-spacing:-.02em">On stage.</h1>
-</section>
-
-<section style="padding:0 20px 40px;">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-    <div style="grid-column:span 2;height:200px;position:relative;border-radius:14px;overflow:hidden;background:#201f1e">
-      <img loading="lazy" src="assets/photo-nocturn-neon.png" alt="NOCTURN" style="width:100%;height:100%;object-fit:cover;display:block">
-      <span style="position:absolute;left:10px;bottom:8px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 6px rgba(0,0,0,.8)">TZ Flagship Event</span>
-    </div>
-    <div style="height:150px;position:relative;border-radius:14px;overflow:hidden;background:#201f1e">
-      <img loading="lazy" src="assets/photo-vocalist-blue.png" alt="Vocalist" style="width:100%;height:100%;object-fit:cover;display:block">
-    </div>
-    <div style="height:150px;position:relative;border-radius:14px;overflow:hidden;background:#201f1e">
-      <img loading="lazy" src="assets/photo-drummer.png" alt="Drummer" style="width:100%;height:100%;object-fit:cover;display:block">
-    </div>
-    <div style="grid-column:span 2;height:200px;position:relative;border-radius:14px;overflow:hidden;background:#201f1e">
-      <img loading="lazy" src="assets/photo-mtv-mixtape.jpg" alt="MTV Mixtape" style="width:100%;height:100%;object-fit:cover;display:block">
-      <span style="position:absolute;left:10px;bottom:8px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.85);text-shadow:0 1px 6px rgba(0,0,0,.8)">Spring Spree Flagship Event</span>
-    </div>
-    <div style="height:150px;position:relative;border-radius:14px;overflow:hidden;background:#201f1e">
-      <img loading="lazy" src="assets/photo-guitarist-green.png" alt="Guitarist" style="width:100%;height:100%;object-fit:cover;display:block">
-    </div>
-    <div style="height:150px;position:relative;border-radius:14px;overflow:hidden;background:#201f1e">
-      <img loading="lazy" src="assets/photo-bassist-green.png" alt="Bassist" style="width:100%;height:100%;object-fit:cover;display:block">
-    </div>
-  </div>
-</section>
-
-<footer style="padding:24px 20px;border-top:1px solid rgba(243,241,236,.06);text-align:center">
-  <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(243,241,236,.35)">NIT Warangal, 506004</span>
-</footer>
-
-</div>
-
-</x-dc>
-<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js")</script>
-<script>
-// ponytail: hide skeleton once gallery images load
-(function(){
-  var sk=document.getElementById('mc-skeleton');
-  if(!sk)return;
-  var imgs=document.querySelectorAll('img[src*="assets/photo"]');
-  var loaded=0,total=imgs.length||1;
-  function done(){sk.classList.add('mc-hide');setTimeout(function(){sk.remove()},300);}
-  if(!imgs.length){done();return;}
-  imgs.forEach(function(img){
-    if(img.complete){loaded++;if(loaded>=total)done();}
-    else{img.addEventListener('load',function(){loaded++;if(loaded>=total)done();});img.addEventListener('error',function(){loaded++;if(loaded>=total)done();});}
-  });
-  setTimeout(done,4000);
-})();
-document.addEventListener('click',function(e){
-  var b=e.target.closest('.mc-mburger');
-  if(b){var n=document.querySelector('.mc-mnav');if(n){n.classList.toggle('open');b.classList.toggle('active');}return;}
-  var a=e.target.closest('.mc-mnav a');
-  if(a){var n=document.querySelector('.mc-mnav'),bb=document.querySelector('.mc-mburger');if(n)n.classList.remove('open');if(bb)bb.classList.remove('active');}
-});
-// ponytail: scroll-triggered sound prompt — appears after 150px scroll, any click unlocks audio
-(function(){
-  if(localStorage.getItem('mc-beat-unlocked')||localStorage.getItem('mc-beat-muted'))return;
-  var s=document.createElement('style');
-  s.textContent='@keyframes mcpulse{0%,100%{box-shadow:0 4px 20px rgba(224,120,50,.4)}50%{box-shadow:0 4px 30px rgba(224,120,50,.7)}}@keyframes mcslideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
-  document.head.appendChild(s);
-  var shown=false;
-  function onScroll(){
-    if(shown||window.scrollY<150)return;
-    shown=true;window.removeEventListener('scroll',onScroll);
-    var pill=document.createElement('div');
-    pill.id='mc-sound-prompt';
-    pill.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(224,120,50,.95);color:#1a1a1a;font-family:Archivo,system-ui,sans-serif;font-weight:600;font-size:14px;padding:10px 24px;border-radius:999px;cursor:pointer;z-index:10000;animation:mcslideUp .4s ease-out,mcpulse 2s ease-in-out infinite;white-space:nowrap';
-    pill.textContent='♪  Tap anywhere for sound';
-    document.body.appendChild(pill);
-    function dismiss(){localStorage.setItem('mc-beat-unlocked','1');var el=document.getElementById('mc-sound-prompt');if(el)el.remove();document.removeEventListener('click',dismiss,true);document.removeEventListener('touchstart',dismiss,true);}
-    document.addEventListener('click',dismiss,true);
-    document.addEventListener('touchstart',dismiss,true);
-  }
-  window.addEventListener('scroll',onScroll,{passive:true});
-})();
-// ponytail: rock beat — autoplay loop with mute toggle
-(function(){
-  // ponytail: mute sticks in localStorage until the user unmutes
-  var muted=false;try{muted=localStorage.getItem('mc-beat-muted')==='1';}catch(e){}
-  var audio=document.createElement('audio');
-  audio.src='assets/beat.mp3';
-  audio.loop=true;
-  audio.volume=0.35;
-  audio.preload='auto';
-  audio.autoplay=!muted;
-  var btn=document.createElement('button');
-  btn.id='mc-music-toggle';
-  btn.setAttribute('aria-label','Toggle background music');
-  btn.style.cssText='position:fixed;bottom:24px;right:24px;z-index:999;width:48px;height:48px;border-radius:999px;border:1.5px solid rgba(224,120,50,.6);background:rgba(26,26,26,.9);backdrop-filter:blur(10px);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s;box-shadow:0 4px 20px rgba(0,0,0,.4)';
-  btn.innerHTML='<svg id="mc-music-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e07832" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><svg id="mc-mute-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(243,241,236,.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
-  if(window.innerWidth<=768){btn.style.width='36px';btn.style.height='36px';btn.style.bottom='16px';btn.style.right='16px';btn.querySelectorAll('svg').forEach(function(s){s.setAttribute('width','16');s.setAttribute('height','16')});}
-  document.body.appendChild(btn);
-  updateBtn(false);
-  var playing=false;
-  function updateBtn(on){document.getElementById('mc-music-icon').style.display=on?'block':'none';document.getElementById('mc-mute-icon').style.display=on?'none':'block';btn.style.borderColor=on?'rgba(224,120,50,.6)':'rgba(224,120,50,.25)';}
-  function play(){try{localStorage.removeItem('mc-beat-muted');}catch(e){}audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});}
-  function pause(){audio.pause();playing=false;updateBtn(false);removeAutoStart();try{localStorage.setItem('mc-beat-muted','1');}catch(e){}}
-  if(!muted)audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});
-  function autoStart(e){if(playing||btn.contains(e.target))return;audio.play().then(function(){playing=true;updateBtn(true);removeAutoStart();}).catch(function(){});}
-  // ponytail: only user-activation events — scroll/wheel/touchmove don't unlock audio
-  function removeAutoStart(){['click','touchstart','keydown','pointerdown'].forEach(function(e){document.removeEventListener(e,autoStart,true);});}
-  if(!muted)['click','touchstart','keydown','pointerdown'].forEach(function(e){document.addEventListener(e,autoStart,true);});
-  btn.addEventListener('click',function(e){e.stopPropagation();if(playing)pause();else play();});
-  // ponytail: persist play state across page navigations
-  try{var ss=sessionStorage.getItem('mc-beat');if(ss){var st=JSON.parse(ss);if(st.t)audio.currentTime=st.t;}}catch(e){}
-  window.addEventListener('pagehide',function(){try{sessionStorage.setItem('mc-beat',JSON.stringify({p:playing,t:audio.currentTime}));}catch(e){}});
-})();
-</script>
+<button id="beatBtn" class="beat" aria-label="Toggle background music" aria-pressed="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line class="mute" x1="2" y1="2" x2="22" y2="22"/></svg></button>
+<script src="oblivion/sub.js"></script>
 </body>
 </html>
