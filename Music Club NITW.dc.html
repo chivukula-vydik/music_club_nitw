@@ -289,11 +289,16 @@ canvas.roots{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer
 
 /* wings */
 .wings{list-style:none;display:grid;gap:12px;counter-reset:w}
-.wings li{position:relative;display:grid;grid-template-columns:52px minmax(0,1fr);gap:16px;align-items:start;padding:18px 20px 18px 18px;
-  background:linear-gradient(100deg,rgba(24,32,31,.85),rgba(12,10,9,.85) 55%,rgba(60,8,5,.55));
-  clip-path:polygon(0 6px,6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%);
-  box-shadow:inset 0 0 0 1px rgba(194,64,31,.28);transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
-.wings li:hover{transform:translateX(8px);box-shadow:inset 0 0 0 1px rgba(224,90,53,.8),inset 0 -20px 40px rgba(143,20,14,.35)}
+/* ponytail: same carved-slab look as .rock > .face (collab offers) */
+.wings li{position:relative;display:grid;grid-template-columns:52px minmax(0,1fr);gap:16px;align-items:start;padding:22px 22px 22px 26px;
+  clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px);
+  background:
+    linear-gradient(180deg,rgba(61,86,82,.16),transparent 35%),
+    radial-gradient(120% 90% at 50% 120%,rgba(143,20,14,.42),transparent 62%),
+    linear-gradient(180deg,#141211,#0a0807);
+  box-shadow:inset 0 0 0 1px rgba(194,64,31,.32),inset 0 1px 0 rgba(239,227,208,.08);transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
+.wings li::before{content:"";position:absolute;top:0;left:0;width:23px;height:1px;background:rgba(224,90,53,.7);transform-origin:0 0;transform:translate(0,16px) rotate(-45deg);pointer-events:none}
+.wings li:hover{transform:translateY(-6px);box-shadow:inset 0 0 0 1px rgba(224,90,53,.75),inset 0 -24px 40px rgba(143,20,14,.35)}
 .wings .no{font-family:var(--gothic);font-weight:900;font-size:2rem;line-height:1;color:#e05a35;text-shadow:0 0 14px rgba(194,64,31,.6)}
 .wings h3{font-family:var(--gothic);font-weight:800;font-size:1.45rem;line-height:1.05;color:var(--ivory)}
 .wings p{color:var(--ash);font-size:.95rem;margin-top:4px}
