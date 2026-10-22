@@ -429,6 +429,7 @@ html.film-on,html.film-on body{overflow:hidden}
   .ev .kind{grid-column:3;justify-self:start;grid-row:2}
   .archive li.arch-row{grid-template-columns:56px minmax(0,1fr) 20px;gap:12px}
   .offers{grid-template-columns:minmax(0,1fr)}
+  .offer > .face{min-height:0;justify-content:flex-start;gap:10px;padding:20px 18px}
   .frame .face{aspect-ratio:16/9}
   .ev .detail{flex-direction:column;align-items:flex-start}
   .beat{right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
@@ -974,7 +975,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',
   const id=a.getAttribute('href'); const el=id.length>1?document.querySelector(id):document.body; if(!el) return;
   e.preventDefault();
   const offset=id==='#top'?0:-70;
-  if(!lenis) return el.scrollIntoView({behavior:reduce?'auto':'smooth'});
+  if(!lenis) return scrollTo({top:el.getBoundingClientRect().top+scrollY+offset,behavior:reduce?'auto':'smooth'});
   // long jumps (logo -> top) fade through black instead of racing past every section and the hero scene
   if(Math.abs(el.getBoundingClientRect().top)>innerHeight*2.5){
     veil.classList.add('on');
