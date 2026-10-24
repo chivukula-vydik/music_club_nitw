@@ -609,8 +609,10 @@
 <!-- OBLIVION cancellation notice, Oblivion-styled; shown once per visitor, closing it leaves the old site. Delete this block when no longer needed. -->
 <link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@900&family=Oswald:wght@500&family=Spectral:wght@400&display=swap" rel="stylesheet">
 <style>
-  #obl{box-sizing:border-box;inset:0;width:100%;max-width:none;height:100%;max-height:none;margin:0;border:0;padding:24px 16px;display:none;place-items:center;color:#efe3d0;
-    background:radial-gradient(90% 60% at 50% 110%,rgba(143,20,14,.5),transparent 65%),linear-gradient(rgba(7,6,5,.82),rgba(7,6,5,.94)),url(oblivion/assets/world.webp) center/cover #070605}
+  #obl{box-sizing:border-box;inset:0;width:100%;max-width:none;height:100%;max-height:none;margin:0;border:0;padding:24px 16px;display:none;place-items:center;color:#efe3d0;background:#070605;overflow:hidden}
+  /* the world seen through wet glass: soft behind, sharp only inside the drops */
+  #obl .glass{position:absolute;inset:-24px;pointer-events:none;filter:blur(5px);
+    background:radial-gradient(90% 60% at 50% 110%,rgba(143,20,14,.5),transparent 65%),linear-gradient(rgba(7,6,5,.8),rgba(7,6,5,.93)),url(oblivion/assets/world.webp) center/cover}
   #obl[open]{display:grid}
   #obl::backdrop{background:#070605}
   #obl .c{max-width:440px;text-align:center;animation:oblin .6s cubic-bezier(.2,.7,.2,1) both}
@@ -621,19 +623,33 @@
     filter:drop-shadow(0 0 1px rgba(255,110,60,.9)) drop-shadow(1px 1px 0 #8f140e) drop-shadow(1px 2px 0 #470a06)}
   #obl p{margin:0 0 14px;font:400 1.08rem/1.6 Spectral,Georgia,serif;color:#ddcdbd}
   #obl .s{font-family:Oswald,sans-serif;letter-spacing:.3em;text-transform:uppercase;font-size:.8rem;color:#e05a35}
-  #obl button{margin-top:18px;padding:14px 30px;border:0;cursor:pointer;font:500 .8rem Oswald,sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#efe3d0;
+  #obl .shade{background:linear-gradient(rgba(7,6,5,.55),rgba(7,6,5,.72)),radial-gradient(ellipse 45% 40% at 50% 50%,rgba(8,4,4,.55),transparent 75%),linear-gradient(to top,rgba(120,18,10,.25),transparent 35%)}
+  #obl .rain,#obl .shade,#obl .flash{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  #obl .flash{background:radial-gradient(80% 60% at 50% 0%,rgba(207,232,242,.55),rgba(207,232,242,.12) 60%,transparent);opacity:0}
+  #obl .flash.on{animation:oblflash .9s ease-out}
+  #obl .c{position:relative}
+  #obl .go{margin-top:18px;padding:14px 30px;border:0;cursor:pointer;font:500 .8rem Oswald,sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#efe3d0;
     clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);background:linear-gradient(180deg,#a31a10,#5a0a06);transition:letter-spacing .3s,filter .3s}
-  #obl button:hover,#obl button:focus-visible{letter-spacing:.38em;filter:brightness(1.2)}
+  #obl .snd{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:16px;padding:8px 12px;border:0;cursor:pointer;background:rgba(7,6,5,.6);
+    box-shadow:inset 0 0 0 1px rgba(239,227,208,.3);font:500 .68rem Oswald,sans-serif;letter-spacing:.25em;text-transform:uppercase;color:#9a8f84;transition:color .25s}
+  #obl .snd:hover,#obl .snd[aria-pressed=true]{color:#efe3d0}
+  #obl .go:hover,#obl .go:focus-visible{letter-spacing:.38em;filter:brightness(1.2)}
+  @keyframes oblflash{0%{opacity:0}6%{opacity:1}14%{opacity:.15}22%{opacity:.8}100%{opacity:0}}
   @keyframes oblin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 </style>
 <dialog id="obl" aria-labelledby="obl-t">
+  <div class="glass" aria-hidden="true"></div>
+  <canvas class="rain" aria-hidden="true"></canvas>
+  <div class="shade" aria-hidden="true"></div>
+  <div class="flash" aria-hidden="true"></div>
+  <button type="button" class="snd" aria-pressed="false">Sound off</button>
   <div class="c">
     <span class="k">A quick update</span>
     <h2 id="obl-t">Oblivion is off.</h2>
     <p>Due to unforeseen circumstances, our upcoming music event will not be happening.</p>
     <p>Thank you to everyone who was looking forward to it and supporting us. We truly appreciate it.</p>
     <p class="s">As always, stay tuned!!</p>
-    <button type="button" autofocus>Continue to site</button>
+    <button type="button" class="go" autofocus>Continue to site</button>
   </div>
 </dialog>
 <script>
@@ -641,9 +657,44 @@
   var d=document.getElementById('obl'),k='mc-obl-cancel-seen';
   try{if(localStorage.getItem(k))return}catch(_){}
   d.showModal();
-  d.querySelector('button').onclick=function(){d.close()};
-  d.addEventListener('close',function(){try{localStorage.setItem(k,'1')}catch(_){}});
+  d.querySelector('.go').onclick=function(){d.close()};
+
+  // the rain-on-glass canvas itself is mounted by the module script below (rainGlass.js)
+  var fl=d.querySelector('.flash'),still=matchMedia('(prefers-reduced-motion: reduce)').matches,flash=0;
+
+  // a real storm recording (public domain, "Storm, Thunderbolts" by stephan via Wikimedia Commons / pdsounds.org);
+  // plays on its own where the browser allows it, otherwise from the visitor's first tap/key; the toggle mutes it
+  var sb=d.querySelector('.snd'),storm=new Audio('oblivion/assets/storm.mp3'),
+      claps=[5.5,35.2,52.8,67.9,88.4,107.4],next=0;   // where the thunder hits in the clip, so the lightning can lead it
+  storm.loop=true;storm.preload='auto';storm.volume=.9;
+  function mark(on){sb.setAttribute('aria-pressed',on);sb.textContent=on?'Sound on':'Sound off'}
+  function go(){storm.play().then(function(){mark(true);unhook()}).catch(function(){})}
+  function unhook(){['pointerdown','keydown','touchstart'].forEach(function(e){d.removeEventListener(e,first,true)})}
+  function first(e){if(!sb.contains(e.target))go()}
+  ['pointerdown','keydown','touchstart'].forEach(function(e){d.addEventListener(e,first,true)});
+  go();
+  sb.onclick=function(){unhook();if(storm.paused)go();else{storm.pause();mark(false)}};
+  function bolt(){if(!still){fl.classList.remove('on');void fl.offsetWidth;fl.classList.add('on');flash=1}}
+
+  // lightning: with sound on it flashes just before each real thunderclap; with sound off, every 5-11s
+  var tm=setInterval(function(){
+    if(storm.paused){if(Math.random()<.025)bolt();return}
+    var t=storm.currentTime,c=claps[next%claps.length];
+    if(t<c-1.5&&next>=claps.length)next=0;                               // clip looped back to the start
+    if(t>=c-.35&&t<c+1){bolt();setTimeout(bolt,140+Math.random()*120);next++}
+    else if(t>=c+1)next++;
+  },200);
+
+  d.addEventListener('close',function(){
+    try{localStorage.setItem(k,'1')}catch(_){}
+    clearInterval(tm);unhook();storm.pause();
+  });
 })();
+</script>
+<script type="module">
+import {mountRainGlass} from './rainGlass.js';
+var d=document.getElementById('obl');
+if(d.open)d.addEventListener('close',mountRainGlass(d.querySelector('.rain'),{src:'oblivion/assets/world.webp'}));
 </script>
 <script>if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js")</script>
 <script>
@@ -720,7 +771,9 @@ if(location.hash){var _h=location.hash;var _t=setInterval(function(){var el=docu
   audio.loop=true;
   audio.volume=0.35;
   audio.preload='auto';
-  audio.autoplay=!muted;
+  var obl=document.getElementById('obl');
+  function blocked(){return obl&&obl.open}  // the cancellation notice has its own sound; beat waits until it closes
+  audio.autoplay=!muted&&!blocked();
 
   var btn=document.createElement('button');
   btn.id='mc-music-toggle';
@@ -741,10 +794,11 @@ if(location.hash){var _h=location.hash;var _t=setInterval(function(){var el=docu
   function pause(){audio.pause();playing=false;updateBtn(false);removeAutoStart();try{localStorage.setItem('mc-beat-muted','1');}catch(e){}}
 
   // try autoplay immediately
-  if(!muted)audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});
+  if(!muted&&!blocked())audio.play().then(function(){playing=true;updateBtn(true);}).catch(function(){});
+  if(obl)obl.addEventListener('close',function(){if(!muted&&!playing)audio.play().then(function(){playing=true;updateBtn(true);removeAutoStart();}).catch(function(){});});
   // fallback: play on first interaction
   function autoStart(e){
-    if(playing||btn.contains(e.target))return;
+    if(playing||btn.contains(e.target)||blocked())return;
     audio.play().then(function(){playing=true;updateBtn(true);removeAutoStart();}).catch(function(){});
   }
   // ponytail: only user-activation events — scroll/wheel/touchmove don't unlock audio
