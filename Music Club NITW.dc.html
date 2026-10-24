@@ -624,6 +624,11 @@
   #obl p{margin:0 0 14px;font:400 1.08rem/1.6 Spectral,Georgia,serif;color:#ddcdbd}
   #obl .s{font-family:Oswald,sans-serif;letter-spacing:.3em;text-transform:uppercase;font-size:.8rem;color:#e05a35}
   #obl .shade{background:linear-gradient(rgba(7,6,5,.55),rgba(7,6,5,.72)),radial-gradient(ellipse 45% 40% at 50% 50%,rgba(8,4,4,.55),transparent 75%),linear-gradient(to top,rgba(120,18,10,.25),transparent 35%)}
+  /* phones: the text covers most of the screen, so the full shade buried the drops; lighten it and lean on a text shadow instead */
+  @media(max-width:600px){
+    #obl .shade{background:linear-gradient(rgba(7,6,5,.22),rgba(7,6,5,.4)),linear-gradient(to top,rgba(120,18,10,.2),transparent 35%)}
+    #obl .c{text-shadow:0 1px 3px #070605,0 0 18px rgba(7,6,5,.9)}
+  }
   #obl .rain,#obl .shade,#obl .flash{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
   #obl .flash{background:radial-gradient(80% 60% at 50% 0%,rgba(207,232,242,.55),rgba(207,232,242,.12) 60%,transparent);opacity:0}
   #obl .flash.on{animation:oblflash .9s ease-out}
